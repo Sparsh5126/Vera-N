@@ -29,6 +29,11 @@ abstract final class AppRadius {
     top: Radius.circular(card),
   );
   static const OutlinedBorder pill = StadiumBorder();
+
+  /// Text fields drawn as pills (half of the tap-target height).
+  static const BorderRadius fieldBorder = BorderRadius.all(
+    Radius.circular(AppSize.minTapTarget / 2),
+  );
 }
 
 /// Fixed sizes.
@@ -49,9 +54,19 @@ abstract final class AppSize {
   /// Soft fade above the floating controls at the bottom of Home.
   static const double bottomFade = 96;
 
-  /// Space kept under scrolling content so the floating button never
-  /// covers the last card.
-  static const double floatingClearance = 112;
+  /// Floating pill navigation bar (Home | Search | …).
+  static const double navBarHeight = 64;
+
+  /// Width of each icon pill in the nav bar (wider than tall, so the
+  /// selected one reads as a pill, not a circle).
+  static const double navItemWidth = 64;
+
+  /// Space kept under scrolling content so the nav bar and the floating
+  /// "New note" button never cover the last card.
+  static const double floatingClearance = 168;
+
+  /// Space under lists on screens with the nav bar but no floating button.
+  static const double navBarClearance = 96;
 
   /// Widest a column of text grows on large screens.
   static const double readableWidth = 680;
@@ -73,4 +88,7 @@ abstract final class AppOpacity {
 
   /// Text selection highlight.
   static const double selection = 0.35;
+
+  /// Matched words in search results (amber fill behind normal text).
+  static const double searchMatch = 0.35;
 }

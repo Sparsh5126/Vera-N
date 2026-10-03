@@ -26,10 +26,16 @@ class HomeScreen extends ConsumerWidget {
     void open(int noteRef) => context.push(Routes.note(noteRef));
 
     return Scaffold(
-      floatingActionButton: PillButton(
-        label: AppCopy.newNote,
-        icon: Icons.add,
-        onPressed: () => context.push(Routes.newNote),
+      // Sits just above the floating nav bar, in thumb reach.
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(
+          bottom: AppSize.navBarHeight + AppSpace.s,
+        ),
+        child: PillButton(
+          label: AppCopy.newNote,
+          icon: Icons.add,
+          onPressed: () => context.push(Routes.newNote),
+        ),
       ),
       body: SafeArea(
         bottom: false,

@@ -113,6 +113,8 @@ abstract final class AppCopy {
   static const matches = 'Matches';
   static const similarInMeaning = 'Similar in meaning';
   static const emptySearch = 'No notes found.';
+  static const clearSearch = 'Clear';
+  static const removeRecentSearch = 'Remove';
 
   // Graph (UI spec §10).
   static const emptyGraph = 'Links between your notes will appear here.';

@@ -22,6 +22,7 @@ lib/
 ├── main.dart                      bootstraps services, runs App
 ├── app/
 │   ├── app.dart                   MaterialApp.router, themes, providers scope
+│   ├── app_shell.dart             tab screens + floating pill nav bar
 │   └── router.dart                route table (go_router)
 ├── core/
 │   ├── styles/

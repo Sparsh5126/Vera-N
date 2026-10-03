@@ -158,26 +158,6 @@ class NotesRepository {
     if (!fileKept) _writer.schedule();
   }
 
-  /// Keyword search over title and body; each word matches as a prefix.
-  Future<List<NoteSummary>> search(String query, {int limit = 50}) async {
-    final terms = query
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((t) => t.isNotEmpty)
-        .map((t) => '"${t.replaceAll('"', '""')}"*');
-    if (terms.isEmpty) return const [];
-    final rows = await _db
-        .customSelect(
-          'SELECT n.* FROM notes_fts f JOIN notes n ON n.id = f.rowid '
-          'WHERE notes_fts MATCH ? AND n.trashed_at IS NULL '
-          'ORDER BY f.rank LIMIT ?',
-          variables: [Variable(terms.join(' ')), Variable(limit)],
-          readsFrom: {_db.notes},
-        )
-        .get();
-    return [for (final r in rows) NoteRows.toSummary(_db.notes.map(r.data))];
-  }
-
   /// Writes the header with [change] applied. A headerless note gets its
   /// `id` header here, on the first change that must persist.
   Future<void> _changeHeader(

@@ -5,6 +5,22 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Search (keyword)**, UI spec §9.
+  - The keyboard opens when the tab opens.
+  - Matches appear as you type, with no debounce and no spinner; a result that arrives after a newer query is dropped.
+  - Matched words get a soft amber fill behind normal-color text, in the title and in a short passage. Results are always one column.
+  - "No notes found." when nothing matches.
+  - Recent searches (up to 8, kept on this device) can be tapped or removed. A search is remembered when a result is opened or the keyboard's search key is pressed.
+  - Not yet built: the Folder, Tag and Date filters (next change), and "Similar in meaning" (embeddings stage).
+- **Floating pill navigation bar** (`PillNavBar`), UI spec §3: Home | Search for now. Graph and Settings join when those screens exist, so there are no dead tabs.
+  - Icons only, each on the same fixed-size pill (`navItemWidth` 64 by 48); the current tab's pill is amber. Names are read by screen readers and shown on long press. (Changed after review on device: showing the selected tab's name made its pill a different shape from the others.)
+  - The bar steps aside while the keyboard is open, and notes open above it, full screen.
+  - Back from Search goes Home first.
+  - "New note" floats just above the bar.
+- `SearchRepository`, split out of `NotesRepository` (which was over 250 lines): FTS5 `highlight()` and `snippet()` with control-character marks, parsed into `MarkedText` ranges. The query builder quotes every word, so typed operators (`OR`, `NEAR`, `*`, quotes) are just text.
+- Shared widgets `HighlightedText` and `PillNavBar`; tokens `navBarHeight`, `navBarClearance`, `fieldBorder`, `searchMatch` opacity.
+- Test helper `AppHarness`, now used by every app-level widget test instead of copied setup.
+- Tests: search repository (prefix, Hindi, highlights, odd input), recent searches, and Search screen widget tests (focus, matches, empty result, recent searches, back to Home). 109 tests in total.
 - **Capture entry point.**
   - The `com.example.vera_n.NEW_NOTE` intent starts the app straight in a blank note with the cursor ready, skipping onboarding (UI spec §5). Used now by the app-icon shortcut "New note"; the widgets and the Quick Settings tile will reuse it.
   - If the app is already running, the intent opens a new note on top.

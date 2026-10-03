@@ -158,25 +158,4 @@ void main() {
     final row = await h.row(ref);
     expect(h.store.text(row.path), endsWith('Only in the database'));
   });
-
-  group('search', () {
-    test('prefix match on each word, Hindi and English', () async {
-      final a = await h.repo.create('आज की बात\nmessages at night');
-      final b = await h.repo.create('कहानी\nmessages cause it');
-      expect((await h.repo.search('mess')).map((n) => n.ref).toSet(), {a, b});
-      expect((await h.repo.search('कहा')).map((n) => n.ref), [b]);
-      expect((await h.repo.search('mess night')).map((n) => n.ref), [a]);
-    });
-
-    test('follows edits and trash; odd input is safe', () async {
-      final a = await h.repo.create('alpha');
-      await h.repo.updateBody(a, 'beta');
-      expect(await h.repo.search('alpha'), isEmpty);
-      expect((await h.repo.search('beta')).map((n) => n.ref), [a]);
-      await h.repo.trash(a);
-      expect(await h.repo.search('beta'), isEmpty);
-      expect(await h.repo.search('  '), isEmpty);
-      expect(await h.repo.search('"a" OR (b* NEAR'), isEmpty);
-    });
-  });
 }
