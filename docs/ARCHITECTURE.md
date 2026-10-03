@@ -31,6 +31,8 @@ lib/
 │   ├── feedback/
 │   │   ├── haptics.dart           named haptic events, respects system settings
 │   │   └── motion.dart            reduce-motion aware helpers (durations come from app_styles)
+│   ├── platform/
+│   │   └── launch_channel.dart    capture entry points and startup timing (Android bridge)
 │   ├── navigation/
 │   │   └── routes.dart            route names/paths (features navigate by name, never import each other)
 │   ├── models/                    plain immutable data: Note, Chunk, Suggestion, Rejection, Relationship, Topic

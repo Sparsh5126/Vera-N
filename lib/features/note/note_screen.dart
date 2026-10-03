@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/copy/app_copy.dart';
 import '../../core/models/note.dart';
+import '../../core/navigation/routes.dart';
+import '../../core/platform/launch_channel.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../core/styles/app_styles.dart';
 import 'state/note_editor_controller.dart';
@@ -40,6 +42,10 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     final noteRef = widget.noteRef;
     if (noteRef == null) {
       _text = TitledTextController();
+      // First frame with the focused editor: the cursor is ready to type.
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => unawaited(LaunchChannel.logTypingReady()),
+      );
     } else {
       unawaited(repo.getNote(noteRef).then(_loaded));
     }
@@ -64,7 +70,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     final repo = ref.read(notesRepositoryProvider);
     final trashed = await _editor.trash();
     if (!mounted) return;
-    context.pop();
+    _leave();
     if (trashed == null) return;
     messenger.showSnackBar(
       SnackBar(
@@ -76,6 +82,16 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
         ),
       ),
     );
+  }
+
+  /// Back to where the user came from, or Home when the note was opened
+  /// straight from a capture shortcut.
+  void _leave() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(Routes.home);
+    }
   }
 
   @override
@@ -109,7 +125,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
         return NoteTopBar(
           saves: _editor.saves,
           pinned: pinned,
-          onBack: () => context.pop(),
+          onBack: _leave,
           onPinChanged: noteRef == null
               ? null
               : (value) => unawaited(_editor.setPinned(value)),

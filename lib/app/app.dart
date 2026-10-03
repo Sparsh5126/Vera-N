@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/copy/app_copy.dart';
+import '../core/navigation/routes.dart';
+import '../core/platform/launch_channel.dart';
 import '../core/storage/storage_providers.dart';
 import '../core/styles/app_styles.dart';
 import 'router.dart';
@@ -35,6 +37,18 @@ class _AppState extends ConsumerState<App> {
       onPause: storage.onPause,
       onResume: storage.onResume,
     );
+    LaunchChannel.listen(
+      onNewNote: () => _router.push(Routes.newNote),
+      onWindowFocused: _showKeyboardIfTyping,
+    );
+  }
+
+  /// On a cold start into a new note the editor is focused before Android
+  /// lets the app show the keyboard. Once the window has focus, ask again.
+  void _showKeyboardIfTyping() {
+    final editor = FocusManager.instance.primaryFocus?.context
+        ?.findAncestorStateOfType<EditableTextState>();
+    editor?.requestKeyboard();
   }
 
   @override

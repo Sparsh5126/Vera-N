@@ -5,6 +5,16 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Capture entry point.**
+  - The `com.example.vera_n.NEW_NOTE` intent starts the app straight in a blank note with the cursor ready, skipping onboarding (UI spec §5). Used now by the app-icon shortcut "New note"; the widgets and the Quick Settings tile will reuse it.
+  - If the app is already running, the intent opens a new note on top.
+  - Back from a captured note goes Home; Android's own back gesture leaves the app (open, write, close).
+- **Startup timing log** (`LaunchBridge.kt`, `LaunchChannel`): profile and debug builds log "VeraN startup: N ms to typing cursor" once per process, measured from process start to the first frame with the focused editor. It stays on the device (`adb logcat`); release builds log nothing.
+- Widget tests: capture opens a focused blank note even on first launch; Back goes Home with the note saved. 99 tests in total.
+- **Startup measured (baseline, before any startup changes):** profile build on the test phone (model A063, Android 15), cold start through the `NEW_NOTE` intent. Runs 2–8, first run discarded: 541, 489, 477, 477, 479, 479, 466 ms. **Median 479 ms** from process start to typing cursor. The target is about 1 s; this doesn't include the launcher's tap handling or the keyboard's slide-up animation.
+  - Breakdown (temporary probe, not committed): about 390 ms passes before Dart's `main()` runs (Flutter engine start, not under our control), 40–50 ms in `main()` (storage, folder and onboarding checks), and 60–65 ms to the first frame with the cursor. Decision: **no startup rework.** Drawing before storage is ready would save at most about 45 ms and would make every file operation wait on startup.
+  - Later samples (phone charging, 35 °C): median about 630 ms. An A/B round with and without the keyboard fix measured the same (about 630 vs 640 ms), so the fix costs nothing. The shift from 479 ms is in something both builds share, most likely the phone's state; the launch-colors change was in both builds and wasn't isolated. Still well under the target.
+
 - **Notes folder you can see (Android).** A Kotlin bridge (`NotesFolderBridge.kt`, `SafDocuments.kt`) uses Android's own folder picker and keeps the permission across restarts. No storage permission is requested. File work runs on one background thread, and each folder is listed with one query.
 - `SafNoteFileStore`, plus `SwitchingNoteFileStore` so the app can change folders while running. `FolderAccess` keeps this testable without Android.
 - **Choosing a folder** moves notes from the in-app holding folder into `<picked>/Notes/`. Notes already there (a reinstall or a synced folder) are kept and indexed. A same-named file with different text is never overwritten.
@@ -14,10 +24,12 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - 14 new tests, 97 in total: folder choose, reconnect, access lost, name clash, migration from version 1, the onboarding screen, the empty-folder guard, restore of a missing file, and colons in note names.
 
 ### Changed
+- The Android launch screen and the window behind the app use the app background (`#F7F6F3` light, `#0B0B0C` dark) instead of white or black, so there's no flash at start, especially in dark mode.
 - UI spec §4: the folder screen now says "or make a new one such as "Vera N" in Documents", because Android's picker can't be pre-filled with a new folder name.
 - The path check is shared by both file stores. Note names with `:` (for example `2:17 AM.md`) are allowed.
 
 ### Fixed
+- **Keyboard didn't open on a cold start into a new note.** The editor was focused, but Flutter asked for the keyboard before the app's window had input focus, and Android ignored the request. Now, the first time the window gains focus, the app asks again if a text field is focused. This happens once per launch, so a keyboard you dismissed doesn't pop back. Verified on the phone: 4 of 4 cold starts show the keyboard; Home without capture doesn't.
 - Restoring a trashed note whose file is gone (for example left in another folder) now writes the file again from the database.
 - The indexer no longer empties the index when the notes folder is unavailable. If the folder lists as empty while more than one note was indexed, nothing is removed.
 

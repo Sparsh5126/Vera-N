@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shown before Flutter's first frame. Mirrors the app background in
+         lib/core/styles/app_palette.dart (light), so there is no flash. -->
+    <color name="launch_background">#F7F6F3</color>
+</resources>
