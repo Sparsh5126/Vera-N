@@ -13,8 +13,9 @@ import '../files/note_header_codec.dart';
 import '../files/note_id.dart';
 import '../files/note_text.dart';
 import '../indexer/note_writer.dart';
+import 'note_placement.dart';
 
-/// Create, read, update and trash notes.
+/// Create, read, update, tag, pin, move and trash notes.
 ///
 /// Every change lands in the database at once (the UI never waits on
 /// files); [NoteWriter] writes the file shortly after.
@@ -26,15 +27,24 @@ class NotesRepository {
     DateTime Function()? clock,
     Random? random,
   }) : _clock = clock ?? DateTime.now,
-       _random = random ?? Random.secure();
+       _random = random ?? Random.secure() {
+    _placement = NotePlacement(
+      _db,
+      _store,
+      _writer,
+      clock: _clock,
+      random: _random,
+    );
+  }
 
-  static const trashFolder = '.trash';
+  static const trashFolder = NotePlacement.trashFolder;
 
   final AppDatabase _db;
   final NoteFileStore _store;
   final NoteWriter _writer;
   final DateTime Function() _clock;
   final Random _random;
+  late final NotePlacement _placement;
 
   /// Notes not in the trash, most recently changed first.
   Stream<List<NoteSummary>> watchNotes() {
@@ -115,48 +125,16 @@ class NotesRepository {
     await NoteRows.replaceTags(_db, ref, tags);
   }
 
-  /// Moves the note's file into `.trash/` and hides the note. The file is
-  /// kept, so the note survives uninstall and can be restored.
-  Future<void> trash(int ref) async {
-    await _writer.flush();
-    final row = await _row(ref).getSingleOrNull();
-    if (row == null || row.trashedAt != null) return;
-    var target = '$trashFolder/${row.path}';
-    if (await _pathTaken(target)) target = _withSuffix(target);
-    if (row.fileModifiedMs != null && await _store.exists(row.path)) {
-      await _store.move(row.path, target);
-    }
-    await _update(ref).write(
-      NotesCompanion(
-        path: Value(target),
-        pathKey: Value(NoteRows.pathKey(target)),
-        trashedAt: Value(_clock()),
-      ),
-    );
-  }
+  /// Moves the note's file into `.trash/`; the file is kept for undo.
+  Future<void> trash(int ref) => _placement.trash(ref);
 
-  /// Brings a trashed note back to where it was (undo for [trash]).
-  Future<void> restore(int ref) async {
-    final row = await _row(ref).getSingleOrNull();
-    if (row == null || row.trashedAt == null) return;
-    var target = row.path.substring(trashFolder.length + 1);
-    if (await _pathTaken(target)) target = _withSuffix(target);
-    final fileKept = await _store.exists(row.path);
-    if (fileKept) await _store.move(row.path, target);
-    await _update(ref).write(
-      NotesCompanion(
-        path: Value(target),
-        pathKey: Value(NoteRows.pathKey(target)),
-        folder: Value(NoteRows.folderOf(target)),
-        trashedAt: const Value(null),
-        // File gone (e.g. left in another folder): write it from here.
-        pendingWrite: fileKept ? const Value.absent() : const Value(true),
-        fileModifiedMs: fileKept ? const Value.absent() : const Value(null),
-        fileSize: fileKept ? const Value.absent() : const Value(null),
-      ),
-    );
-    if (!fileKept) _writer.schedule();
-  }
+  /// Undo for [trash].
+  Future<void> restore(int ref) => _placement.restore(ref);
+
+  /// Moves the note into [folder] (`''` is the top level). Returns the
+  /// folder it was in, for undo.
+  Future<String?> moveToFolder(int ref, String folder) =>
+      _placement.moveToFolder(ref, folder);
 
   /// Writes the header with [change] applied. A headerless note gets its
   /// `id` header here, on the first change that must persist.
@@ -182,7 +160,10 @@ class NotesRepository {
       extra.copyWith(
         noteId: Value(header.id),
         headerRaw: Value(doc.headerLines!.join('\n')),
+        // Changes only if a leading `---` block wasn't a valid header.
         body: Value(doc.body),
+        title: Value(NoteText.title(doc.body)),
+        contentHash: Value(NoteText.contentHash(doc.body)),
       ),
     );
   }
@@ -208,25 +189,12 @@ class NotesRepository {
     while (true) {
       final id = NoteId.generate(now, random: _random);
       final name = NoteId.fileName(id);
-      if (!await _pathTaken(folder.isEmpty ? name : '$folder/$name')) {
+      if (!await _placement.pathTaken(
+        folder.isEmpty ? name : '$folder/$name',
+      )) {
         return id;
       }
     }
-  }
-
-  /// In use by another note (any letter case) or by a file on disk.
-  Future<bool> _pathTaken(String path) async {
-    final row =
-        await (_db.select(_db.notes)
-              ..where((n) => n.pathKey.equals(NoteRows.pathKey(path))))
-            .getSingleOrNull();
-    return row != null || await _store.exists(path);
-  }
-
-  /// `a/b.md` → `a/b-3f9c.md`, for the rare name clash in trash or restore.
-  String _withSuffix(String path) {
-    final hex = _random.nextInt(0x10000).toRadixString(16).padLeft(4, '0');
-    return path.replaceFirst(RegExp(r'\.md$'), '-$hex.md');
   }
 
   Future<String> _freeAdoptedId(DateTime created) async {

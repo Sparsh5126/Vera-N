@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../core/storage/repositories/notes_repository.dart';
+import '../../../core/utils/names.dart';
 import '../../../core/utils/timings.dart';
 
 /// Autosave for the note editor. There is no save button: text is saved
@@ -45,6 +46,39 @@ class NoteEditorController {
     await save();
     final ref = noteRef.value;
     if (ref != null) await _repo.setPinned(ref, pinned);
+  }
+
+  /// Adds a tag the user typed or picked. Returns false if nothing usable.
+  Future<bool> addTag(String input, List<String> current) async {
+    final tag = Names.tag(input);
+    final ref = noteRef.value;
+    if (tag == null || ref == null) return false;
+    final exists = current.any((t) => t.toLowerCase() == tag.toLowerCase());
+    if (!exists) await _repo.setTags(ref, [...current, tag]);
+    return true;
+  }
+
+  Future<void> removeTag(String tag, List<String> current) async {
+    final ref = noteRef.value;
+    if (ref == null) return;
+    await _repo.setTags(ref, [
+      for (final t in current)
+        if (t != tag) t,
+    ]);
+  }
+
+  Future<void> setTags(List<String> tags) async {
+    final ref = noteRef.value;
+    if (ref != null) await _repo.setTags(ref, tags);
+  }
+
+  /// Moves the note to [folder] (`''` is no folder). Returns the folder it
+  /// was in, for undo; null if nothing moved.
+  Future<String?> moveToFolder(String folder) async {
+    await save();
+    final ref = noteRef.value;
+    if (ref == null) return null;
+    return _repo.moveToFolder(ref, folder);
   }
 
   /// Moves the note to the trash. Returns its ref for undo, or null if

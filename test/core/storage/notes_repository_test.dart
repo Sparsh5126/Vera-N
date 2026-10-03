@@ -158,4 +158,75 @@ void main() {
     final row = await h.row(ref);
     expect(h.store.text(row.path), endsWith('Only in the database'));
   });
+
+  group('move to folder', () {
+    test('moves the file, keeps its name, returns the old folder', () async {
+      final ref = await h.repo.create('Move me');
+      await h.writer.flush();
+      final before = await h.row(ref);
+      expect(await h.repo.moveToFolder(ref, 'Ideas/Story'), '');
+      final after = await h.row(ref);
+      expect(after.path, 'Ideas/Story/${before.path}');
+      expect(after.folder, 'Ideas/Story');
+      expect(h.store.text(before.path), isNull);
+      expect(h.store.text(after.path), endsWith('Move me'));
+      expect(after.fileModifiedMs, isNotNull);
+    });
+
+    test('undo moves it back', () async {
+      final ref = await h.repo.create('x', folder: 'A');
+      await h.writer.flush();
+      final old = await h.repo.moveToFolder(ref, 'B');
+      await h.repo.moveToFolder(ref, old!);
+      expect((await h.row(ref)).folder, 'A');
+    });
+
+    test('a name clash gets a suffix, nothing is overwritten', () async {
+      final ref = await h.repo.create('mine');
+      await h.writer.flush();
+      final name = (await h.row(ref)).path;
+      h.store.put('B/$name', 'already there');
+      await h.repo.moveToFolder(ref, 'B');
+      final path = (await h.row(ref)).path;
+      expect(path, isNot('B/$name'));
+      expect(h.store.text('B/$name'), 'already there');
+      expect(h.store.text(path), endsWith('mine'));
+    });
+
+    test('an unsaved note moves before its file exists', () async {
+      final ref = await h.repo.create('not written yet');
+      await h.repo.moveToFolder(ref, 'Later');
+      await h.writer.flush();
+      final row = await h.row(ref);
+      expect(row.folder, 'Later');
+      expect(h.store.text(row.path), endsWith('not written yet'));
+    });
+
+    test('the indexer does not re-read a moved file', () async {
+      final ref = await h.repo.create('quiet');
+      await h.writer.flush();
+      await h.repo.moveToFolder(ref, 'C');
+      final reads = h.store.reads;
+      final report = await h.indexer.reconcile();
+      expect(report.unchanged, 1);
+      expect(h.store.reads, reads);
+    });
+  });
+
+  test(
+    'a header change that keeps a stray --- block updates the title',
+    () async {
+      const text = '---\njust a line\n---\nrest';
+      h.store.put('a.md', text);
+      await h.indexer.reconcile();
+      final ref = (await h.db.select(h.db.notes).get()).single.id;
+      // Indexed as a headerless note whose first line is "---".
+      expect((await h.row(ref)).title, '---');
+      await h.repo.setPinned(ref, true);
+      final row = await h.row(ref);
+      expect(row.body, text);
+      expect(row.title, '---');
+      expect(row.contentHash, isNotEmpty);
+    },
+  );
 }

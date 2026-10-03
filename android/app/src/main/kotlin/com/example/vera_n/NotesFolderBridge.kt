@@ -33,7 +33,9 @@ class NotesFolderBridge(private val activity: Activity) : MethodChannel.MethodCa
             val reply = runCatching { run(call) }
             main.post {
                 reply.fold(
-                    onSuccess = { result.success(it) },
+                    // Calls with no result (move, delete) return Unit, which
+                    // the channel can't send: reply null instead.
+                    onSuccess = { result.success(if (it is Unit) null else it) },
                     onFailure = { result.error("io", it.message, null) },
                 )
             }

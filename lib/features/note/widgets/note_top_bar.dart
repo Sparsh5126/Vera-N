@@ -13,6 +13,7 @@ class NoteTopBar extends StatelessWidget {
     required this.pinned,
     required this.onBack,
     required this.onPinChanged,
+    required this.onMove,
     required this.onDelete,
   });
 
@@ -22,6 +23,9 @@ class NoteTopBar extends StatelessWidget {
 
   /// Null while the note doesn't exist yet (nothing typed).
   final ValueChanged<bool>? onPinChanged;
+
+  /// Null while the note doesn't exist yet.
+  final VoidCallback? onMove;
   final VoidCallback onDelete;
 
   @override
@@ -45,10 +49,15 @@ class NoteTopBar extends StatelessWidget {
             icon: const Icon(Icons.push_pin_outlined),
             selectedIcon: const Icon(Icons.push_pin),
           ),
-          PopupMenuButton<VoidCallback>(
+          PopupMenuButton<VoidCallback?>(
             tooltip: AppCopy.moreOptions,
-            onSelected: (action) => action(),
+            onSelected: (action) => action?.call(),
             itemBuilder: (_) => [
+              PopupMenuItem(
+                value: onMove,
+                enabled: onMove != null,
+                child: const Text(AppCopy.moveToFolder),
+              ),
               PopupMenuItem(value: onDelete, child: const Text(AppCopy.delete)),
             ],
           ),

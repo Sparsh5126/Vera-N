@@ -32,7 +32,7 @@ abstract final class NoteRows {
     required int fileSize,
     DateTime? knownCreated,
   }) {
-    final doc = NoteDocument.parse(text);
+    final doc = NoteHeaderCodec.normalize(NoteDocument.parse(text));
     final header = NoteHeaderCodec.read(doc);
     return NotesCompanion(
       noteId: Value(header.id),

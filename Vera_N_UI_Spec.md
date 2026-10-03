@@ -251,6 +251,8 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 - Typing `[[` opens a note picker for manual links.
 
 **Below the text** (visible only when not typing; empty sections hidden)
+- **Tags (built 2026-10-03):** a note with no tags shows only a small "+ Add tag" button, no heading. "Add tag" opens a sheet with a name field and the user's existing tags listed first (filtered as they type), so tags get reused rather than near-duplicated. Typed tags lose a leading `#` and spaces become `-` (Obsidian tags can't hold spaces). Tapping a solid tag offers "Remove #tag", followed by an Undo snackbar.
+- **Move to folder (built 2026-10-03):** ⋮ → a sheet with "No folder", the existing folders, and "New folder" (typed; `/` makes subfolders). The file keeps its name; an Undo snackbar follows. Disabled until a new note has text.
 - **Tags:** one row. Solid chips are confirmed tags (user-made or approved). Dimmed chips (no fill, dashed outline at about 55% opacity, readable secondary-text label) are AI-suggested tags waiting for approval. Tapping a dimmed tag opens the suggestion sheet (accept, reject, or close for not sure). The user can also add a tag by hand.
 - **Linked:** solid chips for links the user made or approved.
 - **Suggested links:** dimmed chips for AI link suggestions. Tapping opens the suggestion sheet.

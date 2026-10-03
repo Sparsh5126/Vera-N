@@ -29,11 +29,7 @@ abstract final class NoteHeaderCodec {
   /// false`). If the file starts with `---` but isn't a valid header, that
   /// text is kept as part of the body and a new header is put in front.
   static NoteDocument write(NoteDocument doc, NoteHeader header) {
-    var base = doc;
-    final lines = doc.headerLines;
-    if (lines != null && lines.isNotEmpty && _parseMap(lines) == null) {
-      base = NoteDocument(headerLines: null, body: doc.serialize());
-    }
+    final base = normalize(doc);
     final values = _values(header);
     final out = <String>[];
     final written = <String>{};
@@ -59,6 +55,19 @@ abstract final class NoteHeaderCodec {
       }
     }
     return base.withHeaderLines(out);
+  }
+
+  /// A leading `---` block that isn't a valid header (for example a
+  /// horizontal rule) is note text: fold it back into the body so it is
+  /// shown and edited like any other text.
+  static NoteDocument normalize(NoteDocument doc) {
+    final lines = doc.headerLines;
+    if (lines == null || lines.isEmpty || _parseMap(lines) != null) return doc;
+    return NoteDocument(
+      headerLines: null,
+      body: doc.serialize(),
+      newline: doc.newline,
+    );
   }
 
   static Map<String, String?> _values(NoteHeader h) => {

@@ -5,6 +5,17 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Note view: tags** (UI spec §7, details written into the spec).
+  - Solid tag chips below the text, plus an "Add tag" button.
+  - The add sheet lists existing tags first, so they get reused.
+  - Tapping a tag offers to remove it, with Undo.
+  - The details area hides while typing (editor focused and keyboard up).
+  - A tap below the text starts editing at the end.
+- **Move to folder** from the ⋮ menu: no folder, an existing one, or a new one typed with `/` for subfolders. The file name never changes; a name clash gets a suffix; Undo is offered.
+- `NotePlacement` (trash, restore, move to folder) split out of `NotesRepository`. After a move it records the file's new time and size, so the folder check doesn't re-read a file the app just moved.
+- `Names` rules for typed tags and folders.
+- Shared widgets `NoteChip` (solid, or dimmed with a dashed outline, ready for AI suggestions), `DashedPillBorder` and `TextEntrySheet`.
+- Tests: 13 new (moving, name rules, the header fix, tag and folder flows with Undo). 133 in total.
 - **Search filters: Folder, Tag, Date** (UI spec §9, behaviour decided 2026-10-03 and written into the spec).
   - Each pill holds one value from a bottom sheet; the first row clears it. A set pill is solid amber with its value.
   - Folder includes subfolders (letter case ignored). Tag is one confirmed tag. Date is Today, Last 7 days, Last 30 days or This year, by last-changed date.
@@ -52,6 +63,9 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - The path check is shared by both file stores. Note names with `:` (for example `2:17 AM.md`) are allowed.
 
 ### Fixed
+- **Crash on move or delete in the chosen notes folder (Android).** The Kotlin bridge replied to calls with no result (`move`, `delete`) with Kotlin's `Unit`, which Flutter's channel can't encode, so the app crashed on the main thread right after the file work finished. This hit Move to folder, Delete and Undo. It now replies `null`. Found on the phone from `adb logcat -b crash`. Tests missed it because they use an in-memory folder in place of the bridge. The completed moves were re-matched on restart, so no notes were lost.
+- A note starting with a `---` block that isn't a valid header (for example a horizontal rule) was indexed as if the block were a header: its lines were hidden from the text and the title came from the wrong line. Indexing and header writing now share one rule, `NoteHeaderCodec.normalize`: such a block is note text.
+- After a header change (pin, tags), the title and content hash are now recomputed when the text changed.
 - Bottom sheets opened from a tab screen slid under the floating nav bar, which covered and swallowed taps on their last rows. Sheets now open above the bar. Caught by a widget test before reaching the phone.
 - A search result for a one-line note repeated the title as its passage; the repeat is now hidden.
 - **Keyboard didn't open on a cold start into a new note.** The editor was focused, but Flutter asked for the keyboard before the app's window had input focus, and Android ignored the request. Now, the first time the window gains focus, the app asks again if a text field is focused. This happens once per launch, so a keyboard you dismissed doesn't pop back. Verified on the phone: 4 of 4 cold starts show the keyboard; Home without capture doesn't.
