@@ -4,17 +4,20 @@ import 'package:flutter/material.dart';
 
 import '../../../core/copy/app_copy.dart';
 import '../../../core/models/note.dart';
+import '../../../core/storage/repositories/links_repository.dart';
+import '../../../core/storage/repositories/notes_repository.dart';
 import '../../../core/storage/repositories/search_repository.dart';
 import '../../../core/styles/app_styles.dart';
 import '../../../core/utils/names.dart';
 import '../../../shared/widgets/option_sheet.dart';
 import '../../../shared/widgets/text_entry_sheet.dart';
 import '../state/note_editor_controller.dart';
+import 'note_picker_sheet.dart';
 
-/// The Note screen's sheets: add or remove a tag, move to a folder. Every
-/// change offers Undo instead of asking for confirmation first.
+/// The Note screen's sheets: link to a note, add or remove a tag, move to
+/// a folder. Changes offer Undo instead of asking for confirmation first.
 class NoteActions {
-  NoteActions(this._editor, this._library);
+  NoteActions(this._editor, this._library, this._links, this._notes);
 
   /// Picked in the folder sheet to type a new folder name.
   static const _newFolder = '\u0000new';
@@ -23,6 +26,20 @@ class NoteActions {
 
   /// Existing folders and tags, offered before inventing new ones.
   final SearchRepository _library;
+  final LinksRepository _links;
+  final NotesRepository _notes;
+
+  /// After `[[` is typed: pick a note and get the link text to insert, or
+  /// null if the user backed out (the `[[` stays as typed).
+  Future<String?> pickLink(BuildContext context, int? currentRef) async {
+    final notes = await _notes.allNotes();
+    if (!context.mounted) return null;
+    final picked = await NotePickerSheet.show(context, [
+      for (final n in notes)
+        if (n.ref != currentRef) n,
+    ]);
+    return picked == null ? null : _links.linkTextFor(picked);
+  }
 
   Future<void> addTag(BuildContext context, Note note) async {
     final existing = await _library.tags();

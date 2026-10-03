@@ -215,6 +215,10 @@ Raised by the storage stage — **built as proposed, easy to change; please conf
 - Links use the file name, adding the folder path only when the name is ambiguous.
 - When a headerless note is adopted, it gets a newly generated id in the usual form (`20261003-153228-a7f3`). Its file is never renamed, so for these notes the id and the file name differ. `created` is taken from the file's modified time, the best date available.
 
+**Links** (built 2026-10-03)
+- A `links` table (schema 3) holds every `[[link]]` in each note's text: source note, target key (file name or path, lower case, no `.md`), position, label. It is rebuilt from the text on every save and index, so it is always derivable from the files.
+- Notes carry a `name_key` (file name without `.md`, lower case). A link matches a note by `name_key`, or by `path_key` when it includes a folder. Unresolved links are kept but not shown.
+
 **Database location and `.app/`** (decided 2026-10-03)
 - The database lives in app-private storage; it is an index and rebuilds from `Notes/` and `.app/`.
 - `MyNotes/.app/` keeps only what must survive uninstall and sync. Rejections: one append-only `rejections-<deviceid>.jsonl` per device, read by all devices, holding note ids and content hashes only, never note text. Suggestions are not saved as files; laptop suggestions arrive as files and are imported. Settings stay private.

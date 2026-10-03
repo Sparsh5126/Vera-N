@@ -6,6 +6,7 @@ import '../../models/note_header.dart';
 import '../../models/note_summary.dart';
 import '../files/note_document.dart';
 import '../files/note_header_codec.dart';
+import '../files/note_links.dart';
 import '../files/note_text.dart';
 import 'app_database.dart';
 
@@ -38,6 +39,7 @@ abstract final class NoteRows {
       noteId: Value(header.id),
       path: Value(path),
       pathKey: Value(pathKey(path)),
+      nameKey: Value(NoteLinks.nameKey(path)),
       folder: Value(folderOf(path)),
       title: Value(NoteText.title(doc.body)),
       body: Value(doc.body),
@@ -83,7 +85,8 @@ abstract final class NoteRows {
       noteId: row.noteId,
       path: row.path,
       folder: row.folder,
-      title: row.title,
+      // Titles stored before links were shown as titles may hold markup.
+      title: NoteLinks.displayText(row.title),
       body: row.body,
       tags: tagsOf(row.headerRaw),
       pinned: row.pinned,
@@ -96,7 +99,8 @@ abstract final class NoteRows {
   static NoteSummary toSummary(NoteRow row) {
     return NoteSummary(
       ref: row.id,
-      title: row.title,
+      // Titles stored before links were shown as titles may hold markup.
+      title: NoteLinks.displayText(row.title),
       preview: NoteText.preview(
         row.body.characters.take(previewLength).toString(),
       ),
@@ -104,6 +108,42 @@ abstract final class NoteRows {
       modified: row.modified,
       folder: row.folder,
     );
+  }
+
+  /// Path columns for a note at [path] (where it lives and how links and
+  /// lookups find it).
+  static NotesCompanion placedAt(String path) => NotesCompanion(
+    path: Value(path),
+    pathKey: Value(pathKey(path)),
+    nameKey: Value(NoteLinks.nameKey(path)),
+    folder: Value(folderOf(path)),
+  );
+
+  /// Replaces the link rows of note [ref] with the links in [body].
+  static Future<void> replaceLinks(AppDatabase db, int ref, String body) async {
+    await (db.delete(db.links)..where((l) => l.source.equals(ref))).go();
+    final links = NoteLinks.parse(body);
+    await db.batch((b) {
+      b.insertAll(db.links, [
+        for (var i = 0; i < links.length; i++)
+          LinksCompanion.insert(
+            source: ref,
+            targetKey: links[i].targetKey,
+            position: i,
+            label: Value(links[i].label),
+          ),
+      ]);
+    });
+  }
+
+  /// Schema 3 migration: name keys and links for notes indexed before.
+  static Future<void> backfillLinks(AppDatabase db) async {
+    for (final row in await db.select(db.notes).get()) {
+      await (db.update(db.notes)..where((n) => n.id.equals(row.id))).write(
+        NotesCompanion(nameKey: Value(NoteLinks.nameKey(row.path))),
+      );
+      await replaceLinks(db, row.id, row.body);
+    }
   }
 
   /// Replaces the tag rows of note [ref] with [tags].

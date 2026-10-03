@@ -248,13 +248,15 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 - Title is optional; if empty, the first line becomes the title.
 - New notes open with the keyboard up. Existing notes open showing the text; tap anywhere to edit. No separate edit mode.
 - Formatting is hidden until text is selected. A slim row above the keyboard offers bold, list, checklist, attach, and a `[[ ]]` link button.
-- Typing `[[` opens a note picker for manual links.
+- Typing `[[` opens a note picker for manual links (built 2026-10-03). Picking a note replaces the `[[` with `[[file-name|Title]]` (folder path added only when two notes share a file name); backing out leaves `[[` as typed. Links resolve by file name, like Obsidian, so a hand-typed `[[Some Title]]` only links if a file has that name.
 
 **Below the text** (visible only when not typing; empty sections hidden)
 - **Tags (built 2026-10-03):** a note with no tags shows only a small "+ Add tag" button, no heading. "Add tag" opens a sheet with a name field and the user's existing tags listed first (filtered as they type), so tags get reused rather than near-duplicated. Typed tags lose a leading `#` and spaces become `-` (Obsidian tags can't hold spaces). Tapping a solid tag offers "Remove #tag", followed by an Undo snackbar.
+- **Folder (built 2026-10-03, at the user's request):** below the text, like tags. A note in a folder shows a "Folder" heading and one chip with a folder icon; tapping it opens the move sheet. A note in no folder shows an "Add to folder" button instead; with no folder and no tags, the two add buttons share one row.
+- **Links in the editor (2026-10-03):** a link shows only its title, underlined in amber, e.g. "Time Loop". The file keeps the full `[[name|Time Loop]]`, so Obsidian still sees the link. The cursor steps over the hidden markup, and deleting into it removes the whole link, so a half-broken link can't be left behind. Link titles are capped at 40 characters ("…"), and chips cut long labels with "…" rather than overflowing.
 - **Move to folder (built 2026-10-03):** ⋮ → a sheet with "No folder", the existing folders, and "New folder" (typed; `/` makes subfolders). The file keeps its name; an Undo snackbar follows. Disabled until a new note has text.
 - **Tags:** one row. Solid chips are confirmed tags (user-made or approved). Dimmed chips (no fill, dashed outline at about 55% opacity, readable secondary-text label) are AI-suggested tags waiting for approval. Tapping a dimmed tag opens the suggestion sheet (accept, reject, or close for not sure). The user can also add a tag by hand.
-- **Linked:** solid chips for links the user made or approved.
+- **Linked:** solid chips for links the user made or approved. Chips show the linked note's current title (not the text after `|`); tapping opens it. Links to notes that don't exist aren't shown.
 - **Suggested links:** dimmed chips for AI link suggestions. Tapping opens the suggestion sheet.
 - **Mentioned in:** backlinks.
 

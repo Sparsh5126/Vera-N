@@ -5,6 +5,20 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Folder below the note's text**, like tags (at the user's request; UI spec §7). A note in a folder shows one chip; tap it to move. Otherwise an "Add to folder" button; with no folder and no tags, both add buttons share one row.
+- **Links show only their title in the editor** ("Time Loop", underlined in amber; text stays the normal color). The note file still holds `[[name|Time Loop]]` for Obsidian.
+  - `LinkMarkup` hides the markup: the cursor steps over it in the direction it's moving, and an edit that reaches into it removes the whole link.
+  - Keyboard composing (Hindi input) is passed through untouched.
+  - New tokens `AppTextStyles.hidden` and `AppTextStyles.link`.
+- Tests: 11 new (hidden markup, cursor, removal, label cap, what the editor shows, folder row, no overflow). 161 in total.
+- **Links you write** (UI spec §7):
+  - Typing `[[` opens a note picker. Picking a note inserts `[[file-name|Title]]`, adding the folder path only when file names clash; backing out leaves `[[` as typed.
+  - **Linked:** solid chips with each linked note's current title; tap to open.
+  - **Mentioned in:** the notes that link here.
+  - Links resolve by file name, like Obsidian: `[[name]]`, `[[name|text]]`, `[[folder/name]]`, `[[name#heading]]` and `![[embed]]` are understood. Links typed in other apps are indexed too.
+- `links` table and `notes.name_key` (database schema version 3). The migration fills both from existing notes, so links written before the update show up at once. Links are refreshed on every save and every index. `LinksRepository` provides the Linked and Mentioned in queries (live), plus the link text for the picker.
+- `NoteLinks` parsing and writing; `LinkTyping` (spot a freshly typed `[[`, which ignores keyboard composing, then insert the link); `NotePickerSheet`; `NoteRows.placedAt` sets every path column, including the new name key, in one place.
+- Tests: 20 new (parsing, links storage and moves, upgrades from versions 1 and 2, `[[` detection, picker flow and backlinks). 150 in total.
 - **Note view: tags** (UI spec §7, details written into the spec).
   - Solid tag chips below the text, plus an "Add tag" button.
   - The add sheet lists existing tags first, so they get reused.
@@ -63,6 +77,9 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - The path check is shared by both file stores. Note names with `:` (for example `2:17 AM.md`) are allowed.
 
 ### Fixed
+- **Home cards showed raw link text** (`[[20261003-153228-a7f3|Time Loop]]`). Everything outside the editor now shows links as readers see them: card titles and previews, search passages, and Linked / Mentioned in titles (`NoteLinks.displayText`). Titles stored before this fix are converted when read, so no migration is needed.
+- **Long link labels and chips overflowed.** A note's title is its whole first line, so linking to a one-line note put the entire text into the link and its chip. New links cap the title at 40 characters with "…" (`NoteLinks.labelMaxLength`), and chips stop at `chipMaxWidth` (240) with "…". The "Mentioned in" rows are cut to one line.
+- The note picker read the notes list through a live database stream just to take its first value, and that never finished under test. It now uses a one-off query (`NotesRepository.allNotes`), the right tool for a single read.
 - **Crash on move or delete in the chosen notes folder (Android).** The Kotlin bridge replied to calls with no result (`move`, `delete`) with Kotlin's `Unit`, which Flutter's channel can't encode, so the app crashed on the main thread right after the file work finished. This hit Move to folder, Delete and Undo. It now replies `null`. Found on the phone from `adb logcat -b crash`. Tests missed it because they use an in-memory folder in place of the bridge. The completed moves were re-matched on restart, so no notes were lost.
 - A note starting with a `---` block that isn't a valid header (for example a horizontal rule) was indexed as if the block were a header: its lines were hidden from the text and the title came from the wrong line. Indexing and header writing now share one rule, `NoteHeaderCodec.normalize`: such a block is note text.
 - After a header change (pin, tags), the title and content hash are now recomputed when the text changed.

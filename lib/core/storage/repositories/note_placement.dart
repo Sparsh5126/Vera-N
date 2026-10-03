@@ -97,10 +97,7 @@ class NotePlacement {
   }) async {
     final onDisk = rewrite ? null : await _store.stat(target);
     await (_db.update(_db.notes)..where((n) => n.id.equals(ref))).write(
-      NotesCompanion(
-        path: Value(target),
-        pathKey: Value(NoteRows.pathKey(target)),
-        folder: Value(NoteRows.folderOf(target)),
+      NoteRows.placedAt(target).copyWith(
         trashedAt: trashedAt,
         pendingWrite: rewrite ? const Value(true) : const Value.absent(),
         fileModifiedMs: Value(onDisk?.modified.millisecondsSinceEpoch),

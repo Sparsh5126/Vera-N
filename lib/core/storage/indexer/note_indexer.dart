@@ -81,13 +81,7 @@ class NoteIndexer {
   ) async {
     if (row.path != entry.path) {
       // Renamed only in letter case.
-      await _update(
-        row.id,
-        NotesCompanion(
-          path: Value(entry.path),
-          folder: Value(NoteRows.folderOf(entry.path)),
-        ),
-      );
+      await _update(row.id, NoteRows.placedAt(entry.path));
     }
     final sameFile =
         row.fileModifiedMs == entry.modified.millisecondsSinceEpoch &&
@@ -121,11 +115,7 @@ class NoteIndexer {
 
     if (match == null) {
       final ref = await _db.into(_db.notes).insert(values);
-      await NoteRows.replaceTags(
-        _db,
-        ref,
-        NoteRows.tagsOf(values.headerRaw.value),
-      );
+      await _derive(ref, values);
       report.added++;
       return;
     }
@@ -134,12 +124,8 @@ class NoteIndexer {
       // Moved elsewhere while edited here: take the new path, keep our text.
       await _update(
         match.id,
-        NotesCompanion(
-          path: values.path,
-          pathKey: values.pathKey,
-          folder: values.folder,
-          conflict: const Value(true),
-        ),
+        NoteRows.placedAt(values.path.value)
+            .copyWith(conflict: const Value(true)),
       );
       report.conflicts++;
       return;
@@ -148,22 +134,14 @@ class NoteIndexer {
         ? values.copyWith(created: Value(match.created))
         : values;
     await _update(match.id, kept);
-    await NoteRows.replaceTags(
-      _db,
-      match.id,
-      NoteRows.tagsOf(values.headerRaw.value),
-    );
+    await _derive(match.id, values);
     report.moved++;
   }
 
   Future<void> _apply(int ref, NoteFileEntry entry, DateTime created) async {
     final values = await _read(entry, created);
     await _update(ref, values);
-    await NoteRows.replaceTags(
-      _db,
-      ref,
-      NoteRows.tagsOf(values.headerRaw.value),
-    );
+    await _derive(ref, values);
   }
 
   Future<NotesCompanion> _read(NoteFileEntry entry, [DateTime? created]) async {
@@ -175,6 +153,16 @@ class NoteIndexer {
       fileSize: entry.size,
       knownCreated: created,
     );
+  }
+
+  /// Tags and links come from the file's header and text.
+  Future<void> _derive(int ref, NotesCompanion values) async {
+    await NoteRows.replaceTags(
+      _db,
+      ref,
+      NoteRows.tagsOf(values.headerRaw.value),
+    );
+    await NoteRows.replaceLinks(_db, ref, values.body.value);
   }
 
   Future<void> _update(int ref, NotesCompanion values) =>

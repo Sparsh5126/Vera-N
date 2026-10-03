@@ -97,11 +97,14 @@ abstract final class AppCopy {
   static const tags = 'Tags';
   static const suggestedLinks = 'Suggested links';
   static const mentionedIn = 'Mentioned in';
+  static const linkPickerHint = 'Link to a note…';
   static const addTag = 'Add tag';
   static const tagNameHint = 'Tag name';
   static String removeTag(String tag) => 'Remove #$tag';
   static const tagRemoved = 'Tag removed';
   static const noFolder = 'No folder';
+  static const folderSection = 'Folder';
+  static const addToFolder = 'Add to folder';
   static const newFolder = 'New folder';
   static const folderNameHint = 'Folder name';
   static String movedTo(String folder) => 'Moved to $folder';

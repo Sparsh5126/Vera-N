@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'repositories/links_repository.dart';
 import 'repositories/notes_repository.dart';
 import 'repositories/search_repository.dart';
 import 'repositories/settings_repository.dart';
@@ -21,4 +22,8 @@ final searchRepositoryProvider = Provider<SearchRepository>(
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => ref.watch(storageProvider).settings,
+);
+
+final linksRepositoryProvider = Provider<LinksRepository>(
+  (ref) => LinksRepository(ref.watch(storageProvider).db),
 );

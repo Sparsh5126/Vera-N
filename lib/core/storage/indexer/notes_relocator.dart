@@ -40,10 +40,7 @@ class NotesRelocator {
     final row = _db.update(_db.notes)
       ..where((n) => n.pathKey.equals(NoteRows.pathKey(oldPath)));
     return row.write(
-      NotesCompanion(
-        path: Value(written.path),
-        pathKey: Value(NoteRows.pathKey(written.path)),
-        folder: Value(NoteRows.folderOf(written.path)),
+      NoteRows.placedAt(written.path).copyWith(
         fileModifiedMs: Value(written.modified.millisecondsSinceEpoch),
         fileSize: Value(written.size),
       ),

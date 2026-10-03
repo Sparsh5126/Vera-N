@@ -4,6 +4,7 @@ import '../../models/search_filters.dart';
 import '../../models/search_hit.dart';
 import '../db/app_database.dart';
 import '../db/note_rows.dart';
+import '../files/note_links.dart';
 import '../files/note_text.dart';
 
 /// Keyword search over the notes' titles and text (FTS5 index), with the
@@ -108,7 +109,9 @@ class SearchRepository {
       ref: r.read<int>('id'),
       title: MarkedText.parse(r.read<String>('marked_title')),
       snippet: rawBody == null
-          ? MarkedText.parse(r.read<String>('marked_snippet'))
+          ? MarkedText.parse(
+              NoteLinks.displayText(r.read<String>('marked_snippet')),
+            )
           : MarkedText(NoteText.preview(rawBody), const []),
       modified: r.read<DateTime>('modified'),
     );

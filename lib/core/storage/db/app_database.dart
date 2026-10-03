@@ -2,12 +2,13 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'note_rows.dart';
 import 'tables.dart';
 
 part 'app_database.g.dart';
 
 /// The index database, in app-private storage (ARCHITECTURE.md §8).
-@DriftDatabase(tables: [Notes, NoteTags, Settings])
+@DriftDatabase(tables: [Notes, NoteTags, Settings, Links])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
@@ -24,7 +25,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -36,6 +37,12 @@ class AppDatabase extends _$AppDatabase {
     },
     onUpgrade: (m, from, to) async {
       if (from < 2) await m.createTable(settings);
+      if (from < 3) {
+        await m.addColumn(notes, notes.nameKey);
+        await m.createIndex(notesNameKey);
+        await m.createTable(links);
+        await NoteRows.backfillLinks(this);
+      }
     },
     beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),
   );

@@ -6,28 +6,48 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/core/storage/db/app_database.dart';
 import 'package:vera_n/core/storage/repositories/settings_repository.dart';
 
+/// Turns today's schema back into an older version, keeping one note.
+Future<void> makeOldDatabase(File file, int version) async {
+  final db = AppDatabase(NativeDatabase(file));
+  await db.customStatement(
+    'INSERT INTO notes (path, path_key, folder, title, body, content_hash, '
+    "created, modified) VALUES ('Ideas/Old.md', 'ideas/old.md', 'Ideas', "
+    "'Old', 'Old, see [[Other]]', 'h', 0, 0)",
+  );
+  await db.customStatement('DROP TABLE links');
+  await db.customStatement('DROP INDEX notes_name_key');
+  await db.customStatement('ALTER TABLE notes DROP COLUMN name_key');
+  if (version < 2) await db.customStatement('DROP TABLE settings');
+  await db.customStatement('PRAGMA user_version = $version');
+  await db.close();
+}
+
 void main() {
-  test('a version 1 database gains settings and keeps its notes', () async {
+  late File file;
+
+  setUp(() async {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     final dir = await Directory.systemTemp.createTemp('vera_n_migrate_');
     addTearDown(() => dir.delete(recursive: true));
-    final file = File('${dir.path}/vera_n.sqlite');
-
-    // Make a version 1 database: today's schema minus the settings table.
-    final v1 = AppDatabase(NativeDatabase(file));
-    await v1.customStatement(
-      "INSERT INTO notes (path, path_key, folder, title, body, content_hash, "
-      "created, modified) VALUES ('a.md', 'a.md', '', 'Old', 'Old', 'h', 0, 0)",
-    );
-    await v1.customStatement('DROP TABLE settings');
-    await v1.customStatement('PRAGMA user_version = 1');
-    await v1.close();
-
-    final v2 = AppDatabase(NativeDatabase(file));
-    final settings = SettingsRepository(v2);
-    await settings.setOnboardingDone();
-    expect(await settings.onboardingDone(), isTrue);
-    expect((await v2.select(v2.notes).get()).single.title, 'Old');
-    await v2.close();
+    file = File('${dir.path}/vera_n.sqlite');
   });
+
+  for (final version in [1, 2]) {
+    test('a version $version database upgrades and keeps its notes', () async {
+      await makeOldDatabase(file, version);
+
+      final db = AppDatabase(NativeDatabase(file));
+      final settings = SettingsRepository(db);
+      await settings.setOnboardingDone();
+      expect(await settings.onboardingDone(), isTrue);
+
+      final note = (await db.select(db.notes).get()).single;
+      expect(note.title, 'Old');
+      expect(note.nameKey, 'old');
+      final links = await db.select(db.links).get();
+      expect(links.single.targetKey, 'other');
+      expect(links.single.source, note.id);
+      await db.close();
+    });
+  }
 }

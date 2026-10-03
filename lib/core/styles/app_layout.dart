@@ -48,6 +48,10 @@ abstract final class AppSize {
   static const double noteCardHeight = 168;
   static const double pinnedCardWidth = 168;
 
+  /// Widest a tag, folder or link chip grows before its label is cut
+  /// with "…" (a note's title is its whole first line).
+  static const double chipMaxWidth = 240;
+
   /// Where a card preview starts fading out, as a fraction of its height.
   static const double previewFadeStart = 0.6;
 

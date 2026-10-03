@@ -10,6 +10,7 @@ import '../../core/navigation/routes.dart';
 import '../../core/platform/launch_channel.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../core/styles/app_styles.dart';
+import 'state/link_typing.dart';
 import 'state/note_editor_controller.dart';
 import 'state/note_providers.dart';
 import 'widgets/note_actions.dart';
@@ -36,12 +37,20 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   final _focus = FocusNode();
   TitledTextController? _text;
 
+  /// Text before the latest change, to notice a freshly typed `[[`.
+  String _lastText = '';
+
   @override
   void initState() {
     super.initState();
     final repo = ref.read(notesRepositoryProvider);
     _editor = NoteEditorController(repo, ref: widget.noteRef);
-    _actions = NoteActions(_editor, ref.read(searchRepositoryProvider));
+    _actions = NoteActions(
+      _editor,
+      ref.read(searchRepositoryProvider),
+      ref.read(linksRepositoryProvider),
+      repo,
+    );
     // Details below the text hide while typing.
     _focus.addListener(() => setState(() {}));
     _lifecycle = AppLifecycleListener(onInactive: _editor.save);
@@ -59,7 +68,8 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
   void _loaded(Note? note) {
     if (!mounted) return;
-    setState(() => _text = TitledTextController(text: note?.body ?? ''));
+    _lastText = note?.body ?? '';
+    setState(() => _text = TitledTextController(text: _lastText));
   }
 
   @override
@@ -100,6 +110,27 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     }
   }
 
+  void _onTextChanged(String value) {
+    final before = _lastText;
+    _lastText = value;
+    _editor.onTextChanged(value);
+    final text = _text;
+    if (text != null && LinkTyping.justOpened(before, text.value)) {
+      unawaited(_insertLink(text));
+    }
+  }
+
+  Future<void> _insertLink(TitledTextController text) async {
+    final link = await _actions.pickLink(context, _editor.noteRef.value);
+    if (link != null && mounted) {
+      text.value = LinkTyping.insert(text.value, link);
+      _onTextChanged(text.text);
+    }
+    if (mounted) _focus.requestFocus();
+  }
+
+  void _openNote(int noteRef) => context.push(Routes.note(noteRef));
+
   /// A tap below the text starts editing at its end.
   void _editAtEnd() {
     final text = _text;
@@ -110,7 +141,9 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final text = _text?..titleStyle = context.textStyles.noteTitle;
+    final text = _text
+      ?..titleStyle = context.textStyles.noteTitle
+      ..palette = context.colors;
     return Scaffold(
       body: SafeArea(
         child: ValueListenableBuilder<int?>(
@@ -159,16 +192,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       slivers: [
         SliverToBoxAdapter(child: _readable(_editorField(text))),
         if (note != null && !typing)
-          SliverToBoxAdapter(
-            child: _readable(
-              NoteDetails(
-                tags: note.tags,
-                onAddTag: () => unawaited(_actions.addTag(context, note)),
-                onTagTap: (tag) =>
-                    unawaited(_actions.tagTapped(context, note, tag)),
-              ),
-            ),
-          ),
+          SliverToBoxAdapter(child: _readable(_details(note))),
         SliverFillRemaining(
           hasScrollBody: false,
           child: GestureDetector(
@@ -177,6 +201,21 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _details(Note note) {
+    return Consumer(
+      builder: (context, ref, _) => NoteDetails(
+        folder: note.folder,
+        onFolderTap: () => unawaited(_actions.moveToFolder(context, note)),
+        tags: note.tags,
+        linked: ref.watch(linkedProvider(note.ref)).value ?? const [],
+        mentionedIn: ref.watch(mentionedInProvider(note.ref)).value ?? const [],
+        onAddTag: () => unawaited(_actions.addTag(context, note)),
+        onTagTap: (tag) => unawaited(_actions.tagTapped(context, note, tag)),
+        onOpenNote: _openNote,
+      ),
     );
   }
 
@@ -194,7 +233,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       controller: text,
       focusNode: _focus,
       autofocus: widget.noteRef == null,
-      onChanged: _editor.onTextChanged,
+      onChanged: _onTextChanged,
       style: context.textStyles.body,
       keyboardType: TextInputType.multiline,
       textCapitalization: TextCapitalization.sentences,

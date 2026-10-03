@@ -57,6 +57,27 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Headings such as "Pinned", "Tags", "Linked".
   final TextStyle sectionLabel;
 
+  /// Link markup kept in the note's text but not shown in the editor
+  /// (`[[name|` and `]]`): practically no width, no color.
+  static TextStyle hidden(TextStyle base) => base.copyWith(
+    fontSize: _hiddenSize,
+    color: Colors.transparent,
+    letterSpacing: 0,
+    decoration: TextDecoration.none,
+  );
+
+  static const double _hiddenSize = 0.01;
+
+  /// A link's visible title in the editor: normal text color (amber is
+  /// never a text color), with an amber underline.
+  static TextStyle link(TextStyle base, AppPalette p) => base.copyWith(
+    decoration: TextDecoration.underline,
+    decorationColor: p.accent,
+    decorationThickness: _linkUnderline,
+  );
+
+  static const double _linkUnderline = 2;
+
   /// Inter is a variable font: the weight axis must be set explicitly.
   static TextStyle _inter(
     double size,

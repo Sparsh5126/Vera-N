@@ -6,6 +6,7 @@ import 'package:drift/drift.dart';
 @TableIndex(name: 'notes_modified', columns: {#trashedAt, #modified})
 @TableIndex(name: 'notes_note_id', columns: {#noteId})
 @TableIndex(name: 'notes_folder', columns: {#folder})
+@TableIndex(name: 'notes_name_key', columns: {#nameKey})
 class Notes extends Table {
   IntColumn get id => integer().autoIncrement()();
 
@@ -17,6 +18,9 @@ class Notes extends Table {
 
   /// Lower-cased [path]: paths compare case-insensitively.
   TextColumn get pathKey => text().unique()();
+
+  /// Lower-cased file name without `.md`: what `[[links]]` point at.
+  TextColumn get nameKey => text().withDefault(const Constant(''))();
 
   /// Subfolder path, '' for the top level.
   TextColumn get folder => text()();
@@ -70,4 +74,24 @@ class Settings extends Table {
 
   @override
   Set<Column<Object>> get primaryKey => {key};
+}
+
+/// `[[links]]` written in each note's text, for Linked, Mentioned in and
+/// the graph. Rebuilt from the text whenever it changes.
+@DataClassName('LinkRow')
+@TableIndex(name: 'links_target', columns: {#targetKey})
+@TableIndex(name: 'links_source', columns: {#source})
+class Links extends Table {
+  IntColumn get source =>
+      integer().references(Notes, #id, onDelete: KeyAction.cascade)();
+
+  /// See `ParsedLink.targetKey`: a file name or a path, lower case.
+  TextColumn get targetKey => text()();
+
+  /// Order in the note, so Linked chips follow the text.
+  IntColumn get position => integer()();
+  TextColumn get label => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {source, targetKey};
 }

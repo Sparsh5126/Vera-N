@@ -51,6 +51,18 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, NoteRow> {
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
+  static const VerificationMeta _nameKeyMeta = const VerificationMeta(
+    'nameKey',
+  );
+  @override
+  late final GeneratedColumn<String> nameKey = GeneratedColumn<String>(
+    'name_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   static const VerificationMeta _folderMeta = const VerificationMeta('folder');
   @override
   late final GeneratedColumn<String> folder = GeneratedColumn<String>(
@@ -228,6 +240,7 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, NoteRow> {
     noteId,
     path,
     pathKey,
+    nameKey,
     folder,
     title,
     body,
@@ -280,6 +293,12 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, NoteRow> {
       );
     } else if (isInserting) {
       context.missing(_pathKeyMeta);
+    }
+    if (data.containsKey('name_key')) {
+      context.handle(
+        _nameKeyMeta,
+        nameKey.isAcceptableOrUnknown(data['name_key']!, _nameKeyMeta),
+      );
     }
     if (data.containsKey('folder')) {
       context.handle(
@@ -417,6 +436,10 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, NoteRow> {
         DriftSqlType.string,
         data['${effectivePrefix}path_key'],
       )!,
+      nameKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_key'],
+      )!,
       folder: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}folder'],
@@ -498,6 +521,9 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
   /// Lower-cased [path]: paths compare case-insensitively.
   final String pathKey;
 
+  /// Lower-cased file name without `.md`: what `[[links]]` point at.
+  final String nameKey;
+
   /// Subfolder path, '' for the top level.
   final String folder;
   final String title;
@@ -533,6 +559,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
     this.noteId,
     required this.path,
     required this.pathKey,
+    required this.nameKey,
     required this.folder,
     required this.title,
     required this.body,
@@ -558,6 +585,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
     }
     map['path'] = Variable<String>(path);
     map['path_key'] = Variable<String>(pathKey);
+    map['name_key'] = Variable<String>(nameKey);
     map['folder'] = Variable<String>(folder);
     map['title'] = Variable<String>(title);
     map['body'] = Variable<String>(body);
@@ -592,6 +620,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
           : Value(noteId),
       path: Value(path),
       pathKey: Value(pathKey),
+      nameKey: Value(nameKey),
       folder: Value(folder),
       title: Value(title),
       body: Value(body),
@@ -628,6 +657,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
       noteId: serializer.fromJson<String?>(json['noteId']),
       path: serializer.fromJson<String>(json['path']),
       pathKey: serializer.fromJson<String>(json['pathKey']),
+      nameKey: serializer.fromJson<String>(json['nameKey']),
       folder: serializer.fromJson<String>(json['folder']),
       title: serializer.fromJson<String>(json['title']),
       body: serializer.fromJson<String>(json['body']),
@@ -653,6 +683,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
       'noteId': serializer.toJson<String?>(noteId),
       'path': serializer.toJson<String>(path),
       'pathKey': serializer.toJson<String>(pathKey),
+      'nameKey': serializer.toJson<String>(nameKey),
       'folder': serializer.toJson<String>(folder),
       'title': serializer.toJson<String>(title),
       'body': serializer.toJson<String>(body),
@@ -676,6 +707,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
     Value<String?> noteId = const Value.absent(),
     String? path,
     String? pathKey,
+    String? nameKey,
     String? folder,
     String? title,
     String? body,
@@ -696,6 +728,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
     noteId: noteId.present ? noteId.value : this.noteId,
     path: path ?? this.path,
     pathKey: pathKey ?? this.pathKey,
+    nameKey: nameKey ?? this.nameKey,
     folder: folder ?? this.folder,
     title: title ?? this.title,
     body: body ?? this.body,
@@ -720,6 +753,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
       noteId: data.noteId.present ? data.noteId.value : this.noteId,
       path: data.path.present ? data.path.value : this.path,
       pathKey: data.pathKey.present ? data.pathKey.value : this.pathKey,
+      nameKey: data.nameKey.present ? data.nameKey.value : this.nameKey,
       folder: data.folder.present ? data.folder.value : this.folder,
       title: data.title.present ? data.title.value : this.title,
       body: data.body.present ? data.body.value : this.body,
@@ -751,6 +785,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
           ..write('noteId: $noteId, ')
           ..write('path: $path, ')
           ..write('pathKey: $pathKey, ')
+          ..write('nameKey: $nameKey, ')
           ..write('folder: $folder, ')
           ..write('title: $title, ')
           ..write('body: $body, ')
@@ -776,6 +811,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
     noteId,
     path,
     pathKey,
+    nameKey,
     folder,
     title,
     body,
@@ -800,6 +836,7 @@ class NoteRow extends DataClass implements Insertable<NoteRow> {
           other.noteId == this.noteId &&
           other.path == this.path &&
           other.pathKey == this.pathKey &&
+          other.nameKey == this.nameKey &&
           other.folder == this.folder &&
           other.title == this.title &&
           other.body == this.body &&
@@ -822,6 +859,7 @@ class NotesCompanion extends UpdateCompanion<NoteRow> {
   final Value<String?> noteId;
   final Value<String> path;
   final Value<String> pathKey;
+  final Value<String> nameKey;
   final Value<String> folder;
   final Value<String> title;
   final Value<String> body;
@@ -842,6 +880,7 @@ class NotesCompanion extends UpdateCompanion<NoteRow> {
     this.noteId = const Value.absent(),
     this.path = const Value.absent(),
     this.pathKey = const Value.absent(),
+    this.nameKey = const Value.absent(),
     this.folder = const Value.absent(),
     this.title = const Value.absent(),
     this.body = const Value.absent(),
@@ -863,6 +902,7 @@ class NotesCompanion extends UpdateCompanion<NoteRow> {
     this.noteId = const Value.absent(),
     required String path,
     required String pathKey,
+    this.nameKey = const Value.absent(),
     required String folder,
     required String title,
     required String body,
@@ -891,6 +931,7 @@ class NotesCompanion extends UpdateCompanion<NoteRow> {
     Expression<String>? noteId,
     Expression<String>? path,
     Expression<String>? pathKey,
+    Expression<String>? nameKey,
     Expression<String>? folder,
     Expression<String>? title,
     Expression<String>? body,
@@ -912,6 +953,7 @@ class NotesCompanion extends UpdateCompanion<NoteRow> {
       if (noteId != null) 'note_id': noteId,
       if (path != null) 'path': path,
       if (pathKey != null) 'path_key': pathKey,
+      if (nameKey != null) 'name_key': nameKey,
       if (folder != null) 'folder': folder,
       if (title != null) 'title': title,
       if (body != null) 'body': body,
@@ -935,6 +977,7 @@ class NotesCompanion extends UpdateCompanion<NoteRow> {
     Value<String?>? noteId,
     Value<String>? path,
     Value<String>? pathKey,
+    Value<String>? nameKey,
     Value<String>? folder,
     Value<String>? title,
     Value<String>? body,
@@ -956,6 +999,7 @@ class NotesCompanion extends UpdateCompanion<NoteRow> {
       noteId: noteId ?? this.noteId,
       path: path ?? this.path,
       pathKey: pathKey ?? this.pathKey,
+      nameKey: nameKey ?? this.nameKey,
       folder: folder ?? this.folder,
       title: title ?? this.title,
       body: body ?? this.body,
@@ -988,6 +1032,9 @@ class NotesCompanion extends UpdateCompanion<NoteRow> {
     }
     if (pathKey.present) {
       map['path_key'] = Variable<String>(pathKey.value);
+    }
+    if (nameKey.present) {
+      map['name_key'] = Variable<String>(nameKey.value);
     }
     if (folder.present) {
       map['folder'] = Variable<String>(folder.value);
@@ -1044,6 +1091,7 @@ class NotesCompanion extends UpdateCompanion<NoteRow> {
           ..write('noteId: $noteId, ')
           ..write('path: $path, ')
           ..write('pathKey: $pathKey, ')
+          ..write('nameKey: $nameKey, ')
           ..write('folder: $folder, ')
           ..write('title: $title, ')
           ..write('body: $body, ')
@@ -1481,12 +1529,331 @@ class SettingsCompanion extends UpdateCompanion<SettingRow> {
   }
 }
 
+class $LinksTable extends Links with TableInfo<$LinksTable, LinkRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LinksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<int> source = GeneratedColumn<int>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES notes (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _targetKeyMeta = const VerificationMeta(
+    'targetKey',
+  );
+  @override
+  late final GeneratedColumn<String> targetKey = GeneratedColumn<String>(
+    'target_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+    'label',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [source, targetKey, position, label];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'links';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LinkRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('target_key')) {
+      context.handle(
+        _targetKeyMeta,
+        targetKey.isAcceptableOrUnknown(data['target_key']!, _targetKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_targetKeyMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+        _labelMeta,
+        label.isAcceptableOrUnknown(data['label']!, _labelMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {source, targetKey};
+  @override
+  LinkRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LinkRow(
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source'],
+      )!,
+      targetKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}target_key'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      label: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}label'],
+      ),
+    );
+  }
+
+  @override
+  $LinksTable createAlias(String alias) {
+    return $LinksTable(attachedDatabase, alias);
+  }
+}
+
+class LinkRow extends DataClass implements Insertable<LinkRow> {
+  final int source;
+
+  /// See `ParsedLink.targetKey`: a file name or a path, lower case.
+  final String targetKey;
+
+  /// Order in the note, so Linked chips follow the text.
+  final int position;
+  final String? label;
+  const LinkRow({
+    required this.source,
+    required this.targetKey,
+    required this.position,
+    this.label,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['source'] = Variable<int>(source);
+    map['target_key'] = Variable<String>(targetKey);
+    map['position'] = Variable<int>(position);
+    if (!nullToAbsent || label != null) {
+      map['label'] = Variable<String>(label);
+    }
+    return map;
+  }
+
+  LinksCompanion toCompanion(bool nullToAbsent) {
+    return LinksCompanion(
+      source: Value(source),
+      targetKey: Value(targetKey),
+      position: Value(position),
+      label: label == null && nullToAbsent
+          ? const Value.absent()
+          : Value(label),
+    );
+  }
+
+  factory LinkRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LinkRow(
+      source: serializer.fromJson<int>(json['source']),
+      targetKey: serializer.fromJson<String>(json['targetKey']),
+      position: serializer.fromJson<int>(json['position']),
+      label: serializer.fromJson<String?>(json['label']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'source': serializer.toJson<int>(source),
+      'targetKey': serializer.toJson<String>(targetKey),
+      'position': serializer.toJson<int>(position),
+      'label': serializer.toJson<String?>(label),
+    };
+  }
+
+  LinkRow copyWith({
+    int? source,
+    String? targetKey,
+    int? position,
+    Value<String?> label = const Value.absent(),
+  }) => LinkRow(
+    source: source ?? this.source,
+    targetKey: targetKey ?? this.targetKey,
+    position: position ?? this.position,
+    label: label.present ? label.value : this.label,
+  );
+  LinkRow copyWithCompanion(LinksCompanion data) {
+    return LinkRow(
+      source: data.source.present ? data.source.value : this.source,
+      targetKey: data.targetKey.present ? data.targetKey.value : this.targetKey,
+      position: data.position.present ? data.position.value : this.position,
+      label: data.label.present ? data.label.value : this.label,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LinkRow(')
+          ..write('source: $source, ')
+          ..write('targetKey: $targetKey, ')
+          ..write('position: $position, ')
+          ..write('label: $label')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(source, targetKey, position, label);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LinkRow &&
+          other.source == this.source &&
+          other.targetKey == this.targetKey &&
+          other.position == this.position &&
+          other.label == this.label);
+}
+
+class LinksCompanion extends UpdateCompanion<LinkRow> {
+  final Value<int> source;
+  final Value<String> targetKey;
+  final Value<int> position;
+  final Value<String?> label;
+  final Value<int> rowid;
+  const LinksCompanion({
+    this.source = const Value.absent(),
+    this.targetKey = const Value.absent(),
+    this.position = const Value.absent(),
+    this.label = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LinksCompanion.insert({
+    required int source,
+    required String targetKey,
+    required int position,
+    this.label = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : source = Value(source),
+       targetKey = Value(targetKey),
+       position = Value(position);
+  static Insertable<LinkRow> custom({
+    Expression<int>? source,
+    Expression<String>? targetKey,
+    Expression<int>? position,
+    Expression<String>? label,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (source != null) 'source': source,
+      if (targetKey != null) 'target_key': targetKey,
+      if (position != null) 'position': position,
+      if (label != null) 'label': label,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LinksCompanion copyWith({
+    Value<int>? source,
+    Value<String>? targetKey,
+    Value<int>? position,
+    Value<String?>? label,
+    Value<int>? rowid,
+  }) {
+    return LinksCompanion(
+      source: source ?? this.source,
+      targetKey: targetKey ?? this.targetKey,
+      position: position ?? this.position,
+      label: label ?? this.label,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (source.present) {
+      map['source'] = Variable<int>(source.value);
+    }
+    if (targetKey.present) {
+      map['target_key'] = Variable<String>(targetKey.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LinksCompanion(')
+          ..write('source: $source, ')
+          ..write('targetKey: $targetKey, ')
+          ..write('position: $position, ')
+          ..write('label: $label, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $NotesTable notes = $NotesTable(this);
   late final $NoteTagsTable noteTags = $NoteTagsTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
+  late final $LinksTable links = $LinksTable(this);
   late final Index notesModified = Index(
     'notes_modified',
     'CREATE INDEX notes_modified ON notes (trashed_at, modified)',
@@ -1499,9 +1866,21 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'notes_folder',
     'CREATE INDEX notes_folder ON notes (folder)',
   );
+  late final Index notesNameKey = Index(
+    'notes_name_key',
+    'CREATE INDEX notes_name_key ON notes (name_key)',
+  );
   late final Index noteTagsTag = Index(
     'note_tags_tag',
     'CREATE INDEX note_tags_tag ON note_tags (tag)',
+  );
+  late final Index linksTarget = Index(
+    'links_target',
+    'CREATE INDEX links_target ON links (target_key)',
+  );
+  late final Index linksSource = Index(
+    'links_source',
+    'CREATE INDEX links_source ON links (source)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -1511,10 +1890,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     notes,
     noteTags,
     settings,
+    links,
     notesModified,
     notesNoteId,
     notesFolder,
+    notesNameKey,
     noteTagsTag,
+    linksTarget,
+    linksSource,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -1525,6 +1908,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       ),
       result: [TableUpdate('note_tags', kind: UpdateKind.delete)],
     ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'notes',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('links', kind: UpdateKind.delete)],
+    ),
   ]);
 }
 
@@ -1533,6 +1923,7 @@ typedef $$NotesTableCreateCompanionBuilder = NotesCompanion Function({
   Value<String?> noteId,
   required String path,
   required String pathKey,
+  Value<String> nameKey,
   required String folder,
   required String title,
   required String body,
@@ -1554,6 +1945,7 @@ typedef $$NotesTableUpdateCompanionBuilder = NotesCompanion Function({
   Value<String?> noteId,
   Value<String> path,
   Value<String> pathKey,
+  Value<String> nameKey,
   Value<String> folder,
   Value<String> title,
   Value<String> body,
@@ -1592,6 +1984,25 @@ final class $$NotesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$LinksTable, List<LinkRow>> _linksRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.links,
+    aliasName: 'notes__id__links__source',
+  );
+
+  $$LinksTableProcessedTableManager get linksRefs {
+    final manager = $$LinksTableTableManager(
+      $_db,
+      $_db.links,
+    ).filter((f) => f.source.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_linksRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
@@ -1619,6 +2030,11 @@ class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
 
   ColumnFilters<String> get pathKey => $composableBuilder(
     column: $table.pathKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameKey => $composableBuilder(
+    column: $table.nameKey,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1721,6 +2137,31 @@ class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
     );
     return f(composer);
   }
+
+  Expression<bool> linksRefs(
+    Expression<bool> Function($$LinksTableFilterComposer f) f,
+  ) {
+    final $$LinksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.links,
+      getReferencedColumn: (t) => t.source,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LinksTableFilterComposer(
+            $db: $db,
+            $table: $db.links,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$NotesTableOrderingComposer
@@ -1749,6 +2190,11 @@ class $$NotesTableOrderingComposer
 
   ColumnOrderings<String> get pathKey => $composableBuilder(
     column: $table.pathKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameKey => $composableBuilder(
+    column: $table.nameKey,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1849,6 +2295,9 @@ class $$NotesTableAnnotationComposer
   GeneratedColumn<String> get pathKey =>
       $composableBuilder(column: $table.pathKey, builder: (column) => column);
 
+  GeneratedColumn<String> get nameKey =>
+      $composableBuilder(column: $table.nameKey, builder: (column) => column);
+
   GeneratedColumn<String> get folder =>
       $composableBuilder(column: $table.folder, builder: (column) => column);
 
@@ -1924,6 +2373,31 @@ class $$NotesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> linksRefs<T extends Object>(
+    Expression<T> Function($$LinksTableAnnotationComposer a) f,
+  ) {
+    final $$LinksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.links,
+      getReferencedColumn: (t) => t.source,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LinksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.links,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$NotesTableTableManager
@@ -1939,7 +2413,7 @@ class $$NotesTableTableManager
           $$NotesTableUpdateCompanionBuilder,
           (NoteRow, $$NotesTableReferences),
           NoteRow,
-          PrefetchHooks Function({bool noteTagsRefs})
+          PrefetchHooks Function({bool noteTagsRefs, bool linksRefs})
         > {
   $$NotesTableTableManager(_$AppDatabase db, $NotesTable table)
     : super(
@@ -1958,6 +2432,7 @@ class $$NotesTableTableManager
                 Value<String?> noteId = const Value.absent(),
                 Value<String> path = const Value.absent(),
                 Value<String> pathKey = const Value.absent(),
+                Value<String> nameKey = const Value.absent(),
                 Value<String> folder = const Value.absent(),
                 Value<String> title = const Value.absent(),
                 Value<String> body = const Value.absent(),
@@ -1978,6 +2453,7 @@ class $$NotesTableTableManager
                 noteId: noteId,
                 path: path,
                 pathKey: pathKey,
+                nameKey: nameKey,
                 folder: folder,
                 title: title,
                 body: body,
@@ -2000,6 +2476,7 @@ class $$NotesTableTableManager
                 Value<String?> noteId = const Value.absent(),
                 required String path,
                 required String pathKey,
+                Value<String> nameKey = const Value.absent(),
                 required String folder,
                 required String title,
                 required String body,
@@ -2020,6 +2497,7 @@ class $$NotesTableTableManager
                 noteId: noteId,
                 path: path,
                 pathKey: pathKey,
+                nameKey: nameKey,
                 folder: folder,
                 title: title,
                 body: body,
@@ -2044,10 +2522,13 @@ class $$NotesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({noteTagsRefs = false}) {
+          prefetchHooksCallback: ({noteTagsRefs = false, linksRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (noteTagsRefs) db.noteTags],
+              explicitlyWatchedTables: [
+                if (noteTagsRefs) db.noteTags,
+                if (linksRefs) db.links,
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
@@ -2060,6 +2541,18 @@ class $$NotesTableTableManager
                           $$NotesTableReferences(db, table, p0).noteTagsRefs,
                       referencedItemsForCurrentItem: (item, referencedItems) =>
                           referencedItems.where((e) => e.note == item.id),
+                      typedResults: items,
+                    ),
+                  if (linksRefs)
+                    await $_getPrefetchedData<NoteRow, $NotesTable, LinkRow>(
+                      currentTable: table,
+                      referencedTable: $$NotesTableReferences._linksRefsTable(
+                        db,
+                      ),
+                      managerFromTypedResult: (p0) =>
+                          $$NotesTableReferences(db, table, p0).linksRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.source == item.id),
                       typedResults: items,
                     ),
                 ];
@@ -2082,7 +2575,7 @@ typedef $$NotesTableProcessedTableManager =
       $$NotesTableUpdateCompanionBuilder,
       (NoteRow, $$NotesTableReferences),
       NoteRow,
-      PrefetchHooks Function({bool noteTagsRefs})
+      PrefetchHooks Function({bool noteTagsRefs, bool linksRefs})
     >;
 typedef $$NoteTagsTableCreateCompanionBuilder = NoteTagsCompanion Function({
   required int note,
@@ -2468,6 +2961,300 @@ typedef $$SettingsTableProcessedTableManager =
       SettingRow,
       PrefetchHooks Function()
     >;
+typedef $$LinksTableCreateCompanionBuilder = LinksCompanion Function({
+  required int source,
+  required String targetKey,
+  required int position,
+  Value<String?> label,
+  Value<int> rowid,
+});
+typedef $$LinksTableUpdateCompanionBuilder = LinksCompanion Function({
+  Value<int> source,
+  Value<String> targetKey,
+  Value<int> position,
+  Value<String?> label,
+  Value<int> rowid,
+});
+
+final class $$LinksTableReferences
+    extends BaseReferences<_$AppDatabase, $LinksTable, LinkRow> {
+  $$LinksTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $NotesTable _sourceTable(_$AppDatabase db) =>
+      db.notes.createAlias('links__source__notes__id');
+
+  $$NotesTableProcessedTableManager get source {
+    final $_column = $_itemColumn<int>('source')!;
+
+    final manager = $$NotesTableTableManager(
+      $_db,
+      $_db.notes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_sourceTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$LinksTableFilterComposer extends Composer<_$AppDatabase, $LinksTable> {
+  $$LinksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get targetKey => $composableBuilder(
+    column: $table.targetKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$NotesTableFilterComposer get source {
+    final $$NotesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.source,
+      referencedTable: $db.notes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NotesTableFilterComposer(
+            $db: $db,
+            $table: $db.notes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LinksTableOrderingComposer
+    extends Composer<_$AppDatabase, $LinksTable> {
+  $$LinksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get targetKey => $composableBuilder(
+    column: $table.targetKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$NotesTableOrderingComposer get source {
+    final $$NotesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.source,
+      referencedTable: $db.notes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NotesTableOrderingComposer(
+            $db: $db,
+            $table: $db.notes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LinksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LinksTable> {
+  $$LinksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get targetKey =>
+      $composableBuilder(column: $table.targetKey, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
+
+  $$NotesTableAnnotationComposer get source {
+    final $$NotesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.source,
+      referencedTable: $db.notes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NotesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.notes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LinksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LinksTable,
+          LinkRow,
+          $$LinksTableFilterComposer,
+          $$LinksTableOrderingComposer,
+          $$LinksTableAnnotationComposer,
+          $$LinksTableCreateCompanionBuilder,
+          $$LinksTableUpdateCompanionBuilder,
+          (LinkRow, $$LinksTableReferences),
+          LinkRow,
+          PrefetchHooks Function({bool source})
+        > {
+  $$LinksTableTableManager(_$AppDatabase db, $LinksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LinksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LinksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LinksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> source = const Value.absent(),
+                Value<String> targetKey = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<String?> label = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LinksCompanion(
+                source: source,
+                targetKey: targetKey,
+                position: position,
+                label: label,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int source,
+                required String targetKey,
+                required int position,
+                Value<String?> label = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LinksCompanion.insert(
+                source: source,
+                targetKey: targetKey,
+                position: position,
+                label: label,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LinksTable, LinkRow>(table),
+                  $$LinksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({source = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (source) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.source,
+                        referencedTable: $$LinksTableReferences._sourceTable(
+                          db,
+                        ),
+                        referencedColumn: $$LinksTableReferences
+                            ._sourceTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$LinksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LinksTable,
+      LinkRow,
+      $$LinksTableFilterComposer,
+      $$LinksTableOrderingComposer,
+      $$LinksTableAnnotationComposer,
+      $$LinksTableCreateCompanionBuilder,
+      $$LinksTableUpdateCompanionBuilder,
+      (LinkRow, $$LinksTableReferences),
+      LinkRow,
+      PrefetchHooks Function({bool source})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2478,4 +3265,6 @@ class $AppDatabaseManager {
       $$NoteTagsTableTableManager(_db, _db.noteTags);
   $$SettingsTableTableManager get settings =>
       $$SettingsTableTableManager(_db, _db.settings);
+  $$LinksTableTableManager get links =>
+      $$LinksTableTableManager(_db, _db.links);
 }

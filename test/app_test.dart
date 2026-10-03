@@ -33,6 +33,16 @@ void main() {
     await app.finish(tester);
   });
 
+  testWidgets('Home cards show link titles, not file names', (tester) async {
+    await app.storage.notes.create(
+      'Future Self\nsee [[20261003-153228-a7f3|Time Loop]] now',
+    );
+    await app.pump(tester);
+    expect(find.text('see Time Loop now'), findsOneWidget);
+    expect(find.textContaining('20261003'), findsNothing);
+    await app.finish(tester);
+  });
+
   testWidgets('write a note, go back, see it on Home', (tester) async {
     await app.pump(tester);
     await tester.tap(find.text('New note'));

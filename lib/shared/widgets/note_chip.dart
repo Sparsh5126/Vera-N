@@ -28,7 +28,10 @@ class NoteChip extends StatelessWidget {
     final look = dimmed ? context.colors.dimmedChip : context.colors.solidChip;
     final icon = this.icon;
     final content = ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: AppSize.minTapTarget),
+      constraints: const BoxConstraints(
+        minHeight: AppSize.minTapTarget,
+        maxWidth: AppSize.chipMaxWidth,
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpace.m),
         child: Row(
@@ -38,9 +41,13 @@ class NoteChip extends StatelessWidget {
               Icon(icon, size: AppSize.iconSmall, color: look.label),
               const SizedBox(width: AppSpace.xs),
             ],
-            Text(
-              label,
-              style: context.textStyles.label.copyWith(color: look.label),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textStyles.label.copyWith(color: look.label),
+              ),
             ),
           ],
         ),

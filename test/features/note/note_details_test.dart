@@ -101,4 +101,38 @@ void main() {
     expect(move.enabled, isFalse);
     await app.finish(tester);
   });
+
+  testWidgets('folder shows below the text like a tag; tap to move', (
+    tester,
+  ) async {
+    final ref = await openNote(tester, 'Wanderer');
+    expect(find.text('Add to folder'), findsOneWidget);
+    await tester.tap(find.text('Add to folder'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('New folder'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, 'Ideas');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Folder'), findsOneWidget);
+    expect(find.widgetWithText(NoteChip, 'Ideas'), findsOneWidget);
+    expect(find.text('Add to folder'), findsNothing);
+    expect((await app.storage.notes.getNote(ref))!.folder, 'Ideas');
+    await app.finish(tester);
+  });
+
+  testWidgets('long titles never overflow a chip', (tester) async {
+    final long = 'A very long first line that keeps going and going on';
+    await openNote(tester, long);
+    await tester.tap(find.text('Add to folder'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('New folder'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, long);
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await app.finish(tester);
+  });
 }

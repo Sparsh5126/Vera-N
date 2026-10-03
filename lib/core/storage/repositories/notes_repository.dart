@@ -11,6 +11,7 @@ import '../files/note_document.dart';
 import '../files/note_file_store.dart';
 import '../files/note_header_codec.dart';
 import '../files/note_id.dart';
+import '../files/note_links.dart';
 import '../files/note_text.dart';
 import '../indexer/note_writer.dart';
 import 'note_placement.dart';
@@ -57,6 +58,14 @@ class NotesRepository {
     return query.watch().map((rows) => rows.map(NoteRows.toSummary).toList());
   }
 
+  /// Notes not in the trash, most recently changed first (one read).
+  Future<List<NoteSummary>> allNotes() async {
+    final query = _db.select(_db.notes)
+      ..where((n) => n.trashedAt.isNull())
+      ..orderBy([(n) => OrderingTerm.desc(n.modified)]);
+    return (await query.get()).map(NoteRows.toSummary).toList();
+  }
+
   Future<Note?> getNote(int ref) async {
     final row = await _row(ref).getSingleOrNull();
     return row == null ? null : NoteRows.toNote(row);
@@ -85,6 +94,7 @@ class NotesRepository {
             noteId: Value(id),
             path: path,
             pathKey: NoteRows.pathKey(path),
+            nameKey: Value(NoteLinks.nameKey(path)),
             folder: folder,
             title: NoteText.title(body),
             body: body,
@@ -95,6 +105,7 @@ class NotesRepository {
             pendingWrite: const Value(true),
           ),
         );
+    await NoteRows.replaceLinks(_db, ref, body);
     _writer.schedule();
     return ref;
   }
@@ -112,6 +123,7 @@ class NotesRepository {
         modified: Value(_clock()),
       ),
     );
+    await NoteRows.replaceLinks(_db, ref, body);
   }
 
   Future<void> setPinned(int ref, bool pinned) => _changeHeader(
@@ -166,6 +178,7 @@ class NotesRepository {
         contentHash: Value(NoteText.contentHash(doc.body)),
       ),
     );
+    if (doc.body != row.body) await NoteRows.replaceLinks(_db, ref, doc.body);
   }
 
   /// Applies an in-app change and schedules the file write. The revision
