@@ -109,6 +109,16 @@ abstract final class AppCopy {
   static const filterFolder = 'Folder';
   static const filterTag = 'Tag';
   static const filterDate = 'Date';
+  static const anyFolder = 'Any folder';
+  static const anyTag = 'Any tag';
+  static const anyTime = 'Any time';
+  static const dateToday = 'Today';
+  static const dateLast7Days = 'Last 7 days';
+  static const dateLast30Days = 'Last 30 days';
+  static const dateThisYear = 'This year';
+  static const noFoldersYet = 'No folders yet.';
+  static const noTagsYet = 'No tags yet.';
+  static String tagLabel(String tag) => '#$tag';
   static const recentSearches = 'Recent searches';
   static const matches = 'Matches';
   static const similarInMeaning = 'Similar in meaning';

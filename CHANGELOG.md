@@ -5,6 +5,13 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Search filters: Folder, Tag, Date** (UI spec §9, behaviour decided 2026-10-03 and written into the spec).
+  - Each pill holds one value from a bottom sheet; the first row clears it. A set pill is solid amber with its value.
+  - Folder includes subfolders (letter case ignored). Tag is one confirmed tag. Date is Today, Last 7 days, Last 30 days or This year, by last-changed date.
+  - With a filter set and nothing typed, matching notes are listed newest first.
+  - Filtering runs in SQL alongside the keyword match.
+- Shared widgets `FilterPill` (reusable for the Graph filters) and `OptionSheet`; model `SearchFilters` / `DateFilter`; `SearchRepository.folders()` (with parent folders) and `tags()` (trashed notes left out).
+- Tests: 11 new (repository filters and lists, filter widget flows). 120 in total.
 - **Search (keyword)**, UI spec §9.
   - The keyboard opens when the tab opens.
   - Matches appear as you type, with no debounce and no spinner; a result that arrives after a newer query is dropped.
@@ -45,6 +52,8 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - The path check is shared by both file stores. Note names with `:` (for example `2:17 AM.md`) are allowed.
 
 ### Fixed
+- Bottom sheets opened from a tab screen slid under the floating nav bar, which covered and swallowed taps on their last rows. Sheets now open above the bar. Caught by a widget test before reaching the phone.
+- A search result for a one-line note repeated the title as its passage; the repeat is now hidden.
 - **Keyboard didn't open on a cold start into a new note.** The editor was focused, but Flutter asked for the keyboard before the app's window had input focus, and Android ignored the request. Now, the first time the window gains focus, the app asks again if a text field is focused. This happens once per launch, so a keyboard you dismissed doesn't pop back. Verified on the phone: 4 of 4 cold starts show the keyboard; Home without capture doesn't.
 - Restoring a trashed note whose file is gone (for example left in another folder) now writes the file again from the database.
 - The indexer no longer empties the index when the notes folder is unavailable. If the folder lists as empty while more than one note was indexed, nothing is removed.

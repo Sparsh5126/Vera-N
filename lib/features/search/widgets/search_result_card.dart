@@ -21,6 +21,12 @@ class SearchResultCard extends StatelessWidget {
   final String dateLabel;
   final VoidCallback onTap;
 
+  /// A one-line note's passage is just its title again: skip it.
+  bool get _showSnippet {
+    final passage = hit.snippet.text.replaceAll('…', '').trim();
+    return passage.isNotEmpty && passage != hit.title.text.trim();
+  }
+
   @override
   Widget build(BuildContext context) {
     final styles = context.textStyles;
@@ -48,7 +54,7 @@ class SearchResultCard extends StatelessWidget {
                   Text(dateLabel, style: styles.small),
                 ],
               ),
-              if (hit.snippet.text.trim().isNotEmpty) ...[
+              if (_showSnippet) ...[
                 const SizedBox(height: AppSpace.xs),
                 HighlightedText(
                   text: hit.snippet.text,

@@ -303,7 +303,11 @@ One reusable card, two containers:
 - Before typing: recent searches, each removable.
 - **Matches:** keyword results, highlighted, instant.
 - **Similar in meaning:** on-device meaning-based results, filled in a moment later so keyword results never wait.
-- Filters: thin pills for Folder, Tag, Date.
+- Filters: thin pills for Folder, Tag, Date (decided 2026-10-03):
+  - Each holds one value, picked from a bottom sheet whose first row clears it ("Any folder", "Any tag", "Any time"). A set pill turns solid amber and shows its value; tapping it again reopens the sheet.
+  - Folder includes its subfolders. Tag is one confirmed tag. Date is Today, Last 7 days, Last 30 days, or This year, by when the note was last changed (the date on its card).
+  - With a filter set and nothing typed, Search lists the matching notes newest first, so filters also work as a quick browse.
+  - Folder and Tag sheets say "No folders yet." / "No tags yet." when there is nothing to pick.
 - Results are always a single-column list, even if Home uses grid.
 - Search shows only the user's notes, never AI suggestions.
 - Empty result: a quiet "No notes found".

@@ -1,6 +1,7 @@
 import 'dart:ui' show TextRange;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vera_n/core/models/search_filters.dart';
 import 'package:vera_n/core/models/search_hit.dart';
 import 'package:vera_n/core/storage/repositories/search_repository.dart';
 import 'package:vera_n/core/storage/repositories/settings_repository.dart';
@@ -60,6 +61,89 @@ void main() {
     final m = MarkedText.parse('a ${searchMatchStart}bc$searchMatchEnd d');
     expect(m.text, 'a bc d');
     expect(m.matches.single, const TextRange(start: 2, end: 4));
+  });
+
+  group('filters', () {
+    Future<List<int>> filtered(String q, SearchFilters f) async =>
+        (await search.search(
+          q,
+          filters: f,
+          now: h.now,
+        )).map((hit) => hit.ref).toList();
+
+    test('folder includes its subfolders, any letter case', () async {
+      final a = await h.repo.create('a', folder: 'Ideas');
+      final b = await h.repo.create('b', folder: 'Ideas/Story');
+      await h.repo.create('c', folder: 'Ideasx');
+      await h.repo.create('d');
+      final f = const SearchFilters(folder: 'ideas');
+      expect((await filtered('', f)).toSet(), {a, b});
+    });
+
+    test('tag, any letter case', () async {
+      final a = await h.repo.create('tagged');
+      await h.repo.setTags(a, ['Story']);
+      await h.repo.create('plain');
+      expect(await filtered('', const SearchFilters(tag: 'story')), [a]);
+    });
+
+    test('date counts whole local days back from today', () async {
+      final old = await h.repo.create('old');
+      h.now = h.now.add(const Duration(days: 10));
+      final recent = await h.repo.create('recent');
+      expect(
+        await filtered('', const SearchFilters(date: DateFilter.last7Days)),
+        [recent],
+      );
+      expect(
+        (await filtered(
+          '',
+          const SearchFilters(date: DateFilter.thisYear),
+        )).toSet(),
+        {old, recent},
+      );
+      expect(
+        DateFilter.last7Days.startFrom(DateTime(2026, 10, 3, 18)),
+        DateTime(2026, 9, 27),
+      );
+    });
+
+    test('no words: matching notes newest first, with a preview', () async {
+      final a = await h.repo.create('First\nbody a', folder: 'X');
+      h.now = h.now.add(const Duration(minutes: 1));
+      final b = await h.repo.create('Second\nbody b', folder: 'X');
+      final hits = await search.search(
+        '',
+        filters: const SearchFilters(folder: 'X'),
+      );
+      expect(hits.map((x) => x.ref), [b, a]);
+      expect(hits.first.title.text, 'Second');
+      expect(hits.first.snippet.text, 'body b');
+      expect(hits.first.snippet.matches, isEmpty);
+    });
+
+    test('words and filters together', () async {
+      final a = await h.repo.create('loop one', folder: 'X');
+      await h.repo.create('loop two', folder: 'Y');
+      expect(await filtered('loop', const SearchFilters(folder: 'X')), [a]);
+    });
+
+    test('no words and no filters: nothing', () async {
+      await h.repo.create('a');
+      expect(await filtered('', const SearchFilters()), isEmpty);
+    });
+
+    test('folder and tag lists for the pickers', () async {
+      await h.repo.create('a', folder: 'Ideas/Story');
+      await h.repo.create('b', folder: 'Archive');
+      final t = await h.repo.create('c');
+      await h.repo.setTags(t, ['story', 'Idea']);
+      final gone = await h.repo.create('d');
+      await h.repo.setTags(gone, ['trashed-only']);
+      await h.repo.trash(gone);
+      expect(await search.folders(), ['Archive', 'Ideas', 'Ideas/Story']);
+      expect(await search.tags(), ['Idea', 'story']);
+    });
   });
 
   group('recent searches', () {
