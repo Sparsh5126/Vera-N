@@ -66,10 +66,12 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 
 **Screen 4: Notes folder**
 > Choose where your notes live.
-> Pick a folder on your phone, like Documents. Your notes are saved there as plain files you can open in other apps, and they stay even if you remove Vera N.
+> Pick a folder on your phone, or make a new one such as "Vera N" in Documents. Your notes are saved there as plain files you can open in other apps, and they stay even if you remove Vera N.
 > ( Choose folder )  (Not now)
 
-- "Choose folder" opens Android's own folder picker at Documents, suggesting a new folder named "Vera N". The storage root and Download root can't be picked on Android 11+, so a subfolder is always used.
+- "Choose folder" opens Android's own folder picker at Documents. The picker can't be pre-filled with a new folder name, so the text above suggests making one; the picker has its own "new folder" option. The storage root and Download root can't be picked on Android 11+, so a subfolder is always used.
+- Backing out of the picker returns to this screen, where both choices stay available.
+- Until screens 1–3 and 5 are built, this is the only onboarding screen shown on first launch (Android only).
 - "Not now", or backing out of the picker, never blocks writing: notes are kept inside the app until a folder is chosen. Settings shows this under Notes folder (see section 11).
 
 **Screen 5: Name prompt**

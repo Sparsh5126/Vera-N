@@ -7,7 +7,7 @@ import 'tables.dart';
 part 'app_database.g.dart';
 
 /// The index database, in app-private storage (ARCHITECTURE.md §8).
-@DriftDatabase(tables: [Notes, NoteTags])
+@DriftDatabase(tables: [Notes, NoteTags, Settings])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
@@ -24,7 +24,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -33,6 +33,9 @@ class AppDatabase extends _$AppDatabase {
       for (final statement in _searchIndex) {
         await customStatement(statement);
       }
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) await m.createTable(settings);
     },
     beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),
   );

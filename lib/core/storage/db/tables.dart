@@ -61,3 +61,13 @@ class NoteTags extends Table {
   @override
   Set<Column<Object>> get primaryKey => {note, tag};
 }
+
+/// Small per-device settings (private storage, never synced).
+@DataClassName('SettingRow')
+class Settings extends Table {
+  TextColumn get key => text()();
+  TextColumn get value => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {key};
+}

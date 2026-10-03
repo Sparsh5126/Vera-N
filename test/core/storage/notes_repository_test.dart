@@ -148,6 +148,17 @@ void main() {
     expect((await h.repo.watchNotes().first).map((n) => n.ref), [ref]);
   });
 
+  test('restoring a note whose file is gone writes it again', () async {
+    final ref = await h.repo.create('Only in the database');
+    await h.writer.flush();
+    await h.repo.trash(ref);
+    h.store.files.clear();
+    await h.repo.restore(ref);
+    await h.writer.flush();
+    final row = await h.row(ref);
+    expect(h.store.text(row.path), endsWith('Only in the database'));
+  });
+
   group('search', () {
     test('prefix match on each word, Hindi and English', () async {
       final a = await h.repo.create('आज की बात\nmessages at night');

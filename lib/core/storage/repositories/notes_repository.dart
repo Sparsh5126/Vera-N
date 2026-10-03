@@ -141,15 +141,21 @@ class NotesRepository {
     if (row == null || row.trashedAt == null) return;
     var target = row.path.substring(trashFolder.length + 1);
     if (await _pathTaken(target)) target = _withSuffix(target);
-    if (await _store.exists(row.path)) await _store.move(row.path, target);
+    final fileKept = await _store.exists(row.path);
+    if (fileKept) await _store.move(row.path, target);
     await _update(ref).write(
       NotesCompanion(
         path: Value(target),
         pathKey: Value(NoteRows.pathKey(target)),
         folder: Value(NoteRows.folderOf(target)),
         trashedAt: const Value(null),
+        // File gone (e.g. left in another folder): write it from here.
+        pendingWrite: fileKept ? const Value.absent() : const Value(true),
+        fileModifiedMs: fileKept ? const Value.absent() : const Value(null),
+        fileSize: fileKept ? const Value.absent() : const Value(null),
       ),
     );
+    if (!fileKept) _writer.schedule();
   }
 
   /// Keyword search over title and body; each word matches as a prefix.

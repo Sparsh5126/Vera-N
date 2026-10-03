@@ -12,6 +12,9 @@ class IndexReport {
   int removed = 0;
   int conflicts = 0;
   int unchanged = 0;
+
+  /// Every indexed file was missing, so nothing was removed.
+  bool folderMissing = false;
 }
 
 /// Brings the database in line with the notes folder. Runs off the UI (on
@@ -54,6 +57,14 @@ class NoteIndexer {
         .toList();
     for (final entry in added) {
       await _addOrMove(entry, missing, report);
+    }
+    // An empty folder where several notes were means the folder is
+    // unavailable (unmounted, renamed, access lost), not that the user
+    // deleted every note. Keep the index; the files will come back.
+    final onDisk = rows.where((r) => r.fileModifiedMs != null).length;
+    if (entries.isEmpty && onDisk > 1) {
+      report.folderMissing = true;
+      return report;
     }
     for (final row in missing) {
       if (row.pendingWrite) continue; // The writer will recreate the file.

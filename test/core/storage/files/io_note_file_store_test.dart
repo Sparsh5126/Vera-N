@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/core/storage/files/io_note_file_store.dart';
+import 'package:vera_n/core/storage/files/note_file_store.dart';
 
 void main() {
   late Directory root;
@@ -52,6 +53,10 @@ void main() {
     expect(await store.read('Archive/a.md'), 'a');
     await store.delete('Archive/a.md');
     expect(await store.exists('Archive/a.md'), isFalse);
+  });
+
+  test('names with colons are fine (on systems that allow them)', () {
+    expect(checkNotePath('Ideas/2:17 AM.md'), ['Ideas', '2:17 AM.md']);
   });
 
   test('refuses paths that escape the notes folder', () {

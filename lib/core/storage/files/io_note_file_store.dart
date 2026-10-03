@@ -75,13 +75,9 @@ class IoNoteFileStore implements NoteFileStore {
 
   /// Resolves [path] inside [root], refusing anything that escapes it.
   File _file(String path) {
-    final segments = path.split('/');
-    final unsafe =
-        path.isEmpty ||
-        p.isAbsolute(path) ||
-        path.contains(r'\') ||
-        segments.any((s) => s.isEmpty || s == '.' || s == '..');
-    if (unsafe) throw ArgumentError.value(path, 'path', 'not a safe note path');
-    return File(p.joinAll([root.path, ...segments]));
+    if (p.isAbsolute(path)) {
+      throw ArgumentError.value(path, 'path', 'not a safe note path');
+    }
+    return File(p.joinAll([root.path, ...checkNotePath(path)]));
   }
 }

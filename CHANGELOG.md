@@ -4,6 +4,23 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Added
+- **Notes folder you can see (Android).** A Kotlin bridge (`NotesFolderBridge.kt`, `SafDocuments.kt`) uses Android's own folder picker and keeps the permission across restarts. No storage permission is requested. File work runs on one background thread, and each folder is listed with one query.
+- `SafNoteFileStore`, plus `SwitchingNoteFileStore` so the app can change folders while running. `FolderAccess` keeps this testable without Android.
+- **Choosing a folder** moves notes from the in-app holding folder into `<picked>/Notes/`. Notes already there (a reinstall or a synced folder) are kept and indexed. A same-named file with different text is never overwritten.
+- **Access removed:** on start, if access to the folder is gone, notes are rewritten into the holding folder from the database. Nothing is lost.
+- **Onboarding screen "Choose where your notes live"** (UI spec §4), shown on first launch on Android. *Not now* goes to Home; backing out of the picker stays on the screen.
+- Settings table (database schema version 2, with a migration), storing the notes folder, the onboarding flag, and a random 8-character device id for `.app/` files.
+- 14 new tests, 97 in total: folder choose, reconnect, access lost, name clash, migration from version 1, the onboarding screen, the empty-folder guard, restore of a missing file, and colons in note names.
+
+### Changed
+- UI spec §4: the folder screen now says "or make a new one such as "Vera N" in Documents", because Android's picker can't be pre-filled with a new folder name.
+- The path check is shared by both file stores. Note names with `:` (for example `2:17 AM.md`) are allowed.
+
+### Fixed
+- Restoring a trashed note whose file is gone (for example left in another folder) now writes the file again from the database.
+- The indexer no longer empties the index when the notes folder is unavailable. If the folder lists as empty while more than one note was indexed, nothing is removed.
+
 ## [0.1.0] - in progress
 
 ### Added

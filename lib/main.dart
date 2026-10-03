@@ -10,10 +10,12 @@ import 'core/storage/storage_services.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = await StorageServices.open();
+  final onboard =
+      storage.canChooseFolder && !await storage.settings.onboardingDone();
   runApp(
     ProviderScope(
       overrides: [storageProvider.overrideWithValue(storage)],
-      child: const App(),
+      child: App(startWithOnboarding: onboard),
     ),
   );
   // Pick up notes added or changed outside the app, without delaying start.

@@ -41,3 +41,17 @@ abstract interface class NoteFileStore {
 
   Future<void> delete(String path);
 }
+
+/// Checks that [path] stays inside the notes folder and returns its
+/// segments. Throws [ArgumentError] for absolute paths, `..`, backslashes,
+/// or empty segments.
+List<String> checkNotePath(String path) {
+  final segments = path.split('/');
+  final unsafe =
+      path.isEmpty ||
+      path.startsWith('/') ||
+      path.contains(r'\') ||
+      segments.any((s) => s.isEmpty || s == '.' || s == '..');
+  if (unsafe) throw ArgumentError.value(path, 'path', 'not a safe note path');
+  return segments;
+}

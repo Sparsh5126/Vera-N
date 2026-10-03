@@ -97,6 +97,17 @@ void main() {
     expect(row.folder, 'ideas');
   });
 
+  test('if every file vanishes at once, nothing is removed', () async {
+    h.store.put('a.md', 'A');
+    h.store.put('b.md', 'B');
+    await h.indexer.reconcile();
+    h.store.files.clear();
+    final report = await h.indexer.reconcile();
+    expect(report.folderMissing, isTrue);
+    expect(report.removed, 0);
+    expect(await rows(), hasLength(2));
+  });
+
   test('deleted files leave the index; unsaved notes stay', () async {
     h.store.put('a.md', 'A');
     await h.indexer.reconcile();

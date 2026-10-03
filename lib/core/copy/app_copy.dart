@@ -21,11 +21,13 @@ abstract final class AppCopy {
       'devices. We have no servers that see your notes.';
   static const onboardingFolderTitle = 'Choose where your notes live.';
   static const onboardingFolderBody =
-      'Pick a folder on your phone, like Documents. Your notes are saved there '
+      'Pick a folder on your phone, or make a new one such as "Vera N" in '
+      'Documents. Your notes are saved there '
       'as plain files you can open in other apps, and they stay even if you '
       'remove Vera N.';
   static const chooseFolder = 'Choose folder';
   static const notNow = 'Not now';
+  static const folderError = "Couldn't use that folder. Try another one.";
 
   /// Suggested name for the new folder in the system folder picker.
   static const suggestedFolderName = 'Vera N';

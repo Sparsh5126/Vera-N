@@ -12,14 +12,19 @@ import 'router.dart';
 /// Going to the background writes unsaved text to files; coming back picks
 /// up changes made outside the app.
 class App extends ConsumerStatefulWidget {
-  const App({super.key});
+  const App({super.key, this.startWithOnboarding = false});
+
+  /// First launch: ask where notes should live before Home.
+  final bool startWithOnboarding;
 
   @override
   ConsumerState<App> createState() => _AppState();
 }
 
 class _AppState extends ConsumerState<App> {
-  late final GoRouter _router = buildRouter();
+  late final GoRouter _router = buildRouter(
+    startWithOnboarding: widget.startWithOnboarding,
+  );
   late final AppLifecycleListener _lifecycle;
 
   @override

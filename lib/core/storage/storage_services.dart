@@ -1,42 +1,82 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:drift/drift.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import 'db/app_database.dart';
+import 'files/folder_access.dart';
 import 'files/io_note_file_store.dart';
 import 'files/note_file_store.dart';
+import 'files/switching_note_file_store.dart';
 import 'indexer/note_indexer.dart';
 import 'indexer/note_writer.dart';
+import 'indexer/notes_relocator.dart';
 import 'repositories/notes_repository.dart';
+import 'repositories/settings_repository.dart';
 
 /// The storage objects the app shares, wired together once at start.
+///
+/// Notes live in the folder the user picked, or, until then (or if access
+/// is removed), in the app-private holding folder (ARCHITECTURE.md §8).
 class StorageServices {
-  StorageServices(this.db, this.store)
-    : writer = NoteWriter(db, store),
-      indexer = NoteIndexer(db, store) {
+  StorageServices(this.db, NoteFileStore holding, {this.folders})
+    : _holding = holding,
+      store = SwitchingNoteFileStore(holding),
+      settings = SettingsRepository(db) {
+    writer = NoteWriter(db, store);
+    indexer = NoteIndexer(db, store);
     notes = NotesRepository(db, store, writer);
   }
 
-  /// Opens storage on the device.
-  ///
-  /// Until the folder picker exists, notes live in the app-private holding
-  /// folder (`<app support>/MyNotes/Notes`), the "Not now" path of
-  /// ARCHITECTURE.md §8.
+  /// Opens storage on the device and reconnects to the picked folder.
   static Future<StorageServices> open() async {
     final support = await getApplicationSupportDirectory();
-    final notesDir = Directory(p.join(support.path, 'MyNotes', 'Notes'));
-    return StorageServices(AppDatabase.open(), IoNoteFileStore(notesDir));
+    final holding = Directory(p.join(support.path, 'MyNotes', 'Notes'));
+    final services = StorageServices(
+      AppDatabase.open(),
+      IoNoteFileStore(holding),
+      folders: Platform.isAndroid ? const AndroidFolderAccess() : null,
+    );
+    await services.reconnectFolder();
+    return services;
   }
 
   final AppDatabase db;
-  final NoteFileStore store;
-  final NoteWriter writer;
-  final NoteIndexer indexer;
-  late final NotesRepository notes;
+  final SwitchingNoteFileStore store;
+  final SettingsRepository settings;
 
+  /// Null where picking a folder isn't supported yet (desktop).
+  final FolderAccess? folders;
+  final NoteFileStore _holding;
+  late final NoteWriter writer;
+  late final NoteIndexer indexer;
+  late final NotesRepository notes;
   Future<void>? _reconciling;
+
+  bool get canChooseFolder => folders != null;
+
+  /// Lets the user pick the notes folder and moves the notes there.
+  /// Returns false if they backed out of the picker.
+  Future<bool> chooseFolder() async {
+    final folders = this.folders;
+    final folder = await folders?.pick();
+    if (folders == null || folder == null) return false;
+    await writer.flush();
+    final target = folders.storeFor(folder);
+    await NotesRelocator(db).relocate(store.current, target);
+    store.switchTo(target);
+    await settings.setNotesFolder(folder);
+    await reconcile();
+    return true;
+  }
+
+  /// The picked folder's name, or null when notes are only in the app.
+  Future<String?> notesFolderName() async {
+    final folder = await settings.notesFolder();
+    return folder == null ? null : folders?.displayName(folder);
+  }
 
   /// Picks up changes made outside the app. Never runs twice at once.
   Future<void> reconcile() {
@@ -50,4 +90,27 @@ class StorageServices {
 
   /// App back in front: pick up outside changes.
   void onResume() => unawaited(reconcile());
+
+  /// Uses the picked folder if access is still granted. If access was
+  /// removed, notes go back to the holding folder: every note is rewritten
+  /// there from the database, so nothing is lost.
+  Future<void> reconnectFolder() async {
+    final folder = await settings.notesFolder();
+    final folders = this.folders;
+    if (folder == null || folders == null) return;
+    if (await folders.hasAccess(folder)) {
+      store.switchTo(folders.storeFor(folder));
+      return;
+    }
+    await settings.setNotesFolder(null);
+    store.switchTo(_holding);
+    await (db.update(db.notes)..where((n) => n.trashedAt.isNull())).write(
+      const NotesCompanion(
+        pendingWrite: Value(true),
+        fileModifiedMs: Value(null),
+        fileSize: Value(null),
+      ),
+    );
+    writer.schedule();
+  }
 }

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:drift/native.dart';
 import 'package:vera_n/core/storage/db/app_database.dart';
 import 'package:vera_n/core/storage/indexer/note_indexer.dart';

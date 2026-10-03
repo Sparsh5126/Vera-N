@@ -226,7 +226,12 @@ Raised by the storage stage — **built as proposed, easy to change; please conf
 - Writes: the editor saves to the database instantly; the file is written in the background shortly after. A pending-writes list finishes any unwritten file on the next start.
 - Outside changes (Syncthing, Obsidian): no change notifications on these folders, so the indexer compares one folder listing against the database on app resume, off the UI.
 - First launch: onboarding screen "Choose where your notes live" (UI spec §4). Declined, cancelled, or later revoked: notes are kept in an app-private holding folder, writing is never blocked, and Settings → Notes folder offers to choose a folder and move the notes.
-- `NoteFileStore` is an interface with two implementations: folder picker (Android) and plain files (holding folder, desktop, tests).
+- `NoteFileStore` is an interface with two implementations: folder picker (Android) and plain files (holding folder, desktop, tests). `SwitchingNoteFileStore` forwards to whichever is current, so nothing else changes when the user picks a folder.
+- **Built (2026-10-03):** `NotesFolderBridge.kt` and `SafDocuments.kt` on channel `vera_n/notes_folder`, with all file work on one background thread. Each folder is listed with one query (name, type, time, size). Files are written in place with truncate mode (`wt`); unlike the plain-file store, this is not atomic, because the system picker has no rename-over. Moves are done as copy then delete, which every provider supports.
+- **Choosing a folder** flushes pending writes, then moves every note from the current folder into the picked folder's `Notes/` subfolder and points the database rows at the new files. Notes already in the picked folder are kept and indexed. A same-named file with different text is never overwritten: the moved note gets a 4-character suffix.
+- **Access removed** (detected on start): the app switches back to the holding folder and rewrites every note there from the database, so nothing is lost.
+- **Folder unavailable:** if the folder lists as empty while more than one note was indexed, the indexer removes nothing.
+- The chosen folder, the onboarding flag, and the device id live in a `settings` table (schema version 2) in the private database.
 
 **Note colors** (decided 2026-10-03)
 - Light-mode amber is used only for fills, outlines, and icons; text uses the text colors. Dimmed chips: dashed outline at about 55%, label at full-strength secondary text.
