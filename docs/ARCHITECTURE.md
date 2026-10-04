@@ -191,7 +191,7 @@ From the specs — **blocking the stages noted, not the architecture**:
 
 1. **Accepted-link storage**: inline footer block vs sidecar. Blocks: Review/accept logic.
 2. ~~On-device embedding model~~: **decided 2026-10-04**: paraphrase-multilingual-MiniLM-L12-v2 int8, trimmed to English + Hindi (`tool/model_trim/`), ONNX Runtime (`flutter_onnxruntime`), bundled. See section 8.
-3. **Similarity thresholds** for "strong". Blocks: suggestions stage.
+3. ~~Similarity thresholds~~: **decided 2026-10-04**: a "strong" match is cosine ≥ **0.60** at launch. On the benchmark's Hindi / English / Hinglish pairs, unrelated notes topped out at 0.50 and related pairs averaged 0.71. It is to be tuned later from accept rates (product spec §8).
 
 Raised by the storage stage — **built as proposed, easy to change; please confirm**:
 
@@ -224,6 +224,7 @@ Raised by the storage stage — **built as proposed, easy to change; please conf
 - Bundled in the app (no internet permission). The user's limit is 150 MB of app size; projected ~71 MB download, ~118 MB on the phone.
 - 384-dimensional vectors, mean-pooled and normalized. It reads 128 tokens, so notes are split into chunks of at most 128 tokens.
 - Loaded only for a batch, then released: it adds ~140 MB of memory while loaded and takes 0.5–0.8 s to load on a Snapdragon 778G.
+- Files: `assets/models/minilm-l12-en-hi/` (Git LFS), with the Apache-2.0 license and a notice of the trim.
 - Evidence: `tool/embedding_bench/README.md` and `tool/model_trim/README.md`.
 
 **Database location and `.app/`** (decided 2026-10-03)

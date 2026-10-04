@@ -5,6 +5,8 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Trimmed embedding model committed** at `assets/models/minilm-l12-en-hi/`, with Git LFS (`.gitattributes` tracks `assets/models/**`). Included: the Apache-2.0 license and a README with source, SHA-256 checksums and the notice of changes. Not yet listed in `pubspec.yaml` assets; it joins the app in the embeddings stage, so builds don't grow before the model is used.
+- Decided 2026-10-04: **similarity threshold 0.60** for a "strong" match at launch (ARCHITECTURE.md §7, product spec §21).
 - **Embedding model chosen and trimmed** (decided 2026-10-04). The model is paraphrase-multilingual-MiniLM-L12-v2 int8 (Apache-2.0), bundled in the app, with the user's limit of 150 MB app size.
   - The full model would mean ~120 MB download but ~255 MB on the phone, because it is unpacked from the APK. So `tool/model_trim/` trims it to English + Hindi: it keeps the word pieces the 300,000 most common English words use (wordfreq, which includes common romanized Hindi), all Devanagari, symbols and emoji. Kept rows keep their exact values.
   - Result: model 118 → 44.9 MB, tokenizer 17 → 2.4 MB.
