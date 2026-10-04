@@ -5,7 +5,7 @@ import '../../../core/copy/app_copy.dart';
 import '../../../core/styles/app_styles.dart';
 import 'saved_tick.dart';
 
-/// Back, the saved tick, pin, and the ⋮ menu.
+/// Back, the saved tick, copy, pin, and the ⋮ menu.
 class NoteTopBar extends StatelessWidget {
   const NoteTopBar({
     super.key,
@@ -13,6 +13,7 @@ class NoteTopBar extends StatelessWidget {
     required this.pinned,
     required this.onBack,
     required this.onPinChanged,
+    required this.onCopy,
     required this.onMove,
     required this.onDelete,
   });
@@ -23,6 +24,9 @@ class NoteTopBar extends StatelessWidget {
 
   /// Null while the note doesn't exist yet (nothing typed).
   final ValueChanged<bool>? onPinChanged;
+
+  /// Copies the whole note. Null while there is no text.
+  final VoidCallback? onCopy;
 
   /// Null while the note doesn't exist yet.
   final VoidCallback? onMove;
@@ -42,6 +46,11 @@ class NoteTopBar extends StatelessWidget {
           ),
           const Spacer(),
           SavedTick(saves: saves),
+          IconButton(
+            onPressed: onCopy,
+            tooltip: AppCopy.copyNote,
+            icon: const Icon(Icons.content_copy_outlined),
+          ),
           IconButton(
             onPressed: onPin == null ? null : () => onPin(!pinned),
             tooltip: pinned ? AppCopy.unpin : AppCopy.pin,

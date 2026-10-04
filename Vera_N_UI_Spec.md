@@ -243,7 +243,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 └─────────────────────────┘
 ```
 
-**Top bar:** back, pin toggle, ⋮ menu (move to folder, archive, delete, attachments). A tiny "saved" tick fades in and out; there is no save button (autosave).
+**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (move to folder, archive, delete, attachments). A tiny "saved" tick fades in and out; there is no save button (autosave).
 
 **Writing**
 - Title is optional; if empty, the first line becomes the title.

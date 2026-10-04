@@ -201,6 +201,9 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       onPinChanged: note == null
           ? null
           : (value) => unawaited(_editor.setPinned(value)),
+      onCopy: note == null
+          ? null
+          : () => unawaited(_actions.copy(context, _text?.text ?? note.body)),
       onMove: note == null
           ? null
           : () => unawaited(_actions.moveToFolder(context, note)),

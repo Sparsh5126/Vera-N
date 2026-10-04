@@ -15,6 +15,9 @@ abstract final class AppMotion {
   /// How long the note's "saved" tick stays before fading out.
   static const Duration savedTickHold = Duration(milliseconds: 1200);
 
+  /// A short notice with nothing to tap (e.g. "Copied").
+  static const Duration briefNotice = Duration(seconds: 2);
+
   /// Snackbars with Undo stay long enough to reach the button.
   static const Duration undoWindow = Duration(seconds: 5);
 

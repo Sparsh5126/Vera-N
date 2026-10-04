@@ -1,21 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../core/copy/app_copy.dart';
 import '../../../core/models/note.dart';
+import '../../../core/storage/files/note_markup.dart';
 import '../../../core/storage/repositories/links_repository.dart';
 import '../../../core/storage/repositories/notes_repository.dart';
 import '../../../core/storage/repositories/search_repository.dart';
 import '../../../core/utils/names.dart';
+import '../../../shared/widgets/notice_snack_bar.dart';
 import '../../../shared/widgets/option_sheet.dart';
 import '../../../shared/widgets/text_entry_sheet.dart';
 import '../../../shared/widgets/undo_snack_bar.dart';
 import '../state/note_editor_controller.dart';
 import 'note_picker_sheet.dart';
 
-/// The Note screen's sheets: link to a note, add or remove a tag, move to
-/// a folder. Changes offer Undo instead of asking for confirmation first.
+/// The Note screen's actions: copy, link to a note, add or remove a tag,
+/// move to a folder. Changes offer Undo instead of asking for confirmation first.
 class NoteActions {
   NoteActions(this._editor, this._library, this._links, this._notes);
 
@@ -44,6 +47,14 @@ class NoteActions {
         if (n.ref != currentRef) n,
     ]);
     return picked == null ? null : _links.linkTextFor(picked, label: label);
+  }
+
+  /// Copies the whole note as the user sees it: links as their titles,
+  /// checklists as ☐ / ☑, no Markdown symbols.
+  Future<void> copy(BuildContext context, String body) async {
+    final messenger = ScaffoldMessenger.of(context);
+    await Clipboard.setData(ClipboardData(text: NoteMarkup.display(body)));
+    NoticeSnackBar.show(messenger, AppCopy.copied);
   }
 
   Future<void> addTag(BuildContext context, Note note) async {

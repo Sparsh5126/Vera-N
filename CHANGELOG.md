@@ -5,6 +5,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Copy note** button next to pin (backlog #11). Copies the whole note as the user sees it (`NoteMarkup.display`: links as titles, ☐ / ☑, no Markdown), including text not yet saved, then shows a brief "Copied" (`NoticeSnackBar`, token `AppMotion.briefNotice`). Disabled while a new note is empty. 2 tests.
 - **Home Recent | Folders | Tags switch** (UI spec §5; the open question in §14 is now decided).
   - Folders and Tags show a pill per folder or tag; tap one to see its notes (a folder includes its subfolders), tap again to clear.
   - The lists update live, and the view and the pick are kept while the app runs.

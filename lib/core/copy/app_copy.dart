@@ -90,6 +90,8 @@ abstract final class AppCopy {
 
   // Note view (UI spec §7).
   static const back = 'Back';
+  static const copyNote = 'Copy note';
+  static const copied = 'Copied';
   static const pin = 'Pin';
   static const unpin = 'Unpin';
   static const moreOptions = 'More options';
