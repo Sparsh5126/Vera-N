@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 
+import 'numbered_points.dart';
+
 /// Line markers the formatting row can toggle.
 enum LineMark {
   list('- '),
@@ -51,7 +53,8 @@ abstract final class MarkdownFormat {
 
   /// Puts [mark] on every non-empty selected line, or takes it off if all
   /// of them already have it. A list line becomes a checklist line (and
-  /// back) instead of getting both markers.
+  /// back) instead of getting both markers. List on numbered points keeps
+  /// them numbered, one per line ([NumberedPoints]).
   static TextEditingValue toggleLines(TextEditingValue value, LineMark mark) {
     final sel = value.selection;
     if (!sel.isValid) return value;
@@ -62,17 +65,10 @@ abstract final class MarkdownFormat {
     final endBreak = text.indexOf('\n', sel.end);
     final end = endBreak == -1 ? text.length : endBreak;
     final lines = text.substring(start, end).split('\n');
-    final filled = lines.where((l) => l.trim().isNotEmpty);
-    final allMarked = filled.isNotEmpty && filled.every((l) => _has(l, mark));
-    final changed = [
-      for (final l in lines)
-        if (l.trim().isEmpty)
-          l
-        else if (allMarked)
-          l.replaceFirst(_anyMark, '')
-        else
-          '${mark.prefix}${l.replaceFirst(_anyMark, '')}',
-    ].join('\n');
+    final numbered = mark == LineMark.list
+        ? NumberedPoints.asList(lines)
+        : null;
+    final changed = (numbered ?? _marked(lines, mark)).join('\n');
     return TextEditingValue(
       text: text.replaceRange(start, end, changed),
       selection: TextSelection(
@@ -80,6 +76,20 @@ abstract final class MarkdownFormat {
         extentOffset: start + changed.length,
       ),
     );
+  }
+
+  static List<String> _marked(List<String> lines, LineMark mark) {
+    final filled = lines.where((l) => l.trim().isNotEmpty);
+    final allMarked = filled.isNotEmpty && filled.every((l) => _has(l, mark));
+    return [
+      for (final l in lines)
+        if (l.trim().isEmpty)
+          l
+        else if (allMarked)
+          l.replaceFirst(_anyMark, '')
+        else
+          '${mark.prefix}${l.replaceFirst(_anyMark, '')}',
+    ];
   }
 
   static bool _has(String line, LineMark mark) {

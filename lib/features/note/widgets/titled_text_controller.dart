@@ -50,7 +50,7 @@ class TitledTextController extends TextEditingController {
     final cuts = {0, titleEnd, text.length};
     for (final s in spans) {
       cuts.addAll([s.start, s.contentStart, s.contentEnd, s.end]);
-      if (s.isLine) cuts.addAll([s.glyphAt, s.glyphAt + 1]);
+      if (s.hasGlyph) cuts.addAll([s.glyphAt, s.glyphAt + 1]);
     }
     if (showComposing) cuts.addAll([composing.start, composing.end]);
     final points = cuts.where((c) => c <= text.length).toList()..sort();
@@ -92,6 +92,7 @@ class TitledTextController extends TextEditingController {
             s = AppTextStyles.done(s, palette);
           }
         case MarkupKind.bullet:
+        case MarkupKind.numbered:
           break;
       }
     }
@@ -100,7 +101,7 @@ class TitledTextController extends TextEditingController {
 
   static MarkupSpan? _glyphAt(List<MarkupSpan> spans, int at) {
     for (final s in spans) {
-      if (s.isLine && s.glyphAt == at) return s;
+      if (s.hasGlyph && s.glyphAt == at) return s;
     }
     return null;
   }

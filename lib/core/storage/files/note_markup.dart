@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 /// Kinds of Markdown the app shows as formatting instead of symbols.
-enum MarkupKind { link, bold, checkbox, bullet }
+enum MarkupKind { link, bold, checkbox, bullet, numbered }
 
 /// One piece of Markdown in a note's text. The file keeps the Markdown; the
 /// editor shows [contentStart]..[contentEnd] formatted, hides the symbols,
@@ -16,6 +16,7 @@ class MarkupSpan {
     required this.end,
     this.target,
     this.checked = false,
+    this.number,
   });
 
   final MarkupKind kind;
@@ -30,8 +31,17 @@ class MarkupSpan {
   /// For checkboxes: ticked (`- [x] `).
   final bool checked;
 
-  /// Checklist and bullet markers apply to a whole line.
-  bool get isLine => kind == MarkupKind.checkbox || kind == MarkupKind.bullet;
+  /// For numbered lines: the number written (`3` in `3. `).
+  final int? number;
+
+  /// Checklist, bullet and numbered markers apply to a whole line.
+  bool get isLine =>
+      kind == MarkupKind.checkbox ||
+      kind == MarkupKind.bullet ||
+      kind == MarkupKind.numbered;
+
+  /// Checkboxes and bullets are drawn as glyphs; numbers stay as written.
+  bool get hasGlyph => kind == MarkupKind.checkbox || kind == MarkupKind.bullet;
 
   /// The character drawn as a checkbox (the ` `/`x` in `- [ ] `) or a
   /// bullet (the `-` in `- `).
@@ -39,6 +49,7 @@ class MarkupSpan {
 
   /// Whether the character at [offset] is a hidden Markdown symbol.
   bool hides(int offset) {
+    if (kind == MarkupKind.numbered) return false;
     if (isLine) {
       // Everything before the content except the glyph and the space
       // that separates it from the text.
@@ -51,6 +62,8 @@ class MarkupSpan {
   /// Whether the cursor may not rest at [offset] (inside hidden symbols,
   /// or before a line's checkbox or bullet).
   bool blocksCaret(int offset) {
+    // A number is ordinary visible text the user may edit.
+    if (kind == MarkupKind.numbered) return false;
     if (isLine) return offset >= start && offset < contentStart;
     return (offset > start && offset < contentStart) ||
         (offset > contentEnd && offset < end);
@@ -65,6 +78,7 @@ abstract final class NoteMarkup {
   static final _bold = RegExp(r'\*\*(?=[^\s*])([^\n]*?[^\s*])\*\*');
   static final _checkbox = RegExp(r'^- \[([ xX])\] ', multiLine: true);
   static final _bullet = RegExp(r'^- (?!\[[ xX]\] )', multiLine: true);
+  static final _numbered = RegExp(r'^(\d{1,9})\. ', multiLine: true);
 
   static const _cacheSize = 3;
   static final _cache = <String, List<MarkupSpan>>{};
@@ -110,6 +124,15 @@ abstract final class NoteMarkup {
           contentStart: m.end,
           contentEnd: lineEnd(m.end),
           end: lineEnd(m.end),
+        ),
+      for (final m in _numbered.allMatches(text))
+        MarkupSpan(
+          kind: MarkupKind.numbered,
+          start: m.start,
+          contentStart: m.end,
+          contentEnd: lineEnd(m.end),
+          end: lineEnd(m.end),
+          number: int.parse(m.group(1)!),
         ),
     ];
   }

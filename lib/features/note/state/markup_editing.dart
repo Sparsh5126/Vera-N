@@ -6,9 +6,11 @@ import '../../../core/storage/files/note_markup.dart';
 /// formatting, never symbols:
 /// - the cursor steps over hidden symbols in the direction it moved;
 /// - deleting into a link removes the link; into bold markers, the bold;
-///   into a checkbox or bullet, that marker (the line stays);
-/// - Enter on a checklist or bullet line starts the next one, and Enter on
-///   an empty one ends the list.
+///   into a checkbox or bullet, that marker (the line stays); backspace
+///   right after a list number removes the number;
+/// - Enter on a checklist, bullet or numbered line starts the next one
+///   (numbers count on, and the items below are renumbered); Enter on an
+///   empty item ends the list.
 abstract final class MarkupEditing {
   static const _checkboxPrefix = '- [ ] ';
   static const _bulletPrefix = '- ';
@@ -34,7 +36,11 @@ abstract final class MarkupEditing {
     TextEditingValue previous,
     TextEditingValue next,
   ) {
-    final at = _changeStart(previous.text, next.text);
+    // The cursor sits right after what was typed. (Comparing the texts is
+    // ambiguous when Enter lands next to another line break.)
+    final sel = next.selection;
+    if (!sel.isValid || !sel.isCollapsed || sel.baseOffset < 1) return null;
+    final at = sel.baseOffset - 1;
     if (next.text[at] != '\n') return null;
     for (final span in NoteMarkup.find(previous.text)) {
       if (!span.isLine || at < span.contentStart || at > span.contentEnd) {
@@ -47,10 +53,19 @@ abstract final class MarkupEditing {
           span.start,
         );
       }
+      final caret = at + 1;
+      final number = span.number;
+      if (number != null) {
+        final prefix = '${number + 1}. ';
+        final text = next.text.replaceRange(caret, caret, prefix);
+        return _value(
+          renumberAfter(text, caret, number + 1),
+          caret + prefix.length,
+        );
+      }
       final prefix = span.kind == MarkupKind.checkbox
           ? _checkboxPrefix
           : _bulletPrefix;
-      final caret = at + 1;
       return _value(
         next.text.replaceRange(caret, caret, prefix),
         caret + prefix.length,
@@ -82,6 +97,15 @@ abstract final class MarkupEditing {
           return _value(
             unbolded,
             inStart ? span.start : span.start + inner.length,
+          );
+        case MarkupKind.numbered:
+          // Only the space after the number: the digits are ordinary text.
+          if (s != span.contentStart - 1 || e != span.contentStart) {
+            return null;
+          }
+          return _value(
+            text.replaceRange(span.start, span.contentStart, ''),
+            span.start,
           );
         case MarkupKind.checkbox:
         case MarkupKind.bullet:
@@ -116,6 +140,23 @@ abstract final class MarkupEditing {
       return next.copyWith(selection: TextSelection.collapsed(offset: to));
     }
     return next;
+  }
+
+  static final _numberedLine = RegExp(r'^(\d{1,9})\. ');
+
+  /// Renumbers the numbered lines that directly follow the line starting
+  /// at [lineStart] (numbered [number]): number + 1, number + 2, ….
+  static String renumberAfter(String text, int lineStart, int number) {
+    final lineEnd = text.indexOf('\n', lineStart);
+    if (lineEnd == -1) return text;
+    final rest = text.substring(lineEnd + 1).split('\n');
+    var next = number + 1;
+    for (var i = 0; i < rest.length; i++) {
+      final m = _numberedLine.firstMatch(rest[i]);
+      if (m == null) break;
+      rest[i] = rest[i].replaceRange(0, m.group(1)!.length, '${next++}');
+    }
+    return '${text.substring(0, lineEnd + 1)}${rest.join('\n')}';
   }
 
   /// Where [before] and [after] first differ.
