@@ -243,7 +243,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 └─────────────────────────┘
 ```
 
-**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (move to folder, archive, delete, attachments). A tiny "saved" tick fades in and out; there is no save button (autosave).
+**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (archive, delete, attachments; move to folder moved below the text, as the Folder row, 2026-10-04, backlog #5). A tiny "saved" tick fades in and out; there is no save button (autosave).
 
 **Writing**
 - Title is optional; if empty, the first line becomes the title.
@@ -258,7 +258,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 - **The editor shows formatting, never Markdown (2026-10-04, at the user's request: "for them it's just notes").** Bold is drawn bold; checklist lines show a real checkbox that ticks and unticks with a tap (ticked items are struck through in secondary text); bullet lines show •. The symbols stay in the file for Obsidian, hidden in the editor; the cursor steps over them, and backspacing into them removes the formatting (bold stars, the checkbox or bullet) but keeps the words. Enter on a checklist or bullet line starts the next item; Enter on an empty item ends the list. Cards and search show ☐ / ☑ / • and plain words. Each checkbox takes 32 points of width and the line's height to tap: below the 48 minimum, because a full-size target would spread every list line apart.
 - **Tapping a link's title opens the linked note** (2026-10-04). A tap at the very start or end of the title only places the cursor, so text can still be added next to a link.
 - **Links in the editor (2026-10-03):** a link shows only its title, underlined in amber, e.g. "Time Loop". The file keeps the full `[[name|Time Loop]]`, so Obsidian still sees the link. The cursor steps over the hidden markup, and deleting into it removes the whole link, so a half-broken link can't be left behind. Link titles are capped at 40 characters ("…"), and chips cut long labels with "…" rather than overflowing.
-- **Move to folder (built 2026-10-03):** ⋮ → a sheet with "No folder", the existing folders, and "New folder" (typed; `/` makes subfolders). The file keeps its name; an Undo snackbar follows. Disabled until a new note has text.
+- **Move to folder (built 2026-10-03; from 2026-10-04 reached through the Folder row, no longer the ⋮ menu):** a sheet with "No folder", the existing folders, and "New folder" (typed; `/` makes subfolders). The file keeps its name; an Undo snackbar follows. Disabled until a new note has text.
 - **Tags:** one row. Solid chips are confirmed tags (user-made or approved). Dimmed chips (no fill, dashed outline at about 55% opacity, readable secondary-text label) are AI-suggested tags waiting for approval. Tapping a dimmed tag opens the suggestion sheet (accept, reject, or close for not sure). The user can also add a tag by hand.
 - **Linked:** solid chips for links the user made or approved. Chips show the linked note's current title (not the text after `|`); tapping opens it. Links to notes that don't exist aren't shown.
 - **Suggested links:** dimmed chips for AI link suggestions. Tapping opens the suggestion sheet.

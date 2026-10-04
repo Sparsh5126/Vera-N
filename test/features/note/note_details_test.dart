@@ -66,9 +66,7 @@ void main() {
 
   testWidgets('move to a new folder, then undo', (tester) async {
     final ref = await openNote(tester, 'Wanderer');
-    await tester.tap(find.byTooltip('More options'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Move to folder'));
+    await tester.tap(find.text('Add to folder'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('New folder'));
     await tester.pumpAndSettle();
@@ -91,15 +89,18 @@ void main() {
     await tester.tap(find.text('New note'));
     await tester.pumpAndSettle();
     expect(find.text('Add tag'), findsNothing);
+    expect(find.text('Add to folder'), findsNothing);
+    await app.finish(tester);
+  });
+
+  testWidgets('the ⋮ menu has no Move to folder (it is below the text)', (
+    tester,
+  ) async {
+    await openNote(tester, 'Wanderer');
     await tester.tap(find.byTooltip('More options'));
     await tester.pumpAndSettle();
-    final move = tester.widget<PopupMenuItem<VoidCallback?>>(
-      find.ancestor(
-        of: find.text('Move to folder'),
-        matching: find.byType(PopupMenuItem<VoidCallback?>),
-      ),
-    );
-    expect(move.enabled, isFalse);
+    expect(find.text('Delete'), findsOneWidget);
+    expect(find.text('Move to folder'), findsNothing);
     await app.finish(tester);
   });
 

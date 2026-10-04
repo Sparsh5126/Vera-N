@@ -118,7 +118,6 @@ abstract final class AppCopy {
   static const folderNameHint = 'Folder name';
   static String movedTo(String folder) => 'Moved to $folder';
   static const movedOutOfFolder = 'Moved out of its folder';
-  static const moveToFolder = 'Move to folder';
   static const archive = 'Archive';
   static const delete = 'Delete';
   static const movedToTrash = 'Moved to trash';

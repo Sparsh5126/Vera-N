@@ -204,9 +204,6 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       onCopy: note == null
           ? null
           : () => unawaited(_actions.copy(context, _text?.text ?? note.body)),
-      onMove: note == null
-          ? null
-          : () => unawaited(_actions.moveToFolder(context, note)),
       onDelete: () => unawaited(_delete()),
     );
   }

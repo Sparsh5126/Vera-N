@@ -115,6 +115,9 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - UI spec §4: the folder screen now says "or make a new one such as "Vera N" in Documents", because Android's picker can't be pre-filled with a new folder name.
 - The path check is shared by both file stores. Note names with `:` (for example `2:17 AM.md`) are allowed.
 
+### Removed
+- **Move to folder in the note's ⋮ menu** (backlog #5): it's reached through the Folder row below the text. The unused `AppCopy.moveToFolder` string is gone too.
+
 ### Fixed
 - Note cards in the grid always showed as unpinned. This was harmless while the grid held only unpinned notes, but folder and tag views include pinned ones; `NotesGrid` now uses each note's own pinned flag.
 - **The Undo popup never went away on its own** (backlog #8). Flutter keeps a snackbar that has an action until it is dismissed (`persist` defaults to true when there's an action). Every Undo now goes through `UndoSnackBar`, which sets `persist: false`. Covered by a test that was checked to fail without the fix.

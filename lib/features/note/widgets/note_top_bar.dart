@@ -14,7 +14,6 @@ class NoteTopBar extends StatelessWidget {
     required this.onBack,
     required this.onPinChanged,
     required this.onCopy,
-    required this.onMove,
     required this.onDelete,
   });
 
@@ -28,8 +27,6 @@ class NoteTopBar extends StatelessWidget {
   /// Copies the whole note. Null while there is no text.
   final VoidCallback? onCopy;
 
-  /// Null while the note doesn't exist yet.
-  final VoidCallback? onMove;
   final VoidCallback onDelete;
 
   @override
@@ -58,15 +55,11 @@ class NoteTopBar extends StatelessWidget {
             icon: const Icon(Icons.push_pin_outlined),
             selectedIcon: const Icon(Icons.push_pin),
           ),
-          PopupMenuButton<VoidCallback?>(
+          // Move to folder lives below the text (the Folder row).
+          PopupMenuButton<VoidCallback>(
             tooltip: AppCopy.moreOptions,
-            onSelected: (action) => action?.call(),
+            onSelected: (action) => action(),
             itemBuilder: (_) => [
-              PopupMenuItem(
-                value: onMove,
-                enabled: onMove != null,
-                child: const Text(AppCopy.moveToFolder),
-              ),
               PopupMenuItem(value: onDelete, child: const Text(AppCopy.delete)),
             ],
           ),
