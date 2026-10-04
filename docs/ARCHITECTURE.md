@@ -190,7 +190,7 @@ Each package is logged in `CHANGELOG.md` with size and battery impact when it is
 From the specs — **blocking the stages noted, not the architecture**:
 
 1. **Accepted-link storage**: inline footer block vs sidecar. Blocks: Review/accept logic.
-2. **On-device embedding model.** Benchmarked 2026-10-04 on a Snapdragon 778G (`tool/embedding_bench/README.md`); awaiting the user's choice. The data favours paraphrase-multilingual-MiniLM-L12-v2 int8 on ONNX Runtime: best Hindi / English separation, same speed and size as e5-small, but a 128-token window, so chunking is needed. Also open: bundle the model (about 130 MB in the APK) or download it once.
+2. ~~On-device embedding model~~: **decided 2026-10-04**: paraphrase-multilingual-MiniLM-L12-v2 int8, trimmed to English + Hindi (`tool/model_trim/`), ONNX Runtime (`flutter_onnxruntime`), bundled. See section 8.
 3. **Similarity thresholds** for "strong". Blocks: suggestions stage.
 
 Raised by the storage stage — **built as proposed, easy to change; please confirm**:
@@ -218,6 +218,13 @@ Raised by the storage stage — **built as proposed, easy to change; please conf
 **Links** (built 2026-10-03)
 - A `links` table (schema 3) holds every `[[link]]` in each note's text: source note, target key (file name or path, lower case, no `.md`), position, label. It is rebuilt from the text on every save and index, so it is always derivable from the files.
 - Notes carry a `name_key` (file name without `.md`, lower case). A link matches a note by `name_key`, or by `path_key` when it includes a folder. Unresolved links are kept but not shown.
+
+**Embedding model** (decided 2026-10-04)
+- paraphrase-multilingual-MiniLM-L12-v2, int8 ONNX, trimmed to English + Hindi by `tool/model_trim/` (45 MB model + 2.4 MB tokenizer), run with ONNX Runtime through `flutter_onnxruntime`, tokenized in Dart with `dart_sentencepiece_tokenizer`.
+- Bundled in the app (no internet permission). The user's limit is 150 MB of app size; projected ~71 MB download, ~118 MB on the phone.
+- 384-dimensional vectors, mean-pooled and normalized. It reads 128 tokens, so notes are split into chunks of at most 128 tokens.
+- Loaded only for a batch, then released: it adds ~140 MB of memory while loaded and takes 0.5–0.8 s to load on a Snapdragon 778G.
+- Evidence: `tool/embedding_bench/README.md` and `tool/model_trim/README.md`.
 
 **Database location and `.app/`** (decided 2026-10-03)
 - The database lives in app-private storage; it is an index and rebuilds from `Notes/` and `.app/`.

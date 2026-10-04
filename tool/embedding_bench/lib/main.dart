@@ -41,6 +41,11 @@ Future<void> _run() async {
       name: 'paraphrase-multilingual-MiniLM-L12-v2 int8',
       dir: '$models/ml-minilm-l12',
     ),
+    // Trimmed to English + Hindi by tool/model_trim (--words 300000).
+    'ml-minilm-l12-trim' => OnnxEmbedder(
+      name: 'paraphrase-multilingual-MiniLM-L12-v2 int8, trimmed en+hi',
+      dir: '$models/ml-minilm-l12-trim',
+    ),
     'embeddinggemma' => TfliteEmbedder(
       name: 'EmbeddingGemma-300M seq256 mixed-precision',
       dir: '$models/embeddinggemma',

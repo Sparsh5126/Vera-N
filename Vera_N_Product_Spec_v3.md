@@ -284,7 +284,7 @@ The phone detects a strong match and shows a dimmed suggestion. In the review ba
 
 - Logo and app icon final artwork (direction: dark rounded square, serif V, one amber dot).
 - Where accepted links are stored (see section 5).
-- Which on-device embedding model to start with.
+- ~~Which on-device embedding model to start with.~~ Decided 2026-10-04: paraphrase-multilingual-MiniLM-L12-v2 (int8), trimmed to English + Hindi and bundled; benchmarked on a mid-range phone (Snapdragon 778G). Details in docs/ARCHITECTURE.md §8.
 - Similarity thresholds for "strong" at launch.
 - How "substantial change" is measured when reconsidering rejected pairs.
 - Capture-screen details (launch-to-typing target). Markdown format and header fields are decided in docs/ARCHITECTURE.md §8: `id`, `created`, `tags`, `pinned`.

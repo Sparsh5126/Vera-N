@@ -5,6 +5,14 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Embedding model chosen and trimmed** (decided 2026-10-04). The model is paraphrase-multilingual-MiniLM-L12-v2 int8 (Apache-2.0), bundled in the app, with the user's limit of 150 MB app size.
+  - The full model would mean ~120 MB download but ~255 MB on the phone, because it is unpacked from the APK. So `tool/model_trim/` trims it to English + Hindi: it keeps the word pieces the 300,000 most common English words use (wordfreq, which includes common romanized Hindi), all Devanagari, symbols and emoji. Kept rows keep their exact values.
+  - Result: model 118 → 44.9 MB, tokenizer 17 → 2.4 MB.
+  - Quality on the related-pair test is identical, on the computer and on the phone. Everyday notes average 0.998 similarity to the full model; English prose averages 0.994.
+  - On the phone: load 1.6–2.1 s → 0.54–0.79 s; memory while loaded 421–477 → 299–314 MB; same speed.
+  - Projected app: ~71 MB download, ~118 MB on the phone.
+  - Trade-off: notes in other scripts get weak suggestions.
+  - A frequency-only cut was tried first and rejected (details in `tool/model_trim/README.md`).
 - **Embedding model benchmark tool** (`tool/embedding_bench/`, product spec §20 risk 1). A separate test app, so the Vera N app gets no new dependencies and real notes are never touched.
   - Measures load time, memory, and time per note at three lengths, plus an indicative quality check on a hand-written Hindi / English / Hinglish set of related pairs.
   - Candidates: multilingual-e5-small (MIT), paraphrase-multilingual-MiniLM-L12-v2 (Apache-2.0), both int8 ONNX; EmbeddingGemma-300M (LiteRT, Gemma terms, gated, downloaded by the user).
