@@ -43,6 +43,7 @@ Floating pill bottom bar: **Home | Search | Graph | Settings**
 - A pill-shaped **New note** button floats just above the bar, bottom right.
 - A soft fade at the bottom of scrolling content keeps cards from clashing with the floating controls; scroll areas get bottom padding so the last card is never hidden.
 - The bar hides while writing a note.
+- Switching tabs (2026-10-04, backlog #10): the amber pill slides to the chosen icon and the page fades in, 200 ms ease-out; both are instant when the system's "reduce motion" is on.
 - Theme: **follows system by default**; options for Dark and Light. Accent color is amber; colors, typography, shape, and motion are defined in section 22 of Vera_N_Product_Spec_v3.md.
 
 ---

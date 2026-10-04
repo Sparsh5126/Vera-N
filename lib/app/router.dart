@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/feedback/motion.dart';
 import '../core/navigation/routes.dart';
+import '../core/styles/app_styles.dart';
 import '../features/home/home_screen.dart';
 import '../features/note/note_screen.dart';
 import '../features/onboarding/onboarding_folder_screen.dart';
@@ -39,9 +41,21 @@ GoRouter buildRouter({bool startWithOnboarding = false}) {
   );
 }
 
-/// Tabs switch in place, without a page transition.
+/// Tabs switch in place with a short fade (none when the system asks
+/// for less motion).
 GoRoute _tab(String path, Widget screen) => GoRoute(
   path: path,
-  pageBuilder: (_, state) =>
-      NoTransitionPage(key: state.pageKey, child: screen),
+  pageBuilder: (context, state) => CustomTransitionPage(
+    key: state.pageKey,
+    child: screen,
+    transitionDuration: Motion.of(context),
+    reverseTransitionDuration: Motion.of(context),
+    transitionsBuilder: (_, animation, _, child) => FadeTransition(
+      opacity: CurvedAnimation(
+        parent: animation,
+        curve: AppMotion.standardCurve,
+      ),
+      child: child,
+    ),
+  ),
 );

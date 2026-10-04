@@ -13,7 +13,7 @@ From the user's note `20261004-145445-ae09` (2026-10-04): "all these aren't urge
 | 7 | Delete a note from Home (long-press or swipe) | Open | Keep a visible button alternative (UI spec §2.6), and offer Undo, not a confirmation. |
 | 8 | The Undo popup doesn't go away on its own | **Done** (2026-10-04) | Flutter keeps a snackbar with an action until dismissed; `UndoSnackBar` now sets `persist: false`. A test guards it. |
 | 9 | Tags and folders as chips; linked and backlinked notes as hyperlinks | Open | See #1. |
-| 10 | Animate switching tabs on the nav pill | Open | 200 ms ease-out from the motion tokens; instant when "reduce motion" is on. |
+| 10 | Animate switching tabs on the nav pill | **Done** (2026-10-04) | 200 ms ease-out from the motion tokens; instant when "reduce motion" is on. |
 | 11 | A button to copy the whole note, next to the pin button | **Done** (2026-10-04) | Copy the text as the reader sees it (links as titles, ☐/☑, no Markdown), in line with "for them it's just notes". |
 
 ## Also open (found during work)
