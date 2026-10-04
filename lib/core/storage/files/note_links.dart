@@ -37,14 +37,6 @@ abstract final class NoteLinks {
     return links;
   }
 
-  /// [text] as a reader sees it: `[[name|Title]]` becomes `Title`, and
-  /// `[[name]]` becomes `name`. For cards, search results and titles;
-  /// the note itself keeps the full links.
-  static String displayText(String text) => text.replaceAllMapped(_link, (m) {
-    final label = m.group(2)?.trim();
-    return label == null || label.isEmpty ? m.group(1)!.trim() : label;
-  });
-
   /// Lookup key for a link target; null if nothing is left.
   static String? targetKey(String target) {
     var t = target.split(RegExp('[#^]')).first.trim().replaceAll(r'\', '/');

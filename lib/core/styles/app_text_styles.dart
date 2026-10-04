@@ -78,6 +78,19 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
 
   static const double _linkUnderline = 2;
 
+  /// Bold text in the editor (`**…**` with the stars hidden).
+  static TextStyle strong(TextStyle base) => base.copyWith(
+    fontWeight: FontWeight.w700,
+    fontVariations: const [FontVariation.weight(700)],
+  );
+
+  /// A ticked checklist item: secondary text, struck through.
+  static TextStyle done(TextStyle base, AppPalette p) => base.copyWith(
+    color: p.textSecondary,
+    decoration: TextDecoration.lineThrough,
+    decorationColor: p.textSecondary,
+  );
+
   /// Inter is a variable font: the weight axis must be set explicitly.
   static TextStyle _inter(
     double size,

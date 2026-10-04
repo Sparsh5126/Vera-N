@@ -48,6 +48,12 @@ abstract final class AppSize {
   static const double noteCardHeight = 168;
   static const double pinnedCardWidth = 168;
 
+  /// Space a checkbox or bullet takes at the start of a list line in the
+  /// editor. The checkbox is tappable across this width and the line's
+  /// height (an inline glyph can't reach the 48 minimum without spreading
+  /// every list line apart).
+  static const double glyphWidth = 32;
+
   /// Widest a tag, folder or link chip grows before its label is cut
   /// with "…" (a note's title is its whole first line).
   static const double chipMaxWidth = 240;

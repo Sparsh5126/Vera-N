@@ -7,10 +7,10 @@ import '../../../core/models/note.dart';
 import '../../../core/storage/repositories/links_repository.dart';
 import '../../../core/storage/repositories/notes_repository.dart';
 import '../../../core/storage/repositories/search_repository.dart';
-import '../../../core/styles/app_styles.dart';
 import '../../../core/utils/names.dart';
 import '../../../shared/widgets/option_sheet.dart';
 import '../../../shared/widgets/text_entry_sheet.dart';
+import '../../../shared/widgets/undo_snack_bar.dart';
 import '../state/note_editor_controller.dart';
 import 'note_picker_sheet.dart';
 
@@ -29,16 +29,21 @@ class NoteActions {
   final LinksRepository _links;
   final NotesRepository _notes;
 
-  /// After `[[` is typed: pick a note and get the link text to insert, or
-  /// null if the user backed out (the `[[` stays as typed).
-  Future<String?> pickLink(BuildContext context, int? currentRef) async {
+  /// Pick a note and get the link text to insert, or null if the user
+  /// backed out. With [label], the link shows those words (the selection)
+  /// instead of the note's title.
+  Future<String?> pickLink(
+    BuildContext context,
+    int? currentRef, {
+    String? label,
+  }) async {
     final notes = await _notes.allNotes();
     if (!context.mounted) return null;
     final picked = await NotePickerSheet.show(context, [
       for (final n in notes)
         if (n.ref != currentRef) n,
     ]);
-    return picked == null ? null : _links.linkTextFor(picked);
+    return picked == null ? null : _links.linkTextFor(picked, label: label);
   }
 
   Future<void> addTag(BuildContext context, Note note) async {
@@ -103,15 +108,10 @@ class NoteActions {
     String message,
     Future<Object?> Function() undo,
   ) {
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: AppMotion.undoWindow,
-        action: SnackBarAction(
-          label: AppCopy.undo,
-          onPressed: () => unawaited(undo()),
-        ),
-      ),
+    UndoSnackBar.show(
+      messenger,
+      message: message,
+      onUndo: () => unawaited(undo()),
     );
   }
 }

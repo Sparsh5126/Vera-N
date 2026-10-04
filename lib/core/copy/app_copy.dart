@@ -98,6 +98,13 @@ abstract final class AppCopy {
   static const suggestedLinks = 'Suggested links';
   static const mentionedIn = 'Mentioned in';
   static const linkPickerHint = 'Link to a note…';
+  static const bullet = '•';
+  static const checkboxDone = 'Done';
+  static const checkboxNotDone = 'Not done';
+  static const formatBold = 'Bold';
+  static const formatList = 'List';
+  static const formatChecklist = 'Checklist';
+  static const formatLink = 'Link to a note';
   static const addTag = 'Add tag';
   static const tagNameHint = 'Tag name';
   static String removeTag(String tag) => 'Remove #$tag';

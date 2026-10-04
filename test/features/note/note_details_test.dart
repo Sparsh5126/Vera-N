@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vera_n/core/styles/app_styles.dart';
 import 'package:vera_n/shared/widgets/note_chip.dart';
 
 import '../../support/app_harness.dart';
@@ -133,6 +134,20 @@ void main() {
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+    await app.finish(tester);
+  });
+
+  testWidgets('the Undo popup goes away on its own', (tester) async {
+    await openNote(tester, 'Tagged');
+    await addTag(tester, 'idea');
+    await tester.tap(find.text('#idea'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Remove #idea'));
+    await tester.pumpAndSettle();
+    expect(find.text('Tag removed'), findsOneWidget);
+    await tester.pump(AppMotion.undoWindow + const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(find.text('Tag removed'), findsNothing);
     await app.finish(tester);
   });
 }

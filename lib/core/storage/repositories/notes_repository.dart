@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 import '../../models/note.dart';
 import '../../models/note_header.dart';
 import '../../models/note_summary.dart';
+import '../../models/search_filters.dart';
 import '../db/app_database.dart';
 import '../db/note_rows.dart';
 import '../files/note_document.dart';
@@ -14,6 +15,7 @@ import '../files/note_id.dart';
 import '../files/note_links.dart';
 import '../files/note_text.dart';
 import '../indexer/note_writer.dart';
+import 'note_filter_sql.dart';
 import 'note_placement.dart';
 
 /// Create, read, update, tag, pin, move and trash notes.
@@ -48,14 +50,25 @@ class NotesRepository {
   late final NotePlacement _placement;
 
   /// Notes not in the trash, most recently changed first.
-  Stream<List<NoteSummary>> watchNotes() {
-    final query = _db.select(_db.notes)
-      ..where((n) => n.trashedAt.isNull())
-      ..orderBy([
-        (n) => OrderingTerm.desc(n.modified),
-        (n) => OrderingTerm.desc(n.id),
-      ]);
-    return query.watch().map((rows) => rows.map(NoteRows.toSummary).toList());
+  ///
+  /// With [filters], only notes in that folder (and its subfolders), with
+  /// that tag, or changed since that date.
+  Stream<List<NoteSummary>> watchNotes({
+    SearchFilters filters = const SearchFilters(),
+  }) {
+    final where = NoteFilterSql(filters, _clock());
+    // Only what a card shows: a short slice of the text, not all of it, so
+    // re-reading the list after each save stays cheap.
+    return _db
+        .customSelect(
+          'SELECT n.id, n.title, n.pinned, n.modified, n.folder, '
+          'substr(n.body, 1, ${NoteRows.previewLength}) AS body FROM notes n '
+          'WHERE ${where.sql} ORDER BY n.modified DESC, n.id DESC',
+          variables: where.variables,
+          readsFrom: {_db.notes, _db.noteTags},
+        )
+        .watch()
+        .map((rows) => rows.map(NoteRows.summaryFrom).toList());
   }
 
   /// Notes not in the trash, most recently changed first (one read).
@@ -111,20 +124,17 @@ class NotesRepository {
   }
 
   /// Saves new text. A headerless note stays headerless.
-  Future<void> updateBody(int ref, String body) async {
-    final row = await _row(ref).getSingleOrNull();
-    if (row == null || row.body == body) return;
-    await _change(
-      ref,
-      NotesCompanion(
-        title: Value(NoteText.title(body)),
-        body: Value(body),
-        contentHash: Value(NoteText.contentHash(body)),
-        modified: Value(_clock()),
-      ),
-    );
-    await NoteRows.replaceLinks(_db, ref, body);
-  }
+  Future<void> updateBody(int ref, String body) => _change(
+    ref,
+    NotesCompanion(
+      title: Value(NoteText.title(body)),
+      body: Value(body),
+      contentHash: Value(NoteText.contentHash(body)),
+      modified: Value(_clock()),
+    ),
+    body: body,
+    skipIfSameBody: true,
+  );
 
   Future<void> setPinned(int ref, bool pinned) => _changeHeader(
     ref,
@@ -177,25 +187,41 @@ class NotesRepository {
         title: Value(NoteText.title(doc.body)),
         contentHash: Value(NoteText.contentHash(doc.body)),
       ),
+      body: doc.body,
     );
-    if (doc.body != row.body) await NoteRows.replaceLinks(_db, ref, doc.body);
   }
 
   /// Applies an in-app change and schedules the file write. The revision
   /// bump happens in the same transaction, so a file write running at the
   /// same time can't clear `pendingWrite` for text it didn't write.
-  Future<void> _change(int ref, NotesCompanion values) async {
+  ///
+  /// When the change sets the text to [body], the note's links are
+  /// rebuilt from it in the same transaction; with [skipIfSameBody], an
+  /// unchanged text skips the write entirely. One transaction means
+  /// listeners (Home, the note view) hear about the save once, not once
+  /// per statement.
+  Future<void> _change(
+    int ref,
+    NotesCompanion values, {
+    String? body,
+    bool skipIfSameBody = false,
+  }) async {
+    var changed = false;
     await _db.transaction(() async {
       final row = await _row(ref).getSingleOrNull();
-      if (row == null) return;
+      if (row == null || (skipIfSameBody && row.body == body)) return;
       await _update(ref).write(
         values.copyWith(
           pendingWrite: const Value(true),
           revision: Value(row.revision + 1),
         ),
       );
+      if (body != null && body != row.body) {
+        await NoteRows.replaceLinks(_db, ref, body);
+      }
+      changed = true;
     });
-    _writer.schedule();
+    if (changed) _writer.schedule();
   }
 
   Future<String> _freeId(DateTime now, String folder) async {

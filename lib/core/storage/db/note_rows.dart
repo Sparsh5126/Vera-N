@@ -7,6 +7,7 @@ import '../../models/note_summary.dart';
 import '../files/note_document.dart';
 import '../files/note_header_codec.dart';
 import '../files/note_links.dart';
+import '../files/note_markup.dart';
 import '../files/note_text.dart';
 import 'app_database.dart';
 
@@ -86,7 +87,7 @@ abstract final class NoteRows {
       path: row.path,
       folder: row.folder,
       // Titles stored before links were shown as titles may hold markup.
-      title: NoteLinks.displayText(row.title),
+      title: NoteMarkup.display(row.title),
       body: row.body,
       tags: tagsOf(row.headerRaw),
       pinned: row.pinned,
@@ -100,13 +101,26 @@ abstract final class NoteRows {
     return NoteSummary(
       ref: row.id,
       // Titles stored before links were shown as titles may hold markup.
-      title: NoteLinks.displayText(row.title),
+      title: NoteMarkup.display(row.title),
       preview: NoteText.preview(
         row.body.characters.take(previewLength).toString(),
       ),
       pinned: row.pinned,
       modified: row.modified,
       folder: row.folder,
+    );
+  }
+
+  /// A card's data from a row of `id, title, pinned, modified, folder,
+  /// body` where body may be only the start of the text.
+  static NoteSummary summaryFrom(QueryRow r) {
+    return NoteSummary(
+      ref: r.read<int>('id'),
+      title: NoteMarkup.display(r.read<String>('title')),
+      preview: NoteText.preview(r.read<String>('body')),
+      pinned: r.read<bool>('pinned'),
+      modified: r.read<DateTime>('modified'),
+      folder: r.read<String>('folder'),
     );
   }
 

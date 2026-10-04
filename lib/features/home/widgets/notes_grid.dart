@@ -5,7 +5,7 @@ import '../../../core/styles/app_styles.dart';
 import '../../../core/utils/date_label.dart';
 import '../../../shared/widgets/note_card.dart';
 
-/// The main notes area as a two-column grid (the default layout).
+/// A two-column grid of note cards (the default layout).
 /// Built lazily, so long libraries scroll smoothly.
 class NotesGrid extends StatelessWidget {
   const NotesGrid({
@@ -41,7 +41,7 @@ class NotesGrid extends StatelessWidget {
             title: note.title,
             preview: note.preview,
             dateLabel: DateLabel.of(note.modified, now),
-            pinned: false,
+            pinned: note.pinned,
             onTap: () => onOpen(note.ref),
           );
         },

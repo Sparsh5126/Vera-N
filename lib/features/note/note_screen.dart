@@ -10,11 +10,16 @@ import '../../core/navigation/routes.dart';
 import '../../core/platform/launch_channel.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../core/styles/app_styles.dart';
+import '../../shared/widgets/undo_snack_bar.dart';
 import 'state/link_typing.dart';
+import 'state/markup_editing.dart';
 import 'state/note_editor_controller.dart';
 import 'state/note_providers.dart';
+import 'widgets/format_bar.dart';
 import 'widgets/note_actions.dart';
 import 'widgets/note_details.dart';
+import 'widgets/note_editor_view.dart';
+import 'widgets/note_format_actions.dart';
 import 'widgets/note_top_bar.dart';
 import 'widgets/titled_text_controller.dart';
 
@@ -56,7 +61,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     _lifecycle = AppLifecycleListener(onInactive: _editor.save);
     final noteRef = widget.noteRef;
     if (noteRef == null) {
-      _text = TitledTextController();
+      _text = _newText('');
       // First frame with the focused editor: the cursor is ready to type.
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => unawaited(LaunchChannel.logTypingReady()),
@@ -69,7 +74,13 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   void _loaded(Note? note) {
     if (!mounted) return;
     _lastText = note?.body ?? '';
-    setState(() => _text = TitledTextController(text: _lastText));
+    setState(() => _text = _newText(_lastText));
+  }
+
+  TitledTextController _newText(String body) {
+    final text = TitledTextController(text: body);
+    text.onCheckboxToggled = () => _onTextChanged(text.text);
+    return text;
   }
 
   @override
@@ -88,15 +99,10 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     if (!mounted) return;
     _leave();
     if (trashed == null) return;
-    messenger.showSnackBar(
-      SnackBar(
-        content: const Text(AppCopy.movedToTrash),
-        duration: AppMotion.undoWindow,
-        action: SnackBarAction(
-          label: AppCopy.undo,
-          onPressed: () => unawaited(repo.restore(trashed)),
-        ),
-      ),
+    UndoSnackBar.show(
+      messenger,
+      message: AppCopy.movedToTrash,
+      onUndo: () => unawaited(repo.restore(trashed)),
     );
   }
 
@@ -131,6 +137,21 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
   void _openNote(int noteRef) => context.push(Routes.note(noteRef));
 
+  /// Tapping inside a link's title opens the linked note.
+  void _onEditorTap() {
+    final text = _text;
+    if (text == null) return;
+    final link = MarkupEditing.linkAt(text.text, text.selection.baseOffset);
+    if (link != null) unawaited(_openLink(link.target!));
+  }
+
+  Future<void> _openLink(String target) async {
+    final linked = await ref.read(linksRepositoryProvider).findNote(target);
+    if (linked == null || !mounted) return;
+    _focus.unfocus();
+    _openNote(linked);
+  }
+
   /// A tap below the text starts editing at its end.
   void _editAtEnd() {
     final text = _text;
@@ -146,25 +167,27 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       ..palette = context.colors;
     return Scaffold(
       body: SafeArea(
-        child: ValueListenableBuilder<int?>(
-          valueListenable: _editor.noteRef,
-          builder: (context, noteRef, _) => Consumer(
-            builder: (context, ref, _) {
-              final note = noteRef == null
-                  ? null
-                  : ref.watch(noteProvider(noteRef)).value;
-              return Column(
-                children: [
-                  _topBar(note),
-                  Expanded(
-                    child: text == null
-                        ? const SizedBox.shrink()
-                        : _body(text, note),
-                  ),
-                ],
-              );
-            },
-          ),
+        child: Column(
+          children: [
+            _watchNote(_topBar),
+            Expanded(
+              child: text == null ? const SizedBox.shrink() : _body(text),
+            ),
+            if (text != null) _formatBar(text),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Rebuilds only [builder]'s part when the note changes (pin, tags,
+  /// saves), so the editor itself never rebuilds while typing.
+  Widget _watchNote(Widget Function(Note? note) builder) {
+    return ValueListenableBuilder<int?>(
+      valueListenable: _editor.noteRef,
+      builder: (context, noteRef, _) => Consumer(
+        builder: (context, ref, _) => builder(
+          noteRef == null ? null : ref.watch(noteProvider(noteRef)).value,
         ),
       ),
     );
@@ -185,22 +208,32 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     );
   }
 
-  Widget _body(TitledTextController text, Note? note) {
-    final keyboardUp = MediaQuery.viewInsetsOf(context).bottom > 0;
-    final typing = _focus.hasFocus && keyboardUp;
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(child: _readable(_editorField(text))),
-        if (note != null && !typing)
-          SliverToBoxAdapter(child: _readable(_details(note))),
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: _editAtEnd,
-          ),
-        ),
-      ],
+  Widget _body(TitledTextController text) {
+    return NoteEditorView(
+      text: text,
+      focus: _focus,
+      autofocus: widget.noteRef == null,
+      onChanged: _onTextChanged,
+      onTap: _onEditorTap,
+      onTapBelow: _editAtEnd,
+      details: _watchNote(
+        (note) => note == null
+            ? const SizedBox.shrink()
+            : NoteEditorView.readable(_details(note)),
+      ),
+    );
+  }
+
+  /// Shown above the keyboard only while text is selected.
+  Widget _formatBar(TitledTextController text) {
+    final format = NoteFormatActions(text, _actions, _onTextChanged);
+    return FormatBar.whileSelecting(
+      text: text,
+      focus: _focus,
+      onBold: format.bold,
+      onList: format.list,
+      onChecklist: format.checklist,
+      onLink: () => unawaited(format.link(context, _editor.noteRef.value)),
     );
   }
 
@@ -216,29 +249,6 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
         onTagTap: (tag) => unawaited(_actions.tagTapped(context, note, tag)),
         onOpenNote: _openNote,
       ),
-    );
-  }
-
-  Widget _readable(Widget child) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: AppSize.readableWidth),
-        child: Padding(padding: AppSpace.screen, child: child),
-      ),
-    );
-  }
-
-  Widget _editorField(TitledTextController text) {
-    return TextField(
-      controller: text,
-      focusNode: _focus,
-      autofocus: widget.noteRef == null,
-      onChanged: _onTextChanged,
-      style: context.textStyles.body,
-      keyboardType: TextInputType.multiline,
-      textCapitalization: TextCapitalization.sentences,
-      maxLines: null,
-      decoration: const InputDecoration(border: InputBorder.none),
     );
   }
 }

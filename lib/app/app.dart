@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/copy/app_copy.dart';
 import '../core/navigation/routes.dart';
+import '../core/platform/frame_stats.dart';
 import '../core/platform/launch_channel.dart';
 import '../core/storage/storage_providers.dart';
 import '../core/styles/app_styles.dart';
@@ -34,7 +35,10 @@ class _AppState extends ConsumerState<App> {
     super.initState();
     final storage = ref.read(storageProvider);
     _lifecycle = AppLifecycleListener(
-      onPause: storage.onPause,
+      onPause: () {
+        FrameStats.report();
+        storage.onPause();
+      },
       onResume: storage.onResume,
     );
     LaunchChannel.listen(

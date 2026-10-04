@@ -5,6 +5,39 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Home Recent | Folders | Tags switch** (UI spec §5; the open question in §14 is now decided).
+  - Folders and Tags show a pill per folder or tag; tap one to see its notes (a folder includes its subfolders), tap again to clear.
+  - The lists update live, and the view and the pick are kept while the app runs.
+  - New: `RecentView` and `GroupView` (slivers), `PillTabs`, a `FilterPill` without the ▾, `homeViewProvider`.
+  - `NotesRepository.watchNotes(filters:)` reuses Search's filter SQL, now `NoteFilterSql`. `SearchRepository.watchFolders()` and `watchTags()` are live versions of the picker lists.
+- Tests: 5 new (default view, folder pick and clear with subfolders, tag pick, empty views, place kept after opening a note). 197 in total.
+- **The editor shows formatting, not Markdown** (at the user's request). Bold is bold. Checklist lines show real checkboxes that tick with a tap (ticked items are struck through), and bullet lines show •.
+  - The Markdown stays in the file for Obsidian. In the editor, the cursor skips the hidden symbols, and backspacing into them removes only the formatting.
+  - Enter continues a checklist or bullet list; Enter on an empty item ends it.
+  - Cards and search show ☐ / ☑ / • and plain words.
+  - `NoteMarkup` (core: finds links, bold, checklist and bullet lines, and gives the reader's text) replaces `LinkMarkup` and `NoteLinks.displayText`. `MarkupEditing` holds the editing rules; `CheckboxGlyph` is drawn inline as a `WidgetSpan`.
+  - Tokens: `AppTextStyles.strong`, `AppTextStyles.done`, `AppSize.glyphWidth`.
+  - Accessibility trade-off: the checkbox target is 32 points wide by one line tall, below the 48 minimum, because a full-size target would spread every list line apart. Recorded in UI spec §7.
+- **Tapping a link's title in the editor opens the linked note** (`LinksRepository.findNote`).
+- **Typing performance work** (user report: typing felt jumpy when fast), measured on the phone (model A063, Android 15, charging, 37 °C). Profile builds, cold start into a new note, 12 bursts of `adb shell input text` with 0.35 s pauses, two rounds alternating before and after, 3 runs each:
+  - Build p90: 3.1–4.0 ms before → 2.4–2.5 ms after (about a third less); the worst build frames mostly dropped too.
+  - Frames over 8.3 ms (6 runs combined): 130 before, 121 after, which is within the noise.
+  - Frames over 16.7 ms (6 runs combined): 15 before, 32 after, but 13 of those came from one run. Not an improvement.
+  - Reading: the changes cut build-side work as intended, but the remaining slow frames are **raster-bound** (GPU drawing), which these changes don't touch. Next step is in `docs/BACKLOG.md`.
+  - Limits: adb types much faster than a person, and the test text was plain, so the new formatting rendering wasn't exercised.
+
+  Tooling:
+  - `FrameStats` logs frame build and raster times in profile builds, summarized when the app goes to the background.
+  - A measurement-only build switch (`--android-project-arg=vera.perf=true`) installs as a separate app with its own empty storage, so timing runs never touch real notes.
+- `docs/BACKLOG.md`: the user's 11 pre-release items, with status and the two that conflict with the spec (premium shadows and colours versus product spec §22).
+- `UndoSnackBar`: one shared way to offer Undo.
+- Tests: 24 new (markup parsing and display, editing rules, checkbox tap, bold rendering, link tap, card symbols, Undo popup timing). 192 in total.
+- **Formatting row** (UI spec §7): a slim row above the keyboard, shown only while text is selected.
+  - Bold (`**…**`), List (`- `) and Checklist (`- [ ] `). All are toggles; a list line becomes a checklist line rather than getting both markers.
+  - Link: turns the selected words into a link to a picked note, keeping your words as the link's title.
+  - Plain Markdown, saved like typing. Attach comes with attachments.
+  - New: `MarkdownFormat`, `FormatBar`, `NoteFormatActions`; `linkTextFor(label:)`.
+- Tests: 13 new (formatting toggles including Hindi, the row's visibility, saving, link from selection). 176 in total.
 - **Folder below the note's text**, like tags (at the user's request; UI spec §7). A note in a folder shows one chip; tap it to move. Otherwise an "Add to folder" button; with no folder and no tags, both add buttons share one row.
 - **Links show only their title in the editor** ("Time Loop", underlined in amber; text stays the normal color). The note file still holds `[[name|Time Loop]]` for Obsidian.
   - `LinkMarkup` hides the markup: the cursor steps over it in the direction it's moving, and an edit that reaches into it removes the whole link.
@@ -72,11 +105,18 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - 14 new tests, 97 in total: folder choose, reconnect, access lost, name clash, migration from version 1, the onboarding screen, the empty-folder guard, restore of a missing file, and colons in note names.
 
 ### Changed
+- Typing performance: **Saving waits for a 1-second pause** in typing instead of 300 ms. Leaving the note or the app still saves at once.
+- **A save is one database transaction** (row, revision and links together) instead of about five statements, so Home and the note view hear about it once.
+- **The editor no longer rebuilds after saves.** Only the top bar and the details area listen to the note.
+- **Home's list query reads a 280-character slice of each note,** not every note's full text.
+- The Note screen was split (`NoteEditorView`, `FormatBar.whileSelecting`) to stay near the file-size target.
 - The Android launch screen and the window behind the app use the app background (`#F7F6F3` light, `#0B0B0C` dark) instead of white or black, so there's no flash at start, especially in dark mode.
 - UI spec §4: the folder screen now says "or make a new one such as "Vera N" in Documents", because Android's picker can't be pre-filled with a new folder name.
 - The path check is shared by both file stores. Note names with `:` (for example `2:17 AM.md`) are allowed.
 
 ### Fixed
+- Note cards in the grid always showed as unpinned. This was harmless while the grid held only unpinned notes, but folder and tag views include pinned ones; `NotesGrid` now uses each note's own pinned flag.
+- **The Undo popup never went away on its own** (backlog #8). Flutter keeps a snackbar that has an action until it is dismissed (`persist` defaults to true when there's an action). Every Undo now goes through `UndoSnackBar`, which sets `persist: false`. Covered by a test that was checked to fail without the fix.
 - **Home cards showed raw link text** (`[[20261003-153228-a7f3|Time Loop]]`). Everything outside the editor now shows links as readers see them: card titles and previews, search passages, and Linked / Mentioned in titles (`NoteLinks.displayText`). Titles stored before this fix are converted when read, so no migration is needed.
 - **Long link labels and chips overflowed.** A note's title is its whole first line, so linking to a one-line note put the entire text into the link and its chip. New links cap the title at 40 characters with "…" (`NoteLinks.labelMaxLength`), and chips stop at `chipMaxWidth` (240) with "…". The "Mentioned in" rows are cut to one line.
 - The note picker read the notes list through a live database stream just to take its first value, and that never finished under test. It now uses a one-off query (`NotesRepository.allNotes`), the right tool for a single read.

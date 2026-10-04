@@ -60,12 +60,4 @@ void main() {
     expect(label.characters.length, NoteLinks.labelMaxLength);
     expect(label, endsWith('…'));
   });
-
-  test('display text shows link titles, or names without one', () {
-    expect(
-      NoteLinks.displayText('see [[n1|Time Loop]] and [[Old Note]] now'),
-      'see Time Loop and Old Note now',
-    );
-    expect(NoteLinks.displayText('no links'), 'no links');
-  });
 }

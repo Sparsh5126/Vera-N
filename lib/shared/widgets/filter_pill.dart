@@ -10,12 +10,16 @@ class FilterPill extends StatelessWidget {
     required this.label,
     required this.active,
     required this.onTap,
+    this.showArrow = true,
   });
 
   /// The filter's name when unset, or its value when set.
   final String label;
   final bool active;
   final VoidCallback onTap;
+
+  /// The ▾ that says "opens a list"; off for plain choices.
+  final bool showArrow;
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +45,9 @@ class FilterPill extends StatelessWidget {
               minWidth: AppSize.minTapTarget,
             ),
             child: Padding(
-              padding: const EdgeInsets.only(
+              padding: EdgeInsets.only(
                 left: AppSpace.m,
-                right: AppSpace.s,
+                right: showArrow ? AppSpace.s : AppSpace.m,
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -52,7 +56,8 @@ class FilterPill extends StatelessWidget {
                     label,
                     style: context.textStyles.label.copyWith(color: fg),
                   ),
-                  Icon(Icons.expand_more, size: AppSize.iconSmall, color: fg),
+                  if (showArrow)
+                    Icon(Icons.expand_more, size: AppSize.iconSmall, color: fg),
                 ],
               ),
             ),

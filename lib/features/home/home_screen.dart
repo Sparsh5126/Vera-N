@@ -6,22 +6,22 @@ import '../../core/copy/app_copy.dart';
 import '../../core/navigation/routes.dart';
 import '../../core/styles/app_styles.dart';
 import '../../core/utils/greeting.dart';
-import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/pill_button.dart';
-import 'state/home_providers.dart';
+import '../../shared/widgets/pill_tabs.dart';
+import 'state/home_view.dart';
 import 'widgets/bottom_fade.dart';
+import 'widgets/group_view.dart';
 import 'widgets/home_header.dart';
-import 'widgets/notes_grid.dart';
-import 'widgets/pinned_row.dart';
+import 'widgets/recent_view.dart';
 
-/// Home: greeting, pinned notes, then all notes. "New note" floats in
-/// thumb reach at the bottom right.
+/// Home: greeting, the Recent | Folders | Tags switch, then the notes of
+/// that view. "New note" floats in thumb reach at the bottom right.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notes = ref.watch(homeNotesProvider);
+    final view = ref.watch(homeViewProvider.select((v) => v.view));
     final now = DateTime.now();
     void open(int noteRef) => context.push(Routes.note(noteRef));
 
@@ -46,32 +46,35 @@ class HomeScreen extends ConsumerWidget {
                 SliverToBoxAdapter(
                   child: HomeHeader(greeting: Greeting.of(now)),
                 ),
-                ...notes.when(
-                  // Local data arrives at once: no spinner.
-                  loading: () => const [],
-                  error: (_, _) => const [
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: EmptyState(message: AppCopy.loadError),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpace.m),
+                    child: PillTabs(
+                      labels: const [
+                        AppCopy.viewRecent,
+                        AppCopy.viewFolders,
+                        AppCopy.viewTags,
+                      ],
+                      selected: view.index,
+                      onSelected: (i) => ref
+                          .read(homeViewProvider.notifier)
+                          .show(HomeView.values[i]),
                     ),
-                  ],
-                  data: (home) => [
-                    if (home.isEmpty)
-                      const SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: EmptyState(message: AppCopy.emptyHome),
-                      ),
-                    if (home.pinned.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: PinnedRow(
-                          notes: home.pinned,
-                          now: now,
-                          onOpen: open,
-                        ),
-                      ),
-                    NotesGrid(notes: home.others, now: now, onOpen: open),
-                  ],
+                  ),
                 ),
+                switch (view) {
+                  HomeView.recent => RecentView(now: now, onOpen: open),
+                  HomeView.folders => GroupView(
+                    byTag: false,
+                    now: now,
+                    onOpen: open,
+                  ),
+                  HomeView.tags => GroupView(
+                    byTag: true,
+                    now: now,
+                    onOpen: open,
+                  ),
+                },
                 const SliverToBoxAdapter(
                   child: SizedBox(height: AppSize.floatingClearance),
                 ),

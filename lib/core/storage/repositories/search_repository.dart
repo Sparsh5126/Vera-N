@@ -4,8 +4,9 @@ import '../../models/search_filters.dart';
 import '../../models/search_hit.dart';
 import '../db/app_database.dart';
 import '../db/note_rows.dart';
-import '../files/note_links.dart';
+import '../files/note_markup.dart';
 import '../files/note_text.dart';
+import 'note_filter_sql.dart';
 
 /// Keyword search over the notes' titles and text (FTS5 index), with the
 /// Folder, Tag and Date filters.
@@ -33,7 +34,7 @@ class SearchRepository {
   }) async {
     final match = ftsQuery(query);
     if (match == null && !filters.isActive) return const [];
-    final where = _FilterSql(filters, now ?? DateTime.now());
+    final where = NoteFilterSql(filters, now ?? DateTime.now());
     final rows = match == null
         ? await _browse(where, limit)
         : await _match(match, where, limit);
@@ -41,14 +42,26 @@ class SearchRepository {
   }
 
   /// Every folder that holds notes, with its parent folders, sorted.
-  Future<List<String>> folders() async {
-    final rows = await _db
-        .customSelect(
-          "SELECT DISTINCT folder FROM notes WHERE folder != '' "
-          'AND trashed_at IS NULL',
-          readsFrom: {_db.notes},
-        )
-        .get();
+  Future<List<String>> folders() async =>
+      _expandFolders(await _folderRows().get());
+
+  /// [folders], kept up to date.
+  Stream<List<String>> watchFolders() =>
+      _folderRows().watch().map(_expandFolders);
+
+  /// Every confirmed tag on a note that isn't in the trash, sorted.
+  Future<List<String>> tags() async => _tagNames(await _tagRows().get());
+
+  /// [tags], kept up to date.
+  Stream<List<String>> watchTags() => _tagRows().watch().map(_tagNames);
+
+  Selectable<QueryRow> _folderRows() => _db.customSelect(
+    "SELECT DISTINCT folder FROM notes WHERE folder != '' "
+    'AND trashed_at IS NULL',
+    readsFrom: {_db.notes},
+  );
+
+  static List<String> _expandFolders(List<QueryRow> rows) {
     final all = <String>{};
     for (final r in rows) {
       final parts = r.read<String>('folder').split('/');
@@ -60,20 +73,18 @@ class SearchRepository {
       ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
   }
 
-  /// Every confirmed tag on a note that isn't in the trash, sorted.
-  Future<List<String>> tags() async {
-    final rows = await _db
-        .customSelect(
-          'SELECT DISTINCT t.tag FROM note_tags t '
-          'JOIN notes n ON n.id = t.note WHERE n.trashed_at IS NULL '
-          'ORDER BY t.tag COLLATE NOCASE',
-          readsFrom: {_db.notes, _db.noteTags},
-        )
-        .get();
-    return [for (final r in rows) r.read<String>('tag')];
-  }
+  Selectable<QueryRow> _tagRows() => _db.customSelect(
+    'SELECT DISTINCT t.tag FROM note_tags t '
+    'JOIN notes n ON n.id = t.note WHERE n.trashed_at IS NULL '
+    'ORDER BY t.tag COLLATE NOCASE',
+    readsFrom: {_db.notes, _db.noteTags},
+  );
 
-  Future<List<QueryRow>> _match(String match, _FilterSql where, int limit) {
+  static List<String> _tagNames(List<QueryRow> rows) => [
+    for (final r in rows) r.read<String>('tag'),
+  ];
+
+  Future<List<QueryRow>> _match(String match, NoteFilterSql where, int limit) {
     return _db
         .customSelect(
           'SELECT n.id, n.modified, '
@@ -90,7 +101,7 @@ class SearchRepository {
         .get();
   }
 
-  Future<List<QueryRow>> _browse(_FilterSql where, int limit) {
+  Future<List<QueryRow>> _browse(NoteFilterSql where, int limit) {
     return _db
         .customSelect(
           'SELECT n.id, n.modified, n.title AS marked_title, '
@@ -110,7 +121,7 @@ class SearchRepository {
       title: MarkedText.parse(r.read<String>('marked_title')),
       snippet: rawBody == null
           ? MarkedText.parse(
-              NoteLinks.displayText(r.read<String>('marked_snippet')),
+              NoteMarkup.display(r.read<String>('marked_snippet')),
             )
           : MarkedText(NoteText.preview(rawBody), const []),
       modified: r.read<DateTime>('modified'),
@@ -127,42 +138,5 @@ class SearchRepository {
         .where((t) => t.isNotEmpty)
         .map((t) => '"${t.replaceAll('"', '""')}"*');
     return terms.isEmpty ? null : terms.join(' ');
-  }
-}
-
-/// The SQL conditions for [SearchFilters] on the `notes n` table.
-class _FilterSql {
-  _FilterSql(SearchFilters f, DateTime now) {
-    final folder = f.folder;
-    if (folder != null) {
-      // The folder itself or any subfolder; folders compare without case.
-      _add(
-        '(lower(n.folder) = lower(?) OR '
-        "substr(lower(n.folder), 1, length(?) + 1) = lower(?) || '/')",
-        [Variable(folder), Variable(folder), Variable(folder)],
-      );
-    }
-    final tag = f.tag;
-    if (tag != null) {
-      _add(
-        'EXISTS (SELECT 1 FROM note_tags t WHERE t.note = n.id '
-        'AND t.tag = ? COLLATE NOCASE)',
-        [Variable(tag)],
-      );
-    }
-    final date = f.date;
-    if (date != null) {
-      _add('n.modified >= ?', [Variable<DateTime>(date.startFrom(now))]);
-    }
-  }
-
-  final _parts = <String>['n.trashed_at IS NULL'];
-  final variables = <Variable>[];
-
-  String get sql => _parts.join(' AND ');
-
-  void _add(String part, List<Variable> vars) {
-    _parts.add(part);
-    variables.addAll(vars);
   }
 }

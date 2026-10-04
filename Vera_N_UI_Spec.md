@@ -122,6 +122,7 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 - Revisit is silent: no notification, the user opens it by choice.
 
 **View switch:** thin rounded pills **Recent | Folders | Tags**. Recent is the default. Folders and Tags swap the notes area to folder or tag pills and their notes.
+- Built 2026-10-04: Folders shows a pill for every folder (parents included, e.g. `Ideas` and `Ideas/Story`); tapping one shows its notes below, subfolders included, newest first; tapping it again clears the choice. Tags works the same with `#tag` pills. Pinned notes appear in place (with their pin icon), not in a separate row. "No folders yet." / "No tags yet." when there are none. The view and the picked folder or tag are kept while the app runs, so returning from a note keeps the user's place.
 
 **Notes area**
 - Pinned notes first, as cards with a small pin icon (horizontal row).
@@ -248,11 +249,14 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 - Title is optional; if empty, the first line becomes the title.
 - New notes open with the keyboard up. Existing notes open showing the text; tap anywhere to edit. No separate edit mode.
 - Formatting is hidden until text is selected. A slim row above the keyboard offers bold, list, checklist, attach, and a `[[ ]]` link button.
+  - Built 2026-10-03: the row appears only while text is selected, just above the keyboard. Every button is a toggle and writes plain Markdown: Bold wraps the selection in `**`; List and Checklist put `- ` / `- [ ] ` on the selected lines (a list line becomes a checklist line rather than getting both). Link opens the note picker and keeps the selected words as the link's title. Attach joins the row when attachments exist.
 - Typing `[[` opens a note picker for manual links (built 2026-10-03). Picking a note replaces the `[[` with `[[file-name|Title]]` (folder path added only when two notes share a file name); backing out leaves `[[` as typed. Links resolve by file name, like Obsidian, so a hand-typed `[[Some Title]]` only links if a file has that name.
 
 **Below the text** (visible only when not typing; empty sections hidden)
 - **Tags (built 2026-10-03):** a note with no tags shows only a small "+ Add tag" button, no heading. "Add tag" opens a sheet with a name field and the user's existing tags listed first (filtered as they type), so tags get reused rather than near-duplicated. Typed tags lose a leading `#` and spaces become `-` (Obsidian tags can't hold spaces). Tapping a solid tag offers "Remove #tag", followed by an Undo snackbar.
 - **Folder (built 2026-10-03, at the user's request):** below the text, like tags. A note in a folder shows a "Folder" heading and one chip with a folder icon; tapping it opens the move sheet. A note in no folder shows an "Add to folder" button instead; with no folder and no tags, the two add buttons share one row.
+- **The editor shows formatting, never Markdown (2026-10-04, at the user's request: "for them it's just notes").** Bold is drawn bold; checklist lines show a real checkbox that ticks and unticks with a tap (ticked items are struck through in secondary text); bullet lines show •. The symbols stay in the file for Obsidian, hidden in the editor; the cursor steps over them, and backspacing into them removes the formatting (bold stars, the checkbox or bullet) but keeps the words. Enter on a checklist or bullet line starts the next item; Enter on an empty item ends the list. Cards and search show ☐ / ☑ / • and plain words. Each checkbox takes 32 points of width and the line's height to tap: below the 48 minimum, because a full-size target would spread every list line apart.
+- **Tapping a link's title opens the linked note** (2026-10-04). A tap at the very start or end of the title only places the cursor, so text can still be added next to a link.
 - **Links in the editor (2026-10-03):** a link shows only its title, underlined in amber, e.g. "Time Loop". The file keeps the full `[[name|Time Loop]]`, so Obsidian still sees the link. The cursor steps over the hidden markup, and deleting into it removes the whole link, so a half-broken link can't be left behind. Link titles are capped at 40 characters ("…"), and chips cut long labels with "…" rather than overflowing.
 - **Move to folder (built 2026-10-03):** ⋮ → a sheet with "No folder", the existing folders, and "New folder" (typed; `/` makes subfolders). The file keeps its name; an Undo snackbar follows. Disabled until a new note has text.
 - **Tags:** one row. Solid chips are confirmed tags (user-made or approved). Dimmed chips (no fill, dashed outline at about 55% opacity, readable secondary-text label) are AI-suggested tags waiting for approval. Tapping a dimmed tag opens the suggestion sheet (accept, reject, or close for not sure). The user can also add a tag by hand.
@@ -412,7 +416,7 @@ Version
 
 - Logo and app icon final artwork, and the final look of the "N" in the logo (colors and typography are settled; see the main spec).
 - Final onboarding copy (the privacy claims must be exactly true at launch, including how sync works).
-- Exact behavior of the Folders and Tags switch on Home (swapping the notes area to folder or tag pills is the current plan).
+- ~~Exact behavior of the Folders and Tags switch on Home~~: decided 2026-10-04, see section 5.
 - Where accepted links are stored (inline `[[link]]` vs sidecar file); see the main spec.
 - Whether the later "Recent notes" widget is worth it, given privacy of titles on the home screen.
 - Whether a cold Flutter start meets the one-second capture target, or a minimal capture entry point is needed.

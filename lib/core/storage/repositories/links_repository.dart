@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../models/linked_note.dart';
 import '../db/app_database.dart';
 import '../files/note_links.dart';
+import '../files/note_markup.dart';
 
 /// Links the user wrote (`[[name]]`): what a note links to, what mentions
 /// it, and the text to insert when linking from the picker.
@@ -41,9 +42,26 @@ class LinksRepository {
     );
   }
 
+  /// The note a link written as `[[target]]` points at, if it exists.
+  Future<int?> findNote(String target) async {
+    final key = NoteLinks.targetKey(target);
+    if (key == null) return null;
+    final row = await _db
+        .customSelect(
+          'SELECT n.id FROM notes n WHERE '
+          "(n.name_key = ? OR n.path_key = ? || '.md') "
+          'AND n.trashed_at IS NULL ORDER BY n.id LIMIT 1',
+          variables: [Variable(key), Variable(key)],
+          readsFrom: {_db.notes},
+        )
+        .getSingleOrNull();
+    return row?.read<int>('id');
+  }
+
   /// The `[[…]]` text that links to note [ref]: its file name, or its
-  /// folder path too when another note has the same file name.
-  Future<String?> linkTextFor(int ref) async {
+  /// folder path too when another note has the same file name. Shown as
+  /// [label] (e.g. the words the user selected), or the note's title.
+  Future<String?> linkTextFor(int ref, {String? label}) async {
     final note = await (_db.select(
       _db.notes,
     )..where((n) => n.id.equals(ref))).getSingleOrNull();
@@ -58,7 +76,7 @@ class LinksRepository {
             .get();
     return NoteLinks.write(
       note.path,
-      note.title,
+      label ?? note.title,
       ambiguous: sameName.isNotEmpty,
     );
   }
@@ -72,7 +90,7 @@ class LinksRepository {
             for (final r in rows)
               LinkedNote(
                 ref: r.read<int>('id'),
-                title: NoteLinks.displayText(r.read<String>('title')),
+                title: NoteMarkup.display(r.read<String>('title')),
               ),
           ],
         );

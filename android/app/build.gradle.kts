@@ -38,6 +38,17 @@ android {
     }
 }
 
+// Measurement builds only: `flutter build apk --profile
+// --android-project-arg=vera.perf=true` installs as a separate app with its
+// own empty storage, so timing runs on a real phone never touch real notes.
+androidComponents {
+    onVariants(selector().withBuildType("profile")) { variant ->
+        if (project.findProperty("vera.perf") == "true") {
+            variant.applicationId.set("com.example.vera_n.perf")
+        }
+    }
+}
+
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
