@@ -190,7 +190,7 @@ Each package is logged in `CHANGELOG.md` with size and battery impact when it is
 From the specs — **blocking the stages noted, not the architecture**:
 
 1. **Accepted-link storage**: inline footer block vs sidecar. Blocks: Review/accept logic.
-2. **On-device embedding model** (MiniLM-class vs EmbeddingGemma, and runtime: TFLite vs ONNX Runtime). Blocks: embeddings stage. Needs a week-one benchmark on a mid-range Android phone.
+2. **On-device embedding model.** Benchmarked 2026-10-04 on a Snapdragon 778G (`tool/embedding_bench/README.md`); awaiting the user's choice. The data favours paraphrase-multilingual-MiniLM-L12-v2 int8 on ONNX Runtime: best Hindi / English separation, same speed and size as e5-small, but a 128-token window, so chunking is needed. Also open: bundle the model (about 130 MB in the APK) or download it once.
 3. **Similarity thresholds** for "strong". Blocks: suggestions stage.
 
 Raised by the storage stage — **built as proposed, easy to change; please confirm**:

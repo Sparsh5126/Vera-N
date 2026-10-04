@@ -1,0 +1,56 @@
+### run 1 e5-small
+BENCH model "multilingual-e5-small int8"
+BENCH rssStartMb 163.16
+BENCH loadMs 2360
+BENCH rssLoadedMb 418.895
+BENCH timing {"short":{"tokens":18,"tokenizeMedianMs":0.287,"medianMs":16.089,"p90Ms":18.535},"medium":{"tokens":55,"tokenizeMedianMs":0.946,"medianMs":27.544,"p90Ms":34.773},"long":{"tokens":211,"tokenizeMedianMs":3.579,"medianMs":95.542,"p90Ms":99.959}}
+BENCH quality {"top1":"22/24","partnerMean":0.89,"partnerP10":0.859,"otherMean":0.801,"otherP90":0.839,"otherMax":0.871}
+BENCH rssPeakMb 502.969
+BENCH done
+### run 1 ml-minilm-l12
+BENCH model "paraphrase-multilingual-MiniLM-L12-v2 int8"
+BENCH rssStartMb 166.766
+BENCH loadMs 2129
+BENCH rssLoadedMb 475.148
+BENCH timing {"short":{"tokens":15,"tokenizeMedianMs":0.272,"medianMs":13.485,"p90Ms":16.07},"medium":{"tokens":52,"tokenizeMedianMs":0.986,"medianMs":23.524,"p90Ms":31.404},"long":{"tokens":128,"tokenizeMedianMs":3.576,"medianMs":51.514,"p90Ms":57.667}}
+BENCH quality {"top1":"24/24","partnerMean":0.705,"partnerP10":0.464,"otherMean":0.09,"otherP90":0.222,"otherMax":0.499}
+BENCH rssPeakMb 558.785
+BENCH done
+### run 2 e5-small
+BENCH model "multilingual-e5-small int8"
+BENCH rssStartMb 159.941
+BENCH loadMs 1988
+BENCH rssLoadedMb 474.367
+BENCH timing {"short":{"tokens":18,"tokenizeMedianMs":0.304,"medianMs":15.646,"p90Ms":25.574},"medium":{"tokens":55,"tokenizeMedianMs":0.932,"medianMs":26.318,"p90Ms":31.153},"long":{"tokens":211,"tokenizeMedianMs":4.733,"medianMs":93.45,"p90Ms":103.841}}
+BENCH quality {"top1":"22/24","partnerMean":0.89,"partnerP10":0.859,"otherMean":0.801,"otherP90":0.839,"otherMax":0.871}
+BENCH rssPeakMb 557.43
+BENCH done
+### run 2 ml-minilm-l12
+BENCH model "paraphrase-multilingual-MiniLM-L12-v2 int8"
+BENCH rssStartMb 158.461
+BENCH loadMs 1658
+BENCH rssLoadedMb 417.359
+BENCH timing {"short":{"tokens":15,"tokenizeMedianMs":0.293,"medianMs":16.569,"p90Ms":19.729},"medium":{"tokens":52,"tokenizeMedianMs":1.031,"medianMs":27.085,"p90Ms":33.016},"long":{"tokens":128,"tokenizeMedianMs":5.59,"medianMs":60.713,"p90Ms":68.348}}
+BENCH quality {"top1":"24/24","partnerMean":0.705,"partnerP10":0.464,"otherMean":0.09,"otherP90":0.222,"otherMax":0.499}
+BENCH rssPeakMb 502.961
+BENCH done
+### run 3 e5-small
+BENCH model "multilingual-e5-small int8"
+BENCH rssStartMb 158.465
+BENCH loadMs 1541
+BENCH rssLoadedMb 417.184
+BENCH timing {"short":{"tokens":18,"tokenizeMedianMs":0.31,"medianMs":16.77,"p90Ms":21.228},"medium":{"tokens":55,"tokenizeMedianMs":0.952,"medianMs":28.984,"p90Ms":34.845},"long":{"tokens":211,"tokenizeMedianMs":3.318,"medianMs":94.647,"p90Ms":105.495}}
+BENCH quality {"top1":"22/24","partnerMean":0.89,"partnerP10":0.859,"otherMean":0.801,"otherP90":0.839,"otherMax":0.871}
+BENCH rssPeakMb 499.918
+BENCH done
+### run 3 ml-minilm-l12
+BENCH model "paraphrase-multilingual-MiniLM-L12-v2 int8"
+BENCH rssStartMb 158.695
+BENCH loadMs 1537
+BENCH rssLoadedMb 418.047
+BENCH timing {"short":{"tokens":15,"tokenizeMedianMs":0.303,"medianMs":15.479,"p90Ms":24.348},"medium":{"tokens":52,"tokenizeMedianMs":1.036,"medianMs":25.906,"p90Ms":31.47},"long":{"tokens":128,"tokenizeMedianMs":5.553,"medianMs":58.72,"p90Ms":63.612}}
+BENCH quality {"top1":"24/24","partnerMean":0.705,"partnerP10":0.464,"otherMean":0.09,"otherP90":0.222,"otherMax":0.499}
+BENCH rssPeakMb 502.613
+BENCH done
+  AC powered: true
+  temperature: 390

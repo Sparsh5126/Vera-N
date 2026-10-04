@@ -37,8 +37,6 @@ dependencies:
   flutter_onnxruntime: ^1.8.5
   tflite_flutter: ^0.12.1
   dart_sentencepiece_tokenizer: ^1.4.1
-  path_provider: ^2.1.6
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

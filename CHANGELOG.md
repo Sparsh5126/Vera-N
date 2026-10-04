@@ -9,7 +9,12 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
   - Measures load time, memory, and time per note at three lengths, plus an indicative quality check on a hand-written Hindi / English / Hinglish set of related pairs.
   - Candidates: multilingual-e5-small (MIT), paraphrase-multilingual-MiniLM-L12-v2 (Apache-2.0), both int8 ONNX; EmbeddingGemma-300M (LiteRT, Gemma terms, gated, downloaded by the user).
   - all-MiniLM-L6-v2 was dropped: English-only, and its tokenizer isn't supported by the Dart tokenizer used.
-  - Results will be logged here when the phone runs are done.
+  - **Results (2026-10-04)**, full table in `tool/embedding_bench/README.md`. Phone charging at 39 °C; 3 fresh launches per model; EmbeddingGemma not run (user choice: open models only).
+    - Speed: both embed a typical note in 15–30 ms (median). Long notes: e5-small 93–96 ms for 211 tokens; multilingual MiniLM 52–61 ms, but it reads only 128 tokens.
+    - Load time: 1.5–2.4 s for each model.
+    - Memory: both add about 250 MB while loaded (165 → ~420 MB), so load, run a batch, and release is required.
+    - Quality, on 24 Hindi / English / Hinglish texts, so indicative only. Multilingual MiniLM found every text's partner (24/24), with related pairs averaging 0.71 and unrelated 0.09. e5-small found 22/24, with everything scoring 0.80–0.89 and related and unrelated overlapping.
+    - Size: about 130 MB with either model.
   - Test phone: Snapdragon 778G (SM7325), 7.4 GB RAM, Android 15.
 - **Numbered lists** (backlog #6 and #3). Typing `1. ` starts a list; Enter adds the next number and renumbers the items below; Enter on an empty item ends the list; backspace right after the number removes it. The List button keeps numbered points numbered, one per line, splitting points written inline ("1. milk 2. eggs") but only at numbers that count on. A numbered list pressed again loses its numbers. New: `MarkupKind.numbered` (visible, not hidden), `MarkupSpan.hasGlyph`, `MarkupEditing.renumberAfter`, `NumberedPoints`. 12 tests, including Hindi.
 - **Delete and pin from Home** (backlog #7). Long-pressing a card opens a sheet with Pin / Unpin and Delete. Delete moves the note to the trash with an Undo popup, never a confirmation. Both actions are also inside the note, so the gesture has a visible button alternative (UI spec §2). Long-press rather than swipe: a swipe in a two-column grid is easy to trigger by accident while scrolling. New: `HomeNoteMenu`, and `CardCallbacks` (open and menu) replace Home's `onOpen` parameter. 3 tests.

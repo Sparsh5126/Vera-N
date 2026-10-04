@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Test app only: read model files pushed by adb to /sdcard/Download
+         (granted with `adb shell appops set ... MANAGE_EXTERNAL_STORAGE
+         allow`; Android 15 won't let an app read adb-created files in its
+         own Android/data folder). The Vera N app never asks for this. -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <application
         android:label="embedding_bench"
         android:name="${applicationName}"

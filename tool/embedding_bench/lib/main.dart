@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'embedder.dart';
 import 'onnx_embedder.dart';
@@ -12,7 +11,7 @@ import 'tflite_embedder.dart';
 /// Embedding model benchmark for Vera N (CLAUDE.md §8, product spec §20).
 ///
 /// One model per launch, so memory numbers don't mix. The model to run is
-/// read from `<app files>/run.txt`; results are logged as one
+/// read from `/sdcard/Download/vera_bench/run.txt`; results are logged as one
 /// `BENCH {json}` line, then the app exits. See README.md.
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +27,8 @@ const _runs = 15;
 const _warmup = 3;
 
 Future<void> _run() async {
-  final files = (await getExternalStorageDirectory())!.path;
+  // Shared folder written by adb (see README.md).
+  const files = '/sdcard/Download/vera_bench';
   final key = (await File('$files/run.txt').readAsString()).trim();
   final models = '$files/models';
   final Embedder embedder = switch (key) {
@@ -72,7 +72,11 @@ Future<void> _run() async {
     result['error'] = '$e';
     result['stack'] = '$st'.split('\n').take(6).join(' | ');
   }
-  debugPrint('BENCH ${jsonEncode(result)}');
+  // One line per section: Android's log cuts long lines.
+  for (final e in result.entries) {
+    debugPrint('BENCH ${e.key} ${jsonEncode(e.value)}');
+  }
+  debugPrint('BENCH done');
   exit(0);
 }
 
