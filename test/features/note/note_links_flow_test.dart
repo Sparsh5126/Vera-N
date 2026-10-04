@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vera_n/shared/widgets/note_chip.dart';
+import 'package:vera_n/shared/widgets/text_link.dart';
 
 import '../../support/app_harness.dart';
 
@@ -90,6 +92,27 @@ void main() {
       return true;
     });
     expect(visible.toString(), 'Self\nsee Time Loop now');
+    await app.finish(tester);
+  });
+
+  testWidgets('tags are chips; linked and mentioning notes are text links', (
+    tester,
+  ) async {
+    final target = await app.storage.notes.create('Time Loop');
+    await app.storage.notes.setTags(target, ['story']);
+    final name = (await app.storage.notes.getNote(target))!.path
+        .replaceAll('.md', '');
+    // A different label, so Home has only one "Time Loop" to tap.
+    await app.storage.notes.create('Self\n[[$name|the loop]]');
+    await app.pump(tester);
+    await openFromHome(tester, 'Time Loop');
+
+    expect(find.widgetWithText(NoteChip, '#story'), findsOneWidget);
+    expect(find.widgetWithText(TextLink, 'Self'), findsOneWidget);
+    await tester.tap(find.widgetWithText(TextLink, 'Self'));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(TextLink, 'Time Loop'), findsOneWidget);
+    expect(find.widgetWithText(NoteChip, 'Time Loop'), findsNothing);
     await app.finish(tester);
   });
 }

@@ -109,6 +109,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - 14 new tests, 97 in total: folder choose, reconnect, access lost, name clash, migration from version 1, the onboarding screen, the empty-folder guard, restore of a missing file, and colons in note names.
 
 ### Changed
+- **Linked and Mentioned in are text links**, no longer chips (backlog #1 and #9). The note's title in normal text with the amber link underline, as in the editor, tappable across 48 points (`TextLink`). Tags and folders stay chips, so what organises a note looks different from the notes it points to. UI spec §7 updated. 1 test.
 - Typing performance: **Saving waits for a 1-second pause** in typing instead of 300 ms. Leaving the note or the app still saves at once.
 - **A save is one database transaction** (row, revision and links together) instead of about five statements, so Home and the note view hear about it once.
 - **The editor no longer rebuilds after saves.** Only the top bar and the details area listen to the note.

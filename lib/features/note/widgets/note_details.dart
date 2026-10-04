@@ -5,6 +5,7 @@ import '../../../core/models/linked_note.dart';
 import '../../../core/styles/app_styles.dart';
 import '../../../shared/widgets/note_chip.dart';
 import '../../../shared/widgets/section_label.dart';
+import '../../../shared/widgets/text_link.dart';
 
 /// What sits below the note's text when not typing (UI spec §7): Folder,
 /// Tags, Linked, and Mentioned in. Empty sections are hidden; a note with
@@ -49,26 +50,17 @@ class NoteDetails extends StatelessWidget {
               AppCopy.linked,
               _wrap([
                 for (final n in linked)
-                  NoteChip(label: n.title, onTap: () => onOpenNote(n.ref)),
+                  TextLink(label: n.title, onTap: () => onOpenNote(n.ref)),
               ]),
             ),
           if (mentionedIn.isNotEmpty)
             _section(
               AppCopy.mentionedIn,
               Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   for (final n in mentionedIn)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        n.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.textStyles.body,
-                      ),
-                      onTap: () => onOpenNote(n.ref),
-                    ),
+                    TextLink(label: n.title, onTap: () => onOpenNote(n.ref)),
                 ],
               ),
             ),
