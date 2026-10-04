@@ -13,6 +13,7 @@ class NoteCard extends StatelessWidget {
     required this.dateLabel,
     required this.pinned,
     required this.onTap,
+    this.onLongPress,
   });
 
   final String title;
@@ -21,6 +22,9 @@ class NoteCard extends StatelessWidget {
   final bool pinned;
   final VoidCallback onTap;
 
+  /// Opens the card's options (Pin, Delete).
+  final VoidCallback? onLongPress;
+
   @override
   Widget build(BuildContext context) {
     final styles = context.textStyles;
@@ -28,6 +32,7 @@ class NoteCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: AppSpace.card,
           child: Column(

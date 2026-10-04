@@ -7,6 +7,7 @@ import '../../../core/styles/app_styles.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/filter_pill.dart';
 import '../state/home_view.dart';
+import 'card_callbacks.dart';
 import 'notes_grid.dart';
 
 /// Home's Folders or Tags view: a pill per folder or tag; tapping one
@@ -17,13 +18,13 @@ class GroupView extends ConsumerWidget {
     super.key,
     required this.byTag,
     required this.now,
-    required this.onOpen,
+    required this.cards,
   });
 
   /// Tags view when true, Folders view otherwise.
   final bool byTag;
   final DateTime now;
-  final ValueChanged<int> onOpen;
+  final CardCallbacks cards;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -80,6 +81,6 @@ class GroupView extends ConsumerWidget {
         ? SearchFilters(tag: picked)
         : SearchFilters(folder: picked);
     final notes = ref.watch(groupNotesProvider(filters)).value ?? const [];
-    return NotesGrid(notes: notes, now: now, onOpen: onOpen);
+    return NotesGrid(notes: notes, now: now, cards: cards);
   }
 }

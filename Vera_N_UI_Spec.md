@@ -129,7 +129,7 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 - Pinned notes first, as cards with a small pin icon (horizontal row).
 - Remaining notes as scrollable cards.
 - **Layout setting:** two-column grid (default) or single-column list.
-- Cards: text top-aligned, optional title first, long text fades out. A small dimmed dot on a card means that note has pending suggestions (no numbers).
+- Cards: text top-aligned, optional title first, long text fades out. Long-pressing a card (2026-10-04, backlog #7) opens a sheet with Pin / Unpin and Delete; Delete moves the note to the trash with an Undo popup, never a confirmation. Both actions are also visible inside the note (the pin button and the ⋮ menu), so the gesture always has a button alternative. A small dimmed dot on a card means that note has pending suggestions (no numbers).
 
 **Empty state (first launch):** a blank page with "Write your first thought" and the New note button.
 

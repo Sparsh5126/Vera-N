@@ -1,17 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/copy/app_copy.dart';
 import '../../core/navigation/routes.dart';
+import '../../core/storage/storage_providers.dart';
 import '../../core/styles/app_styles.dart';
 import '../../core/utils/greeting.dart';
 import '../../shared/widgets/pill_button.dart';
 import '../../shared/widgets/pill_tabs.dart';
 import 'state/home_view.dart';
 import 'widgets/bottom_fade.dart';
+import 'widgets/card_callbacks.dart';
 import 'widgets/group_view.dart';
 import 'widgets/home_header.dart';
+import 'widgets/home_note_menu.dart';
 import 'widgets/recent_view.dart';
 
 /// Home: greeting, the Recent | Folders | Tags switch, then the notes of
@@ -23,7 +28,11 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final view = ref.watch(homeViewProvider.select((v) => v.view));
     final now = DateTime.now();
-    void open(int noteRef) => context.push(Routes.note(noteRef));
+    final menu = HomeNoteMenu(ref.read(notesRepositoryProvider));
+    final cards = CardCallbacks(
+      open: (noteRef) => context.push(Routes.note(noteRef)),
+      menu: (note) => unawaited(menu.show(context, note)),
+    );
 
     return Scaffold(
       // Sits just above the floating nav bar, in thumb reach.
@@ -63,16 +72,16 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
                 switch (view) {
-                  HomeView.recent => RecentView(now: now, onOpen: open),
+                  HomeView.recent => RecentView(now: now, cards: cards),
                   HomeView.folders => GroupView(
                     byTag: false,
                     now: now,
-                    onOpen: open,
+                    cards: cards,
                   ),
                   HomeView.tags => GroupView(
                     byTag: true,
                     now: now,
-                    onOpen: open,
+                    cards: cards,
                   ),
                 },
                 const SliverToBoxAdapter(

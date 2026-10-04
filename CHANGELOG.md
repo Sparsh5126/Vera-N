@@ -5,6 +5,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Delete and pin from Home** (backlog #7). Long-pressing a card opens a sheet with Pin / Unpin and Delete. Delete moves the note to the trash with an Undo popup, never a confirmation. Both actions are also inside the note, so the gesture has a visible button alternative (UI spec §2). Long-press rather than swipe: a swipe in a two-column grid is easy to trigger by accident while scrolling. New: `HomeNoteMenu`, and `CardCallbacks` (open and menu) replace Home's `onOpen` parameter. 3 tests.
 - **Tab switch animation** (backlog #10). The amber pill slides to the chosen tab by transform only (`AnimatedSlide`), icon colours fade, and the page fades in; 200 ms ease-out from the motion tokens. With "reduce motion" on, all of it is instant (`Motion.of`, new in `core/feedback/motion.dart`). 2 tests measure the pill's position halfway through and with reduce motion.
 - **Copy note** button next to pin (backlog #11). Copies the whole note as the user sees it (`NoteMarkup.display`: links as titles, ☐ / ☑, no Markdown), including text not yet saved, then shows a brief "Copied" (`NoticeSnackBar`, token `AppMotion.briefNotice`). Disabled while a new note is empty. 2 tests.
 - **Home Recent | Folders | Tags switch** (UI spec §5; the open question in §14 is now decided).
