@@ -5,6 +5,12 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Embedding model benchmark tool** (`tool/embedding_bench/`, product spec §20 risk 1). A separate test app, so the Vera N app gets no new dependencies and real notes are never touched.
+  - Measures load time, memory, and time per note at three lengths, plus an indicative quality check on a hand-written Hindi / English / Hinglish set of related pairs.
+  - Candidates: multilingual-e5-small (MIT), paraphrase-multilingual-MiniLM-L12-v2 (Apache-2.0), both int8 ONNX; EmbeddingGemma-300M (LiteRT, Gemma terms, gated, downloaded by the user).
+  - all-MiniLM-L6-v2 was dropped: English-only, and its tokenizer isn't supported by the Dart tokenizer used.
+  - Results will be logged here when the phone runs are done.
+  - Test phone: Snapdragon 778G (SM7325), 7.4 GB RAM, Android 15.
 - **Numbered lists** (backlog #6 and #3). Typing `1. ` starts a list; Enter adds the next number and renumbers the items below; Enter on an empty item ends the list; backspace right after the number removes it. The List button keeps numbered points numbered, one per line, splitting points written inline ("1. milk 2. eggs") but only at numbers that count on. A numbered list pressed again loses its numbers. New: `MarkupKind.numbered` (visible, not hidden), `MarkupSpan.hasGlyph`, `MarkupEditing.renumberAfter`, `NumberedPoints`. 12 tests, including Hindi.
 - **Delete and pin from Home** (backlog #7). Long-pressing a card opens a sheet with Pin / Unpin and Delete. Delete moves the note to the trash with an Undo popup, never a confirmation. Both actions are also inside the note, so the gesture has a visible button alternative (UI spec §2). Long-press rather than swipe: a swipe in a two-column grid is easy to trigger by accident while scrolling. New: `HomeNoteMenu`, and `CardCallbacks` (open and menu) replace Home's `onOpen` parameter. 3 tests.
 - **Tab switch animation** (backlog #10). The amber pill slides to the chosen tab by transform only (`AnimatedSlide`), icon colours fade, and the page fades in; 200 ms ease-out from the motion tokens. With "reduce motion" on, all of it is instant (`Motion.of`, new in `core/feedback/motion.dart`). 2 tests measure the pill's position halfway through and with reduce motion.

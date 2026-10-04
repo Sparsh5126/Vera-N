@@ -18,6 +18,6 @@ From the user's note `20261004-145445-ae09` (2026-10-04): "all these aren't urge
 
 ## Also open (found during work)
 
-- **Typing smoothness.** The 2026-10-04 measurement (CHANGELOG) shows the remaining slow frames are raster-bound (GPU drawing), not build-bound. Next step: a DevTools timeline of fast typing on the phone, to see what is being redrawn.
+- **Typing lag (top priority after the embedding benchmark).** The user reports lag while typing again after the backlog round (2026-10-04). The 2026-10-04 measurement (CHANGELOG) found the slow frames raster-bound (GPU drawing), not build-bound. Since then the editor scans for numbered lines too, and the details area and nav bar changed. Next step: a DevTools timeline of fast typing on the phone, with real notes (bold, checklists, links), to see what is redrawn per keystroke, before changing anything.
 - **Release build size.** Profile APKs varied between 75 and 98 MB between builds; measure a release build and log it.
 - **Application id** is still `com.example.vera_n`; it needs the user's own id before any store release.
