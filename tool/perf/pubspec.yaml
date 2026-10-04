@@ -1,0 +1,7 @@
+name: vera_perf
+description: Timeline capture and summary for Vera N performance work.
+publish_to: none
+environment:
+  sdk: ^3.13.1
+dependencies:
+  vm_service: any

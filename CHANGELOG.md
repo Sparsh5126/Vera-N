@@ -5,6 +5,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Typing performance tools** (`tool/perf/`). `typing_scenario.sh` types into the measurement build over adb (kinds plain, rich, long) and prints frame stats. `bin/timeline.dart` records the engine timeline over the VM service and summarises it per thread. New dev-only dependency in `tool/perf` only: `vm_service`. No change to the app's own dependencies.
 - **Trimmed embedding model committed** at `assets/models/minilm-l12-en-hi/`, with Git LFS (`.gitattributes` tracks `assets/models/**`). Included: the Apache-2.0 license and a README with source, SHA-256 checksums and the notice of changes. Not yet listed in `pubspec.yaml` assets; it joins the app in the embeddings stage, so builds don't grow before the model is used.
 - Decided 2026-10-04: **similarity threshold 0.60** for a "strong" match at launch (ARCHITECTURE.md §7, product spec §21).
 - **Embedding model chosen and trimmed** (decided 2026-10-04). The model is paraphrase-multilingual-MiniLM-L12-v2 int8 (Apache-2.0), bundled in the app, with the user's limit of 150 MB app size.
@@ -144,6 +145,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - **Move to folder in the note's ⋮ menu** (backlog #5): it's reached through the Folder row below the text. The unused `AppCopy.moveToFolder` string is gone too.
 
 ### Fixed
+- **Typing in long notes: editor formatting work no longer grows with note length squared** (backlog: typing lag). Each keystroke rebuilt the formatted text by checking every Markdown piece against every text piece. It is now one pass that tracks only the pieces covering the current position. Desktop timing per keystroke: 200 lines 2.3 → 0.8 ms, 1000 lines 43 → 1.3 ms. On the phone at ~150 lines it changed little (UI frame median 23.5 → 23.0 ms, 3 runs each), because the main cost there is elsewhere (see BACKLOG.md).
 - **Enter right next to a blank line could fail to continue a list.** The edit position came from comparing the old and new text, which is ambiguous between two line breaks. It now comes from the cursor, for checklists and bullets as well as numbers.
 - Note cards in the grid always showed as unpinned. This was harmless while the grid held only unpinned notes, but folder and tag views include pinned ones; `NotesGrid` now uses each note's own pinned flag.
 - **The Undo popup never went away on its own** (backlog #8). Flutter keeps a snackbar that has an action until it is dismissed (`persist` defaults to true when there's an action). Every Undo now goes through `UndoSnackBar`, which sets `persist: false`. Covered by a test that was checked to fail without the fix.

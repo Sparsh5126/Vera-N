@@ -55,18 +55,30 @@ class TitledTextController extends TextEditingController {
     if (showComposing) cuts.addAll([composing.start, composing.end]);
     final points = cuts.where((c) => c <= text.length).toList()..sort();
 
+    // One pass over the pieces: [active] holds only the spans covering the
+    // current piece, so long notes stay linear, not pieces × spans.
+    final glyphs = <int, MarkupSpan>{};
+    for (final s in spans) {
+      if (s.hasGlyph) glyphs.putIfAbsent(s.glyphAt, () => s);
+    }
+    final active = <MarkupSpan>[];
+    var nextSpan = 0;
     final children = <InlineSpan>[];
     for (var i = 0; i + 1 < points.length; i++) {
       final a = points[i];
       final b = points[i + 1];
       if (a == b) continue;
+      while (nextSpan < spans.length && spans[nextSpan].start <= a) {
+        active.add(spans[nextSpan++]);
+      }
+      active.removeWhere((s) => s.end <= a);
       final lineStyle = a < titleEnd ? (titleStyle ?? base) : base;
-      final glyph = _glyphAt(spans, a);
+      final glyph = glyphs[a];
       if (glyph != null) {
         children.add(_glyph(glyph, lineStyle));
         continue;
       }
-      var s = _styleAt(spans, a, lineStyle);
+      var s = _styleAt(active, a, lineStyle);
       if (showComposing && a >= composing.start && b <= composing.end) {
         s = s.copyWith(decoration: TextDecoration.underline);
       }
@@ -97,13 +109,6 @@ class TitledTextController extends TextEditingController {
       }
     }
     return s;
-  }
-
-  static MarkupSpan? _glyphAt(List<MarkupSpan> spans, int at) {
-    for (final s in spans) {
-      if (s.hasGlyph && s.glyphAt == at) return s;
-    }
-    return null;
   }
 
   InlineSpan _glyph(MarkupSpan span, TextStyle style) {

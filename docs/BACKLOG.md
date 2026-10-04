@@ -18,6 +18,12 @@ From the user's note `20261004-145445-ae09` (2026-10-04): "all these aren't urge
 
 ## Also open (found during work)
 
-- **Typing lag (top priority after the embedding benchmark).** The user reports lag while typing again after the backlog round (2026-10-04). The 2026-10-04 measurement (CHANGELOG) found the slow frames raster-bound (GPU drawing), not build-bound. Since then the editor scans for numbered lines too, and the details area and nav bar changed. Next step: a DevTools timeline of fast typing on the phone, with real notes (bold, checklists, links), to see what is redrawn per keystroke, before changing anything.
+- **Typing lag in long notes (paused 2026-10-04 at the user's request; resume later).** Measured on the phone with `tool/perf/typing_scenario.sh long` (~150 lines: checklists, bullets, bold):
+  - Short notes are fine (UI frame median ~3.5 ms).
+  - Long notes: UI frame median 23 ms, about 70% of frames over 16 ms. The timeline shows ~18 ms of each frame in LAYOUT of the text field.
+  - The same note as plain unformatted text: median 7.6 ms. So ~15 ms per frame comes from formatting, not the text length alone.
+  - Without the checkbox/bullet glyph widgets: 22 ms, so glyphs are not the cause.
+  - Not yet measured: without the hidden-symbol style (0.01 font size runs) and without bold font variations. These are the next two suspects (many tiny style runs break up text shaping).
+  - Already fixed: the quadratic span build (CHANGELOG).
 - **Release build size.** Profile APKs varied between 75 and 98 MB between builds; measure a release build and log it.
 - **Application id** is still `com.example.vera_n`; it needs the user's own id before any store release.
