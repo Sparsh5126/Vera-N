@@ -254,7 +254,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 └─────────────────────────┘
 ```
 
-**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (archive, delete, attachments; move to folder moved below the text, as the Folder row, 2026-10-04, backlog #5). A tiny "saved" tick fades in and out; there is no save button (autosave).
+**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (attach, archive, delete; move to folder moved below the text, as the Folder row, 2026-10-04, backlog #5). A tiny "saved" tick fades in and out; there is no save button (autosave).
 
 **Writing**
 - Title is optional; if empty, the first line becomes the title.
@@ -262,6 +262,18 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 - Formatting is hidden until text is selected. A slim row above the keyboard offers bold, list, checklist, attach, and a `[[ ]]` link button.
   - Built 2026-10-03: the row appears only while text is selected, just above the keyboard. Every button is a toggle and writes plain Markdown: Bold wraps the selection in `**`; List and Checklist put `- ` / `- [ ] ` on the selected lines (a list line becomes a checklist line rather than getting both). Link opens the note picker and keeps the selected words as the link's title. Attach joins the row when attachments exist.
 - Typing `[[` opens a note picker for manual links (built 2026-10-03). Picking a note replaces the `[[` with `[[file-name|Title]]` (folder path added only when two notes share a file name); backing out leaves `[[` as typed. Links resolve by file name, like Obsidian, so a hand-typed `[[Some Title]]` only links if a file has that name.
+
+- **Attachments (built 2026-10-08, decided by the user):** photo, drawing and voice note.
+  - **Where:** each one sits inline where the cursor was, on its own line, drawn in place:
+    - a photo as a picture with rounded corners, up to 280 tall; tapping opens it full screen with pinch to zoom;
+    - a drawing on a plate in the theme's ink; tapping reopens it to keep drawing;
+    - a voice note as a pill with play / pause, "Voice note" and the time played.
+  - **Attach:** a paperclip in the slim row above the keyboard whenever the note is being edited (the formatting buttons join it while text is selected), and **Attach** in the ⋮ menu. It offers "Photo from gallery", "Take a photo", "Voice note" and "Drawing".
+  - **Voice:** recording starts in a sheet with the time counting up, ended by Save or Cancel. The microphone is asked for the first time only; if refused, the sheet says "Voice notes need the microphone. You can allow it in Settings."
+  - **Drawing:** a full screen with one ink, Undo last line, Clear and Save.
+  - **Editing:** the cursor never rests on an attachment's line. Backspace at the start of the next line, or deleting into it, removes the attachment from the note; the file stays in `Attachments/`.
+  - **Missing file:** an attachment whose file isn't there (still syncing) reads "This attachment isn't here yet."
+  - **Elsewhere:** titles, card previews, search snippets and copies leave attachments out.
 
 **Below the text** (visible only when not typing; empty sections hidden)
 - **Tags (built 2026-10-03):** a note with no tags shows only a small "+ Add tag" button, no heading. "Add tag" opens a sheet with a name field and the user's existing tags listed first (filtered as they type), so tags get reused rather than near-duplicated. Typed tags lose a leading `#` and spaces become `-` (Obsidian tags can't hold spaces). Tapping a solid tag offers "Remove #tag", followed by an Undo snackbar.

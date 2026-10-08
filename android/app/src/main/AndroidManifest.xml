@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Voice notes only; asked for the first time the user records. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <application
         android:label="Vera N"
         android:name="${applicationName}"

@@ -143,6 +143,30 @@ abstract final class AppCopy {
   static const formatList = 'List';
   static const formatChecklist = 'Checklist';
   static const formatLink = 'Link to a note';
+
+  // Attachments (UI spec §7).
+  static const attach = 'Attach';
+  static const attachPhoto = 'Photo from gallery';
+  static const attachCamera = 'Take a photo';
+  static const attachVoice = 'Voice note';
+  static const attachDrawing = 'Drawing';
+  static const photo = 'Photo';
+  static const drawing = 'Drawing';
+  static const voiceNote = 'Voice note';
+  static const play = 'Play';
+  static const pause = 'Pause';
+  static const recording = 'Recording';
+  static const save = 'Save';
+  static const cancel = 'Cancel';
+  static const undoStroke = 'Undo last line';
+  static const clearDrawing = 'Clear';
+  static const editDrawing = 'Tap to keep drawing';
+  static const attachmentMissing = "This attachment isn't here yet.";
+  static const attachFailed = "Couldn't attach that.";
+  static const microphoneNeeded =
+      'Voice notes need the microphone. You can allow it in Settings.';
+  static String duration(Duration d) =>
+      '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
   static const addTag = 'Add tag';
   static const tagNameHint = 'Tag name';
   static String removeTag(String tag) => 'Remove #$tag';

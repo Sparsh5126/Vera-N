@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vera_n/features/note/widgets/format_bar.dart';
 
 import '../../support/app_harness.dart';
 
@@ -32,13 +31,16 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('hidden until text is selected', (tester) async {
+  testWidgets('while editing only Attach shows; formatting joins it while '
+      'text is selected', (tester) async {
     final c = await typeNote(tester, 'Title\na big idea');
-    expect(find.byType(FormatBar), findsNothing);
+    expect(find.byTooltip('Attach'), findsOneWidget);
+    expect(find.byTooltip('Bold'), findsNothing);
     await select(tester, c, 8, 11);
-    expect(find.byType(FormatBar), findsOneWidget);
+    expect(find.byTooltip('Bold'), findsOneWidget);
+    expect(find.byTooltip('Attach'), findsOneWidget);
     await select(tester, c, 9, 9);
-    expect(find.byType(FormatBar), findsNothing);
+    expect(find.byTooltip('Bold'), findsNothing);
     await app.finish(tester);
   });
 

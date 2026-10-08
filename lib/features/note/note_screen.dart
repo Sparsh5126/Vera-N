@@ -8,6 +8,7 @@ import '../../core/ai/suggestions/suggestion_providers.dart';
 import '../../core/copy/app_copy.dart';
 import '../../core/models/archive_folder.dart';
 import '../../core/models/note.dart';
+import '../../core/platform/attachment_capture.dart';
 import '../../core/navigation/routes.dart';
 import '../../core/platform/launch_channel.dart';
 import '../../core/storage/storage_providers.dart';
@@ -15,18 +16,22 @@ import '../../core/styles/app_styles.dart';
 import '../../core/utils/date_label.dart';
 import '../../shared/widgets/suggestion_flow.dart';
 import '../../shared/widgets/undo_snack_bar.dart';
+import 'state/attachment_insert.dart';
 import 'state/link_typing.dart';
 import 'state/markup_editing.dart';
 import 'state/note_editor_controller.dart';
 import 'state/note_providers.dart';
+import 'widgets/attach_flow.dart';
+import 'widgets/attachment_embed.dart';
 import 'widgets/conflict_flow.dart';
 import 'widgets/conflict_notice.dart';
 import 'widgets/format_bar.dart';
 import 'widgets/note_actions.dart';
-import 'widgets/note_details.dart';
+import 'widgets/note_details_section.dart';
 import 'widgets/note_editor_view.dart';
 import 'widgets/note_format_actions.dart';
 import 'widgets/note_top_bar.dart';
+import 'widgets/photo_viewer.dart';
 import 'widgets/titled_text_controller.dart';
 
 /// Write and read one note. New notes open with the keyboard up; existing
@@ -59,6 +64,12 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     beforeChange: _editor.save,
     afterChange: _reloadText,
     onOpenNote: _openNote,
+  );
+  late final _attach = AttachFlow(
+    capture: ref.read(attachmentCaptureProvider),
+    attachments: ref.read(attachmentsRepositoryProvider),
+    onAttached: _insertAttachment,
+    onDrawingSaved: _drawingSaved,
   );
   final _focus = FocusNode();
   TitledTextController? _text;
@@ -101,6 +112,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   TitledTextController _newText(String body) {
     final text = TitledTextController(text: body);
     text.onCheckboxToggled = () => _onTextChanged(text.text);
+    text.embedBuilder = _embed;
     return text;
   }
 
@@ -242,6 +254,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
           ? null
           : () => unawaited(_actions.copy(context, _text?.text ?? note.body)),
       onDelete: () => unawaited(_delete()),
+      onAttach: _chooseAttachment,
       archived: note != null && ArchiveFolder.contains(note.folder),
       onArchive: note == null
           ? null
@@ -273,61 +286,53 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       details: _watchNote(
         (note) => note == null
             ? const SizedBox.shrink()
-            : NoteEditorView.readable(_details(note)),
+            : NoteEditorView.readable(
+                NoteDetailsSection(
+                  note: note,
+                  actions: _actions,
+                  suggestions: _suggestions,
+                  onOpenNote: _openNote,
+                ),
+              ),
       ),
     );
   }
 
-  /// Shown above the keyboard only while text is selected.
+  /// Shown above the keyboard while editing: attach, and the formatting
+  /// buttons while text is selected.
   Widget _formatBar(TitledTextController text) {
     final format = NoteFormatActions(text, _actions, _onTextChanged);
-    return FormatBar.whileSelecting(
+    return FormatBar.whileEditing(
       text: text,
       focus: _focus,
       onBold: format.bold,
       onList: format.list,
       onChecklist: format.checklist,
       onLink: () => unawaited(format.link(context, _editor.noteRef.value)),
+      onAttach: _chooseAttachment,
     );
   }
 
-  Widget _details(Note note) {
-    return Consumer(
-      builder: (context, ref, _) {
-        final suggested =
-            ref.watch(suggestedLinksProvider(note.ref)).value ?? const [];
-        final tagSuggestions =
-            ref.watch(suggestedTagsProvider(note.ref)).value ?? const [];
-        return NoteDetails(
-          folder: note.folder,
-          onFolderTap: () => unawaited(_actions.moveToFolder(context, note)),
-          tags: note.tags,
-          linked: ref.watch(linkedProvider(note.ref)).value ?? const [],
-          mentionedIn:
-              ref.watch(mentionedInProvider(note.ref)).value ?? const [],
-          suggested: [for (final s in suggested) s.other],
-          onSuggestedTap: (other) {
-            final link = suggested.firstWhere((s) => s.other.ref == other);
-            unawaited(
-              _suggestions.open(
-                context,
-                link.suggestion,
-                otherTitle: link.other.title,
-              ),
-            );
-          },
-          suggestedTags: [for (final s in tagSuggestions) s.tag],
-          onSuggestedTagTap: (tag) => unawaited(
-            _suggestions.open(
-              context,
-              tagSuggestions.firstWhere((s) => s.tag == tag),
-            ),
-          ),
-          onAddTag: () => unawaited(_actions.addTag(context, note)),
-          onTagTap: (tag) => unawaited(_actions.tagTapped(context, note, tag)),
-          onOpenNote: _openNote,
-        );
-      },
-    );
+  void _chooseAttachment() => unawaited(_attach.choose(context));
+
+  /// The new attachment goes where the cursor is, on its own line.
+  void _insertAttachment(String name) {
+    final text = _text;
+    if (text == null || !mounted) return;
+    text.value = AttachmentInsert.insert(text.value, name);
+    _onTextChanged(text.text);
   }
+
+  /// A drawing drawn on again shows its new lines.
+  void _drawingSaved(String name) {
+    ref
+      ..invalidate(attachmentBytesProvider(name))
+      ..invalidate(drawingStrokesProvider(name));
+  }
+
+  Widget _embed(String name) => AttachmentEmbed(
+    name: name,
+    onOpenPhoto: (n) => unawaited(PhotoViewer.open(context, n)),
+    onEditDrawing: (n) => unawaited(_attach.editDrawing(context, n)),
+  );
 }

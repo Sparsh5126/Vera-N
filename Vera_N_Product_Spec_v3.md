@@ -66,6 +66,12 @@ App-private storage (per device, not synced, lost on uninstall)
   - **Suggestions are not saved as files.** They are rebuildable and expire after 30 days. Suggestions made by the laptop arrive as files and are imported into the database.
 - Settings stay in app-private storage.
 - Changing or removing AI models never harms notes.
+- **Attachments (built 2026-10-08):** photos, drawings and voice notes live in `MyNotes/Attachments/` as `<id>.<ext>` (the note id scheme). A note embeds one as a standard Markdown line, `![](Attachments/<name>)`, the path from `MyNotes/`, so Obsidian and other apps show it too.
+  - Photos are shrunk to 2048 px and saved as JPEG at quality 80.
+  - Voice notes are AAC in `.m4a`.
+  - A drawing is `<id>.drawing.png`, which any app can open, plus `<id>.drawing.json` holding its strokes so it can be drawn on again.
+  - Attachment files are the user's and are never deleted by the app; removing one from a note leaves its file.
+  - The AI never reads attachments; their lines are left out of the text it analyzes.
 
 ---
 

@@ -6,12 +6,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/app/app.dart';
 import 'package:vera_n/core/ai/search/meaning_search_provider.dart';
 import 'package:vera_n/core/models/app_prefs.dart';
+import 'package:vera_n/core/platform/attachment_capture.dart';
 import 'package:vera_n/core/settings/app_prefs_controller.dart';
 import 'package:vera_n/core/storage/db/app_database.dart';
 import 'package:vera_n/core/storage/files/folder_access.dart';
 import 'package:vera_n/core/storage/storage_providers.dart';
 import 'package:vera_n/core/storage/storage_services.dart';
 
+import 'fake_attachment_capture.dart';
 import 'fake_embedder.dart';
 import 'memory_note_file_store.dart';
 
@@ -31,6 +33,9 @@ class AppHarness {
   /// The model Search's meaning search uses in widget tests.
   final embedder = FakeEmbedder();
 
+  /// Camera, gallery and microphone in widget tests.
+  final capture = FakeAttachmentCapture();
+
   Future<void> pump(
     WidgetTester tester, {
     bool startWithOnboarding = false,
@@ -43,6 +48,7 @@ class AppHarness {
           initialPrefsProvider.overrideWithValue(prefs),
           // Meaning search uses the fake model, never the real one.
           embedderFactoryProvider.overrideWithValue(() => embedder),
+          attachmentCaptureProvider.overrideWithValue(capture),
         ],
         child: App(startWithOnboarding: startWithOnboarding),
       ),

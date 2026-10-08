@@ -21,6 +21,17 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
   - **Moving notes:** when they move into a picked folder, the attachments they embed are copied too. The originals stay in the app's private folder for now.
   - **New packages:** `image_picker` (official; camera through the system camera app, so no camera permission), `record` (microphone), `audioplayers` (playback). Their sizes are logged with the finished feature.
   - Tests: 10.
+- **Attachments, part 2: attach, previews, photo, drawing, voice.**
+  - **Attach:** a paperclip in the slim row above the keyboard whenever the note is being edited; bold, list, checklist and link join it while text is selected. Also **Attach** in the ⋮ menu. It offers Photo from gallery, Take a photo, Voice note and Drawing, and the result goes in at the cursor on its own line.
+  - **Photo:** shrunk to 2048 px and saved as JPEG at quality 80 (CLAUDE.md §8). In the note it shows up to 280 tall; tapping opens it full screen with pinch to zoom.
+  - **Drawing:** a full-screen canvas with one ink, Undo last line, Clear and Save. In the note it is drawn from its strokes in the theme's ink, so it reads in light and dark. Tapping reopens it for more drawing; Save writes the picture and strokes again. The PNG for other apps is printed light (ink on the light plate).
+  - **Voice:** a sheet starts recording (AAC, mono) with the time counting up; Save or Cancel ends it, and the microphone is released at once. In the note: play / pause, "Voice note", and the time played. Nothing plays until tapped.
+  - **Permissions:** the microphone is asked for on first use only. If refused, the sheet says how to allow it. `RECORD_AUDIO` is the only new permission; the camera goes through the system camera app, and the gallery through Android's photo picker.
+  - **Trouble:** device trouble (no camera app, storage full) reads "Couldn't attach that." A missing file (still syncing) reads "This attachment isn't here yet."
+  - **Code:** `AttachmentCapture` (core/platform) wraps the plugins behind one interface, so widget tests use `FakeAttachmentCapture`. The note's details moved into `NoteDetailsSection` to keep the note screen small.
+  - **Size, measured:** release arm64 APK 104.4 MB before → 104.6 MB after (+0.2 MB for `image_picker`, `record` and `audioplayers`). No battery cost when idle: the recorder and player are created on use and released after.
+  - **Size, found while measuring:** the 104.4 MB baseline is not the 71.3 MB measured on 2026-10-04. The ONNX runtime now ships its x86_64 and armeabi-v7a libraries too (about 37 MB), even in an arm64 build. This is a release-packaging item (BACKLOG).
+  - Tests: 1 drawing-model test and 4 widget tests (photo, voice, microphone refused, drawing). The format-bar test now expects Attach while editing.
 
 - **Graph: grouped bubbles for very large libraries** (UI spec §10, the last Graph item).
   - Past 200 notes, the whole-library Graph shows one bubble per top-level folder instead of dots. This applies only with no Folder or Tag filter and no Focus.

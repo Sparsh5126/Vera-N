@@ -33,7 +33,9 @@ lib/
 │   │   ├── haptics.dart           named haptic events, respects system settings
 │   │   └── motion.dart            reduce-motion aware helpers (durations come from app_styles)
 │   ├── platform/
-│   │   └── launch_channel.dart    capture entry points and startup timing (Android bridge)
+│   │   ├── launch_channel.dart    capture entry points and startup timing (Android bridge)
+│   │   ├── attachment_capture.dart camera, gallery, microphone behind one interface (tests use a fake)
+│   │   └── voice_player.dart      plays a voice note
 │   ├── settings/
 │   │   └── app_prefs_controller.dart  the user's Settings choices (AppPrefs), read once at start
 │   ├── navigation/
@@ -55,6 +57,7 @@ lib/
 │   ├── onboarding/
 │   ├── home/
 │   ├── note/                      editor + note view + suggestion sheet container
+│   │   └── drawing/               drawing model (strokes file), canvas, painter, drawing screen
 │   ├── review/                    swipe stack container
 │   ├── search/
 │   ├── graph/

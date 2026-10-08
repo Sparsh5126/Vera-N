@@ -68,6 +68,11 @@ abstract final class AppSize {
   /// every list line apart).
   static const double glyphWidth = 32;
 
+  /// Attachments in a note: the tallest a photo or drawing preview grows,
+  /// and the drawing pen's width.
+  static const double embedMaxHeight = 280;
+  static const double drawingStroke = 3;
+
   /// Widest a tag, folder or link chip grows before its label is cut
   /// with "…" (a note's title is its whole first line).
   static const double chipMaxWidth = 240;
