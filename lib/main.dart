@@ -17,8 +17,7 @@ Future<void> main() async {
   ModelFiles.registerLicense();
   final storage = await StorageServices.open();
   final prefs = await storage.settings.prefs();
-  final onboard =
-      storage.canChooseFolder && !await storage.settings.onboardingDone();
+  final onboard = !await storage.settings.onboardingDone();
   runApp(
     ProviderScope(
       overrides: [

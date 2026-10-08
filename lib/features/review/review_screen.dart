@@ -12,10 +12,10 @@ import '../../core/navigation/routes.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../core/styles/app_styles.dart';
 import '../../core/utils/date_label.dart';
+import '../../shared/widgets/progress_dots.dart';
 import '../../shared/widgets/suggestion_card.dart';
 import '../../shared/widgets/undo_snack_bar.dart';
 import 'state/review_controller.dart';
-import 'widgets/progress_dots.dart';
 import 'widgets/review_buttons.dart';
 import 'widgets/review_done.dart';
 import 'widgets/review_hint.dart';
@@ -121,7 +121,11 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             ),
           ),
           if (state.current != null)
-            ProgressDots(done: state.done, total: state.batch.length),
+            ProgressDots(
+              done: state.done,
+              total: state.batch.length,
+              label: AppCopy.reviewProgress(state.done, state.batch.length),
+            ),
         ],
       ),
     );

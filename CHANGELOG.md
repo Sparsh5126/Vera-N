@@ -5,6 +5,15 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Onboarding** (UI spec §4): the full first-launch flow, on every platform (was: the folder question only, on Android).
+  - All five screens are one swipeable set of pages with dots, in one route (`/welcome`); at the user's request the folder and name are pages of it, not separate screens.
+  - Pages 1–3 ("Notes that stay yours.", "Just write.", "The thinking happens on your phone.") have Next; Skip at the top goes straight to the folder page. Moving between pages uses the standard motion, or jumps with reduce motion on.
+  - The folder page (Android only) has Choose folder and Not now; both continue to the name page.
+  - The name page ("What should we call you?") has Done, which keeps the name for the greeting, and Skip. Its keyboard opens only when the page is reached. Onboarding is marked done only here, so quitting halfway shows it again.
+  - Decided 2026-10-08 (user): screen 3 keeps its laptop line although the laptop layer isn't built yet. It must exist before launch for the claim to be true (UI spec §4).
+  - Checked on the phone (test app, fresh data): swipe and Next through screens 1–3, Not now, a name, then Home greeted by name. Fixed: the page dots sat at the left edge.
+  - `ProgressDots` moved to `shared/widgets/` (Review and onboarding), with the screen-reader label passed in.
+  - Tests: the old folder-screen tests are replaced by 6 covering the whole flow (pages and Next, Skip/Not now/Skip, folder and name, backing out of the picker, swiping through every page, desktop without the folder page).
 - **Graph, second part** (UI spec §10).
   - **Focus:** the preview card's Focus shows only that note and its neighbours, 1 step away by default; "1 step / 2 steps / 3 steps" pills widen it, and "Show all" ends it. The bar reads "Focus: {title}".
   - **Search jump:** the search icon opens a sheet listing note titles as you type; picking one selects it and centres the graph on it, zoomed in enough to read titles. A note that was hidden (unlinked, or outside the focus) is made visible first.

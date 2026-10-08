@@ -72,7 +72,6 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 
 - "Choose folder" opens Android's own folder picker at Documents. The picker can't be pre-filled with a new folder name, so the text above suggests making one; the picker has its own "new folder" option. The storage root and Download root can't be picked on Android 11+, so a subfolder is always used.
 - Backing out of the picker returns to this screen, where both choices stay available.
-- Until screens 1–3 and 5 are built, this is the only onboarding screen shown on first launch (Android only).
 - "Not now", or backing out of the picker, never blocks writing: notes are kept inside the app until a folder is chosen. Settings shows this under Notes folder (see section 11).
 
 **Screen 5: Name prompt**
@@ -82,6 +81,8 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 - Name is optional. If skipped, the greeting is just "Good evening".
 - Short, skippable, no tutorials beyond this.
 - A one-time gesture hint appears the first time the Review screen opens (see section 6).
+- **Built 2026-10-08:** all five screens are one swipeable set of pages with dots (the user asked for the folder and name to be part of it, not separate screens). Screens 1–3 have **Next**, and **Skip** at the top goes straight to the folder page. The folder page (only where a folder can be picked, i.e. Android) has **Choose folder** and **Not now**; both continue to the name page. The name page has **Done** (saves the name for the greeting) and **Skip**, and its keyboard opens only when that page is reached. Onboarding counts as done only after the name page, so leaving halfway shows it again next launch. Capture entry points (shortcut, later widget and tile) still skip onboarding.
+- Screen 3's laptop line is kept as drafted at the user's request (2026-10-08): the laptop layer is planned for this release, so it must be built before launch for the claim to be true.
 
 ---
 

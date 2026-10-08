@@ -33,6 +33,9 @@ abstract final class AppCopy {
   static const suggestedFolderName = 'Vera N';
   static const onboardingNameTitle = 'What should we call you?';
   static const skip = 'Skip';
+  static const next = 'Next';
+  static const done = 'Done';
+  static String onboardingPage(int page, int total) => 'Page $page of $total';
 
   // Navigation (UI spec §3).
   static const navHome = 'Home';

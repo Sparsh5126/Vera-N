@@ -7,7 +7,7 @@ import '../core/styles/app_styles.dart';
 import '../features/graph/graph_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/note/note_screen.dart';
-import '../features/onboarding/onboarding_folder_screen.dart';
+import '../features/onboarding/onboarding_screen.dart';
 import '../features/review/review_screen.dart';
 import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
@@ -23,14 +23,14 @@ GoRouter buildRouter({
 }) {
   return GoRouter(
     initialLocation: startWithOnboarding
-        ? Routes.onboardingFolder
+        ? Routes.welcome
         : startWithNewNote
         ? Routes.newNote
         : Routes.home,
     routes: [
       GoRoute(
-        path: Routes.onboardingFolder,
-        builder: (_, _) => const OnboardingFolderScreen(),
+        path: Routes.welcome,
+        builder: (_, _) => const OnboardingScreen(),
       ),
       ShellRoute(
         builder: (_, state, child) =>

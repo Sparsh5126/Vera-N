@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/copy/app_copy.dart';
-import '../../../core/styles/app_styles.dart';
+import '../../core/styles/app_styles.dart';
 
-/// Progress through a batch as small dots, never a number on screen
-/// (UI spec §6). Screen readers hear the position.
+/// Progress as small dots, never a number on screen (Review batches,
+/// onboarding pages). Screen readers hear [label], e.g. the position.
 class ProgressDots extends StatelessWidget {
-  const ProgressDots({super.key, required this.done, required this.total});
+  const ProgressDots({
+    super.key,
+    required this.done,
+    required this.total,
+    required this.label,
+  });
 
   final int done;
   final int total;
+  final String label;
 
   static const _dot = AppSpace.s;
 
@@ -17,7 +22,7 @@ class ProgressDots extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return Semantics(
-      label: AppCopy.reviewProgress(done, total),
+      label: label,
       child: ExcludeSemantics(
         child: Row(
           mainAxisSize: MainAxisSize.min,
