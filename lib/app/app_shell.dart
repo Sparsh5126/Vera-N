@@ -6,13 +6,17 @@ import '../core/navigation/routes.dart';
 import '../core/styles/app_styles.dart';
 import '../shared/widgets/pill_nav_bar.dart';
 
-/// Holds the tab screens and the floating pill bar. Graph joins the bar
-/// when that screen exists. The bar steps aside while the
+/// Holds the tab screens and the floating pill bar. The bar steps aside while the
 /// keyboard is open; notes open above it, full screen.
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.location, required this.child});
 
-  static const tabs = [Routes.home, Routes.search, Routes.settings];
+  static const tabs = [
+    Routes.home,
+    Routes.search,
+    Routes.graph,
+    Routes.settings,
+  ];
   static const items = [
     PillNavItem(
       icon: Icons.home_outlined,
@@ -23,6 +27,11 @@ class AppShell extends StatelessWidget {
       icon: Icons.search,
       selectedIcon: Icons.search,
       label: AppCopy.navSearch,
+    ),
+    PillNavItem(
+      icon: Icons.hub_outlined,
+      selectedIcon: Icons.hub,
+      label: AppCopy.navGraph,
     ),
     PillNavItem(
       icon: Icons.settings_outlined,

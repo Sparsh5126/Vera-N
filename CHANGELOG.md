@@ -5,6 +5,31 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Graph, second part** (UI spec §10).
+  - **Focus:** the preview card's Focus shows only that note and its neighbours, 1 step away by default; "1 step / 2 steps / 3 steps" pills widen it, and "Show all" ends it. The bar reads "Focus: {title}".
+  - **Search jump:** the search icon opens a sheet listing note titles as you type; picking one selects it and centres the graph on it, zoomed in enough to read titles. A note that was hidden (unlinked, or outside the focus) is made visible first.
+  - **Folder and Tag filters**, as in Search (a folder includes its subfolders). Links count only between notes the filters keep.
+  - **Show suggestions** (off by default; offered only while suggestions are on in Settings): waiting suggestions appear as dimmed dashed lines. Their notes show even if unlinked. Tapping a line (or its screen-reader item, "Suggested link: A and B") opens the same suggestion sheet as in a note, with accept / reject and Undo; closing it counts as not sure. The layout uses confirmed links only, so turning suggestions on never moves the dots.
+  - The suggestion sheet and its accept / reject flow moved to `shared/widgets/` (`SuggestionSheet`, `SuggestionFlow`) so the note view and the Graph share one. Following the layer rule (shared widgets take data and callbacks), the flow gets the actions, the view loader and the date wording as callbacks.
+  - **Layout timing** (laptop, Dart JIT, random graphs with 1.5 links per note): 60 notes 15 ms, 200 notes 81 ms, 500 notes 426 ms. Graphs of up to 30 notes are now laid out in place (a few ms), larger ones in a background isolate, so the screen never stalls. Not yet measured on the phone.
+  - Not built: folder colours for dots when filtering by folder (the app has no folder colours yet), and grouped bubbles for very large libraries.
+  - 2 widget tests (Focus and its steps; a dashed line opens the sheet).
+  - **Checked on the phone** (test app with its own storage; 7 notes in two folders, two linked groups, one suggestion): dots and lines, selection and preview card, Focus, Show all, Show suggestions, accepting a dashed line (it turned solid, the dot grew), and the search jump to an unlinked note all worked. Fixed what the check found:
+    - Separate groups were pushed far apart, squeezing each group into overlapping dots with invisible lines. The pull to the middle is stronger (1.0, was 0.05) and each note gets more room (110, was 90). A link is now about a third of the width in a two-group graph, was 0.09.
+    - Showing suggestions moved the dots, because notes that only had a suggestion changed the layout. Those notes are now always placed and only drawn while suggestions are shown.
+    - Focus left the preview card covering the focused notes; it now closes it.
+    - The "Linked" / Undo message sat under the floating nav bar on Graph and Settings. `UndoSnackBar` (and `SuggestionFlow`) can now keep it above the bar.
+- **Graph, first part** (UI spec §10): the Graph tab, between Search and Settings.
+  - Each note is a dot and each confirmed link a solid line (written `[[links]]`, accepted suggestions included, either direction counted once). Dots grow with the number of links, up to a cap, in one color.
+  - Notes with no links are hidden; the "Show unlinked notes" pill shows them as quieter dots.
+  - Pan and pinch to zoom (0.3–4×). The graph starts centred, zoomed out only as far as needed to fit, so a few notes sit close together rather than at the screen's edges (seen on the phone with two notes). Titles appear from 1.4× zoom.
+  - Tapping a dot highlights it and its links and shows a card with the title, the start of the note, and Open. Tapping elsewhere or ✕ closes it.
+  - Screen readers get one item per dot ("Alpha, 2 links") that selects it, since a drawing can't be read.
+  - **Layout:** a force layout (Fruchterman–Reingold, 300 steps), deterministic, so the same notes and links always give the same picture. Small graphs run in place; larger graphs run in a background isolate. Each result is cached for the session (last 4 kept), so the layout is only recomputed when notes or links change. Not yet measured on the phone for large libraries; the "grouped bubbles" view for very large libraries comes later.
+  - New `GraphRepository` (one query for links, one for notes, updating when either changes).
+  - Empty state: "Links between your notes will appear here."
+  - Next part: Focus, the search jump, Folder and Tag filters, and "Show suggestions".
+  - 4 tests (edges and trash, layout determinism, empty state, tap to preview and Open).
 - **Settings screen** (UI spec §11), the fourth tab after Home and Search (Graph joins later).
   - **YOU:** Name, used in the Home greeting ("Good evening, Asha"); clearing it goes back to just "Good evening".
   - **APP:** Layout (Grid | List), Open app to (Home | New note), and Theme (System | Dark | Light), as pills. A change shows at once. Choices are kept on this device in the settings table and read once at start, so the first frame already has the right theme and layout. The list layout uses the same note card, full width (new token `AppSize.noteRowHeight`).

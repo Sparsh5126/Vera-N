@@ -84,6 +84,25 @@ abstract final class AppSize {
   /// Space under lists on screens with the nav bar but no floating button.
   static const double navBarClearance = 96;
 
+  /// Graph dots: the radius of a note with one link, how much each further
+  /// link adds, and the largest a dot grows.
+  static const double graphDot = 6;
+  static const double graphDotStep = 1.5;
+  static const double graphDotMax = 18;
+
+  /// Graph lines (confirmed links).
+  static const double graphLine = 1.5;
+
+  /// Room each note gets in the graph before zooming.
+  static const double graphSpacing = 110;
+
+  /// Zoom from which note titles appear next to their dots.
+  static const double graphTitleZoom = 1.4;
+
+  /// Graph zoom limits.
+  static const double graphMinZoom = 0.3;
+  static const double graphMaxZoom = 4;
+
   /// Widest a column of text grows on large screens.
   static const double readableWidth = 680;
 }

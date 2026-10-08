@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../core/feedback/motion.dart';
 import '../core/navigation/routes.dart';
 import '../core/styles/app_styles.dart';
+import '../features/graph/graph_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/note/note_screen.dart';
 import '../features/onboarding/onboarding_folder_screen.dart';
@@ -37,6 +38,7 @@ GoRouter buildRouter({
         routes: [
           _tab(Routes.home, const HomeScreen()),
           _tab(Routes.search, const SearchScreen()),
+          _tab(Routes.graph, const GraphScreen()),
           _tab(Routes.settings, const SettingsScreen()),
         ],
       ),

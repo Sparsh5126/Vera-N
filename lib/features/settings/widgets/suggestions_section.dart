@@ -86,6 +86,7 @@ class _SuggestionsSectionState extends ConsumerState<SuggestionsSection> {
           messenger,
           message: message,
           onUndo: () => unawaited(undo()),
+          aboveNavBar: true,
         ),
       ),
     );

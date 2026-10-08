@@ -68,6 +68,10 @@ class SuggestionsRepository {
   /// How many suggestions are waiting, for the Home card.
   Stream<int> watchCount() => _pending().watch().map((rows) => rows.length);
 
+  /// Every suggestion waiting, for the Graph's dashed lines.
+  Stream<List<Suggestion>> watchPending() =>
+      _pending().watch().map((rows) => rows.map(_suggestion).toList());
+
   /// Suggestions waiting that involve note [ref], for its note view.
   Stream<List<Suggestion>> watchFor(int ref) => _pending().watch().map(
     (rows) => [

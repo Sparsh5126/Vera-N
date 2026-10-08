@@ -161,6 +161,18 @@ abstract final class AppCopy {
   static const showSuggestions = 'Show suggestions';
   static const open = 'Open';
   static const focus = 'Focus';
+  static const showUnlinked = 'Show unlinked notes';
+  static const findNote = 'Find a note';
+  static const focusOff = 'Show all';
+  static String focusOn(String title) => 'Focus: $title';
+  static String hops(int n) => n == 1 ? '1 step' : '$n steps';
+  static String suggestedLinkBetween(String a, String b) =>
+      'Suggested link: $a and $b';
+  static String graphDot(String title, int links) => switch (links) {
+    0 => '$title, no links',
+    1 => '$title, 1 link',
+    _ => '$title, $links links',
+  };
 
   // Settings (UI spec §11).
   static const sectionYou = 'YOU';

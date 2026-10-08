@@ -4,11 +4,13 @@ import '../../core/copy/app_copy.dart';
 import '../../core/styles/app_styles.dart';
 
 /// The one way to offer Undo after an action (instead of asking first).
+/// On tab screens without a floating button, pass [aboveNavBar].
 abstract final class UndoSnackBar {
   static void show(
     ScaffoldMessengerState messenger, {
     required String message,
     required VoidCallback onUndo,
+    bool aboveNavBar = false,
   }) {
     messenger
       ..hideCurrentSnackBar()
@@ -19,6 +21,15 @@ abstract final class UndoSnackBar {
           // Flutter keeps a snackbar with an action until dismissed unless
           // told otherwise; Undo should leave on its own.
           persist: false,
+          // Tab screens without a floating button would otherwise show it
+          // under the floating nav bar.
+          margin: aboveNavBar
+              ? const EdgeInsets.only(
+                  left: AppSpace.m,
+                  right: AppSpace.m,
+                  bottom: AppSize.navBarClearance,
+                )
+              : null,
           action: SnackBarAction(label: AppCopy.undo, onPressed: onUndo),
         ),
       );

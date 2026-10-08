@@ -83,7 +83,7 @@ features/home/
 └── widgets/                       widgets used only by this feature
 ```
 
-A widget moves to `shared/widgets/` the moment a second feature needs it.
+A widget moves to `shared/widgets/` the moment a second feature needs it. Example: `SuggestionSheet` and `SuggestionFlow` (note view and Graph) take the suggestion actions as callbacks, so they still import only styles, copy, feedback and models.
 
 ---
 

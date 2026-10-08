@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/copy/app_copy.dart';
-import '../../../core/models/suggestion_view.dart';
-import '../../../core/styles/app_styles.dart';
-import '../../../core/utils/date_label.dart';
-import '../../../shared/widgets/decision_buttons.dart';
-import '../../../shared/widgets/suggestion_card.dart';
+import '../../core/copy/app_copy.dart';
+import '../../core/models/suggestion_view.dart';
+import '../../core/styles/app_styles.dart';
+import 'decision_buttons.dart';
+import 'suggestion_card.dart';
 
 enum SheetChoice { accept, reject }
 
-/// The suggestion card in a bottom sheet, buttons only (UI spec §8).
-/// The reason names [otherTitle], the note the user isn't in. Returns the
-/// choice, or null when closed (which counts as not sure).
+/// The suggestion card in a bottom sheet, buttons only (UI spec §8), from
+/// a note's dimmed chip or a dashed line in the Graph. The reason names
+/// [otherTitle]; [dateLabel] words each note's date. Returns the choice,
+/// or null when closed (which counts as not sure).
 abstract final class SuggestionSheet {
   static Future<SheetChoice?> show(
     BuildContext context,
     SuggestionView view, {
     required String otherTitle,
     required ValueChanged<int> onOpenNote,
+    required String Function(DateTime) dateLabel,
   }) {
-    final now = DateTime.now();
     SuggestionSide side(String label, SuggestedNote note) => SuggestionSide(
-      label: '$label · ${DateLabel.of(note.created, now)}',
+      label: '$label · ${dateLabel(note.created)}',
       title: note.title,
       passage: note.passage,
       onOpen: () {

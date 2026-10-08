@@ -344,6 +344,8 @@ One reusable card, two containers:
 - No stats, no "orphan note" nudges, nothing to maintain.
 - Empty state: "Links between your notes will appear here."
 - Layout calculated once and cached; very large libraries switch to grouped bubbles.
+- **Built 2026-10-08 (first part):** dots and solid lines, dot size by links, "Show unlinked notes" pill (unlinked dots are quieter), pan and pinch with titles from 1.4× zoom, tap → preview card (title, start of the note, Open, ✕). Screen readers get one item per dot. Not yet built: Focus, search jump, Folder/Tag filters, Show suggestions, grouped bubbles.
+- **Built 2026-10-08 (second part):** Focus with "1 step / 2 steps / 3 steps" and "Show all"; the search icon finds a note by title and centres on it (showing it if it was hidden); Folder and Tag pills; "Show suggestions" (offered only while suggestions are on) with dimmed dashed lines whose tap opens the suggestion sheet. The layout ignores suggestion lines, so dots don't move when they are shown. Still to build: folder colours (none exist yet) and grouped bubbles for very large libraries.
 
 ---
 

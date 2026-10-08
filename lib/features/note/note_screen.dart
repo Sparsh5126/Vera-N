@@ -11,6 +11,8 @@ import '../../core/navigation/routes.dart';
 import '../../core/platform/launch_channel.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../core/styles/app_styles.dart';
+import '../../core/utils/date_label.dart';
+import '../../shared/widgets/suggestion_flow.dart';
 import '../../shared/widgets/undo_snack_bar.dart';
 import 'state/link_typing.dart';
 import 'state/markup_editing.dart';
@@ -21,7 +23,6 @@ import 'widgets/note_actions.dart';
 import 'widgets/note_details.dart';
 import 'widgets/note_editor_view.dart';
 import 'widgets/note_format_actions.dart';
-import 'widgets/note_suggestion_flow.dart';
 import 'widgets/note_top_bar.dart';
 import 'widgets/titled_text_controller.dart';
 
@@ -41,8 +42,12 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   late final NoteEditorController _editor;
   late final NoteActions _actions;
   late final AppLifecycleListener _lifecycle;
-  late final NoteSuggestionFlow _suggestions = NoteSuggestionFlow(
-    ref: ref,
+  late final _suggestions = SuggestionFlow(
+    load: ref.read(suggestionViewsProvider).load,
+    accept: ref.read(suggestionActionsProvider).accept,
+    reject: ref.read(suggestionActionsProvider).reject,
+    notSure: ref.read(suggestionActionsProvider).notSure,
+    dateLabel: (d) => DateLabel.of(d, DateTime.now()),
     beforeChange: _editor.save,
     afterChange: _reloadText,
     onOpenNote: _openNote,
@@ -273,12 +278,16 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
           mentionedIn:
               ref.watch(mentionedInProvider(note.ref)).value ?? const [],
           suggested: [for (final s in suggested) s.other],
-          onSuggestedTap: (other) => unawaited(
-            _suggestions.open(
-              context,
-              suggested.firstWhere((s) => s.other.ref == other),
-            ),
-          ),
+          onSuggestedTap: (other) {
+            final link = suggested.firstWhere((s) => s.other.ref == other);
+            unawaited(
+              _suggestions.open(
+                context,
+                link.suggestion,
+                otherTitle: link.other.title,
+              ),
+            );
+          },
           onAddTag: () => unawaited(_actions.addTag(context, note)),
           onTagTap: (tag) => unawaited(_actions.tagTapped(context, note, tag)),
           onOpenNote: _openNote,

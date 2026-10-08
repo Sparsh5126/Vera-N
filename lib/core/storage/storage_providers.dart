@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'repositories/graph_repository.dart';
 import 'repositories/links_repository.dart';
 import 'repositories/notes_repository.dart';
 import 'repositories/search_repository.dart';
@@ -26,4 +27,8 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
 
 final linksRepositoryProvider = Provider<LinksRepository>(
   (ref) => LinksRepository(ref.watch(storageProvider).db),
+);
+
+final graphRepositoryProvider = Provider<GraphRepository>(
+  (ref) => GraphRepository(ref.watch(storageProvider).db),
 );
