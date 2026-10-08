@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -14,10 +15,12 @@ import 'indexer/note_indexer.dart';
 import 'indexer/note_writer.dart';
 import 'indexer/notes_relocator.dart';
 import 'repositories/analysis_repository.dart';
+import 'repositories/notes_exporter.dart';
 import 'repositories/notes_repository.dart';
 import 'repositories/rejections_repository.dart';
 import 'repositories/settings_repository.dart';
 import 'repositories/suggestions_repository.dart';
+import 'repositories/trash_repository.dart';
 
 /// What background analysis uses; see [StorageServices.openForAnalysis].
 typedef AnalysisStorage = ({
@@ -41,6 +44,8 @@ class StorageServices {
     indexer = NoteIndexer(db, store);
     notes = NotesRepository(db, store, writer);
     rejections = RejectionsRepository(db, store);
+    trash = TrashRepository(db, store);
+    exporter = NotesExporter(db, writer);
   }
 
   /// Opens storage on the device and reconnects to the picked folder.
@@ -80,6 +85,8 @@ class StorageServices {
   late final NoteIndexer indexer;
   late final NotesRepository notes;
   late final RejectionsRepository rejections;
+  late final TrashRepository trash;
+  late final NotesExporter exporter;
   Future<void>? _reconciling;
 
   bool get canChooseFolder => folders != null;
@@ -110,6 +117,16 @@ class StorageServices {
     return _reconciling ??= indexer.reconcile().whenComplete(
       () => _reconciling = null,
     );
+  }
+
+  /// Removes notes kept in the trash past 30 days. Run after start, never
+  /// delaying it; a failure only means they wait for the next start.
+  Future<void> cleanUp() async {
+    try {
+      await trash.purge(DateTime.now());
+    } on Object catch (e) {
+      debugPrint('VeraN clean-up failed: $e');
+    }
   }
 
   /// App going to the background: get unsaved text into files now.

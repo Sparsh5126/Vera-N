@@ -28,6 +28,6 @@ Future<void> main() async {
     ),
   );
   // Pick up notes added or changed outside the app, without delaying start.
-  unawaited(storage.reconcile());
+  unawaited(storage.reconcile().then((_) => storage.cleanUp()));
   unawaited(AnalysisScheduler.init());
 }

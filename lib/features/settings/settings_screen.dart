@@ -4,11 +4,12 @@ import '../../core/copy/app_copy.dart';
 import '../../core/styles/app_styles.dart';
 import 'widgets/about_section.dart';
 import 'widgets/app_section.dart';
+import 'widgets/data_section.dart';
 import 'widgets/folder_section.dart';
 import 'widgets/suggestions_section.dart';
 
 /// Settings: one scrollable page (UI spec §11). Rows for features not built
-/// yet (sync status, laptop, trash, export) join later.
+/// yet (sync status, laptop) join later.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -36,6 +37,7 @@ class SettingsScreen extends StatelessWidget {
             const AppSection(),
             const FolderSection(),
             const SuggestionsSection(),
+            const DataSection(),
             const AboutSection(),
             const SizedBox(height: AppSize.floatingClearance),
           ],

@@ -4,6 +4,7 @@ abstract final class Routes {
   static const search = '/search';
   static const graph = '/graph';
   static const settings = '/settings';
+  static const trash = '/trash';
   static const welcome = '/welcome';
   static const newNote = '/note/new';
   static const review = '/review';

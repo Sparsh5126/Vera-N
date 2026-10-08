@@ -396,6 +396,7 @@ Version
 - Advanced is collapsed by default.
 - Trash keeps deleted notes for 30 days.
 - Export produces a Markdown zip.
+- **Built 2026-10-08:** Trash opens a list of deleted notes (newest first) with **Restore** and **Delete forever** on each (user's choice, 2026-10-08); both offer Undo, and a note deleted forever is only removed once its Undo has gone. Notes older than 30 days are removed after each start. **Export notes** makes a .zip of every note in its folders (no trash, no app data) and saves it with Android's own "save as" screen.
 - **Built 2026-10-08:** YOU, APP, Notes folder, SMART SUGGESTIONS, ADVANCED and ABOUT (Privacy, Version, and a Licenses row for open-source and model licenses). Rebuild and Reset offer Undo instead of asking first. Quick capture, sync Status, Laptop connection, Trash and Export join with their features. "Suggest connections" off also hides suggestions that were already waiting, until it is turned back on.
 
 ---

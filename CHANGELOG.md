@@ -5,6 +5,20 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Trash screen** (UI spec §11), from Settings → DATA → Trash.
+  - Deleted notes, most recently deleted first: when, title and the start of the text, with **Restore** and **Delete forever** buttons. A line on top says notes stay 30 days.
+  - Restore puts the note back where it was, with Undo.
+  - Decided 2026-10-08 (user): **Delete forever** is offered too. The note disappears at once, with Undo; the file is removed only when the Undo message goes away (timed out, swiped, or replaced), so nothing is lost by a slip. Tags, links and suggestions of that note go with it.
+  - **30-day clean-up:** notes in the trash longer than 30 days are deleted for good after each start (after the folder check, never delaying the start). Before this, nothing removed them.
+  - New `TrashRepository` (list, delete forever, purge). Empty state: "Nothing in the trash."
+- **Export notes** (UI spec §11), Settings → DATA → Export notes (Android).
+  - Decided 2026-10-08 (user): a .zip of every note as its Markdown file, **in its folders**, saved with **Android's own "save as" screen** (e.g. into Downloads). The trash and the app's own data (suggestions, rejections, analysis) are left out. Nothing leaves the phone unless the user moves the file.
+  - The text comes from the database, which matches the files (unsaved typing is written first). Reading every file back through Android's folder access would be much slower.
+  - The zip is made in a temporary file, handed to a new `ExportBridge.kt` (the app gets access to that one new file only), and always deleted after.
+  - "Notes saved." when done; "Couldn't save the notes. Try again." on failure; nothing if the user backs out.
+  - **New dependency: `archive` 4.3** (pure Dart zip writing; no native code, no network). It brings `posix` (desktop file modes only). Writing the zip format by hand was the alternative; not worth the risk.
+- **Trash and Export checked on the phone** (test build, its own notes): Delete from Home → Trash lists it with "Deleted Today"; Restore brings it back and Undo returns it to the trash; Delete forever hides it at once, keeps the file during the 5 s Undo, then removes it from `.trash/`. Export opened Android's "save as" screen with "Vera N notes 2026-10-08.zip"; saved to Downloads, the zip held the remaining note's full Markdown file (header and text), and "Notes saved." showed above the nav bar. (Android's screen opens in the last folder used; the user picks where.)
+- Tests: 6 storage tests (trash list, delete forever, never deleting an untrashed note, 30-day purge, export contents and name) and 3 Trash screen tests (empty, Restore, Delete forever with Undo). A widget-test note: a live database query read with `.first` inside the test's fake clock leaves drift's clean-up timer stuck and freezes the next step, so those reads use `runAsync`.
 - **Capture outside the app** (UI spec §5): every entry point opens its screen directly, with no new package (plain Android code).
   - **App-icon shortcuts:** New note (first), Search, and Review connections only while suggestions are waiting. They are published at run time (`CaptureShortcuts.kt`) instead of from `res/xml/shortcuts.xml`, so they point at the installed build's own package (the test build's static shortcut pointed at the wrong one). Dart turns Review on and off as the waiting count changes.
   - **Quick Settings tile "New note"** (`NewNoteTileService`): closes the shade and opens a blank note; on a locked phone it asks to unlock first.

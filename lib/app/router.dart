@@ -11,6 +11,7 @@ import '../features/onboarding/onboarding_screen.dart';
 import '../features/review/review_screen.dart';
 import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/trash/trash_screen.dart';
 import 'app_shell.dart';
 
 /// The route table. URL-style paths so widgets, the Quick Settings tile
@@ -44,6 +45,7 @@ GoRouter buildRouter({
       ),
       GoRoute(path: Routes.newNote, builder: (_, _) => const NoteScreen()),
       GoRoute(path: Routes.review, builder: (_, _) => const ReviewScreen()),
+      GoRoute(path: Routes.trash, builder: (_, _) => const TrashScreen()),
       GoRoute(
         path: Routes.notePattern,
         builder: (_, state) => NoteScreen(

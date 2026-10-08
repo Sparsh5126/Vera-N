@@ -219,8 +219,19 @@ abstract final class AppCopy {
   static const forgetDevice = 'Forget device';
   static const trash = 'Trash';
   static const trashValue = 'Kept 30 days';
+  static const trashHint =
+      'Deleted notes stay here for 30 days, then are removed for good.';
+  static const emptyTrash = 'Nothing in the trash.';
+  static const restore = 'Restore';
+  static const restored = 'Restored';
+  static const deleteForever = 'Delete forever';
+  static const deletedForever = 'Deleted for good';
+  static String deletedOn(String date) => 'Deleted $date';
   static const exportNotes = 'Export notes';
   static const exportValue = 'Markdown .zip';
+  static const exporting = 'Making the .zip…';
+  static const exportSaved = 'Notes saved.';
+  static const exportFailed = "Couldn't save the notes. Try again.";
   static const rebuildSuggestions = 'Rebuild suggestions';
   static const resetRejected = 'Reset rejected suggestions';
   static const privacy = 'Privacy';

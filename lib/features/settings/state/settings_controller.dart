@@ -1,11 +1,19 @@
+import 'dart:io';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import '../../../core/ai/scheduler/analysis_scheduler.dart';
 import '../../../core/ai/suggestions/suggestion_actions.dart';
+import '../../../core/copy/app_copy.dart';
 import '../../../core/models/app_prefs.dart';
+import '../../../core/platform/export_channel.dart';
 import '../../../core/platform/launch_channel.dart';
 import '../../../core/settings/app_prefs_controller.dart';
 import '../../../core/storage/storage_providers.dart';
+import '../../../core/storage/repositories/notes_exporter.dart';
 import '../../../core/storage/storage_services.dart';
 
 /// The notes folder's name, or null while notes are only on this phone.
@@ -17,6 +25,9 @@ final notesFolderNameProvider = FutureProvider.autoDispose<String?>(
 final appVersionProvider = FutureProvider<String?>(
   (ref) => LaunchChannel.version(),
 );
+
+/// How an export ended.
+enum ExportOutcome { saved, cancelled, failed }
 
 final settingsControllerProvider = Provider<SettingsController>(
   SettingsController.new,
@@ -73,4 +84,28 @@ class SettingsController {
       }
     };
   }
+
+  /// Makes the notes .zip and lets the user save it with Android's "save
+  /// as" screen. The temporary copy is always deleted after.
+  Future<ExportOutcome> exportNotes() async {
+    final name = NotesExporter.fileName(AppCopy.appName, DateTime.now());
+    final temp = File(p.join((await getTemporaryDirectory()).path, name));
+    try {
+      await temp.writeAsBytes(await _storage.exporter.zip(), flush: true);
+      final saved = await ExportChannel.save(
+        filePath: temp.path,
+        name: name,
+        mime: _zipMime,
+      );
+      return saved == true ? ExportOutcome.saved : ExportOutcome.cancelled;
+    } on PlatformException {
+      return ExportOutcome.failed;
+    } on FileSystemException {
+      return ExportOutcome.failed;
+    } finally {
+      if (await temp.exists()) await temp.delete();
+    }
+  }
+
+  static const _zipMime = 'application/zip';
 }

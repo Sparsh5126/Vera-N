@@ -46,6 +46,7 @@ dependencies:
   flutter_onnxruntime: 1.8.5
   dart_sentencepiece_tokenizer: 1.4.1
   workmanager: ^0.10.10
+  archive: ^4.3.0
 
 dev_dependencies:
   flutter_test:

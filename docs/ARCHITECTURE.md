@@ -197,7 +197,7 @@ From the specs — **blocking the stages noted, not the architecture**:
 
 Raised by the storage stage — **built as proposed, easy to change; please confirm**:
 
-4. **Trash location.** Deleting moves the file to `Notes/.trash/` (the folder Obsidian also uses), so a deleted note survives uninstall and syncs as deleted. The database keeps it as trashed; it is purged after 30 days.
+4. **Trash location.** Deleting moves the file to `Notes/.trash/` (the folder Obsidian also uses), so a deleted note survives uninstall and syncs as deleted. The database keeps it as trashed; it is purged after 30 days (`TrashRepository.purge`, run after each start). "Delete forever" removes the file and the row at once, after its Undo window.
 5. **Edit while the file changed elsewhere.** If a note has an unsaved edit and its file changed on disk (for example via Syncthing), the app never overwrites the file. It marks the note as in conflict and keeps both versions until the conflict screen from product spec §14 exists.
 
 ---

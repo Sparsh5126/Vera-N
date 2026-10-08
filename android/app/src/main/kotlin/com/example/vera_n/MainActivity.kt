@@ -9,6 +9,7 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     private var notesFolder: NotesFolderBridge? = null
     private var launch: LaunchBridge? = null
+    private var export: ExportBridge? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +29,10 @@ class MainActivity : FlutterActivity() {
         val launchBridge = LaunchBridge(this, launchChannel)
         launch = launchBridge
         launchChannel.setMethodCallHandler(launchBridge)
+
+        val exportBridge = ExportBridge(this)
+        export = exportBridge
+        MethodChannel(messenger, ExportBridge.CHANNEL).setMethodCallHandler(exportBridge)
     }
 
     /** Entry points (shortcuts, widgets, tile) start straight at their screen. */
@@ -47,6 +52,7 @@ class MainActivity : FlutterActivity() {
     @Deprecated("FlutterActivity is not a ComponentActivity; this is its result hook.")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (notesFolder?.onActivityResult(requestCode, resultCode, data) == true) return
+        if (export?.onActivityResult(requestCode, resultCode, data) == true) return
         @Suppress("DEPRECATION")
         super.onActivityResult(requestCode, resultCode, data)
     }
