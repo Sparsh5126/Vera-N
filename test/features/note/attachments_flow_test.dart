@@ -74,7 +74,7 @@ void main() {
     await attach(tester, AppCopy.attachCamera);
     final name = files().attachments.keys.single;
     expect(AttachmentName.kindOf(name), isNotNull);
-    expect(editorText(tester), 'Trip\n${NoteMarkup.embed(name)}\n');
+    expect(editorText(tester), 'Trip\n${NoteMarkup.embed(name)}\n\n');
     expect(find.byType(PhotoEmbed), findsOneWidget);
     await app.finish(tester);
   });

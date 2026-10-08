@@ -10,9 +10,11 @@ import '../drawing/drawing.dart';
 import '../drawing/drawing_painter.dart';
 import '../drawing/drawing_svg.dart';
 import 'embed_missing.dart';
+import 'embed_square.dart';
 
-/// A drawing in the note, drawn from its vector lines in the theme's ink
-/// on a plate, so it is sharp at any size and reads in light and dark.
+/// A drawing in the note, in a rounded square: its vector lines in the
+/// theme's ink, framed and centred, so it is sharp at any size and reads
+/// in light and dark.
 /// Tapping reopens it for more drawing.
 class DrawingEmbed extends ConsumerWidget {
   const DrawingEmbed({super.key, required this.name, required this.onTap});
@@ -41,24 +43,12 @@ class DrawingEmbed extends ConsumerWidget {
   }
 
   Widget _plate(BuildContext context, Drawing drawing) {
-    final colors = context.colors;
-    final ratio = drawing.size.width / drawing.size.height;
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: AppSize.embedMaxHeight,
-        maxWidth: AppSize.embedMaxHeight * ratio,
-      ),
-      child: AspectRatio(
-        aspectRatio: ratio,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: colors.card,
-            borderRadius: AppRadius.cardBorder,
-            border: Border.all(color: colors.border),
-          ),
-          child: CustomPaint(
-            painter: DrawingPainter(drawing: drawing, ink: colors.text),
-          ),
+    return EmbedSquare(
+      child: CustomPaint(
+        painter: DrawingPainter(
+          drawing: drawing,
+          ink: context.colors.text,
+          framed: true,
         ),
       ),
     );

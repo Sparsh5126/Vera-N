@@ -31,16 +31,16 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('while editing only Attach shows; formatting joins it while '
-      'text is selected', (tester) async {
+  testWidgets('every button shows while editing; Bold with nothing '
+      'selected bolds the word at the cursor', (tester) async {
     final c = await typeNote(tester, 'Title\na big idea');
-    expect(find.byTooltip('Attach'), findsOneWidget);
-    expect(find.byTooltip('Bold'), findsNothing);
-    await select(tester, c, 8, 11);
-    expect(find.byTooltip('Bold'), findsOneWidget);
-    expect(find.byTooltip('Attach'), findsOneWidget);
+    for (final tip in ['Bold', 'List', 'Checklist', 'Attach']) {
+      expect(find.byTooltip(tip), findsOneWidget);
+    }
     await select(tester, c, 9, 9);
-    expect(find.byTooltip('Bold'), findsNothing);
+    await tester.tap(find.byTooltip('Bold'));
+    await tester.pump();
+    expect(c.text, 'Title\na **big** idea');
     await app.finish(tester);
   });
 

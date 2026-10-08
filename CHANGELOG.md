@@ -4,6 +4,23 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Changed
+- **Formatting buttons always shown while editing** (user, 2026-10-08): Bold, List, Checklist, Link and Attach sit together above the keyboard, not only while text is selected.
+  - With nothing selected, Bold bolds the word at the cursor. A Devanagari word counts as one word, vowel signs included, and nothing happens between words.
+  - List, Checklist and Link already worked at the cursor.
+  - Tests: Bold at the cursor (English, Hindi, between words), and the bar shows every button.
+- **Photos and drawings show in a rounded square** (user, 2026-10-08): 220 on a side, on a plate with a hairline (`EmbedSquare`).
+  - A photo fills the square, cropped to fit. It is decoded within twice the square, not at full size, which saves memory while a photo up to 2:1 stays sharp. Tapping still opens the whole photo.
+  - A drawing is framed to the area its lines cover, so a sketch made on a tall canvas isn't tiny.
+  - `AppSize.embedMaxHeight` (280) is replaced by `AppSize.embedSize` (220).
+
+### Fixed
+- **Cursor 7–8 lines too low after attaching a photo or drawing** (found by the user).
+  - **Cause, measured:** on an empty *last* line, Flutter places the cursor from the line above; under a tall picture it lands about half the picture's height too low. An empty line that has another below it is placed correctly, which is why typing a character fixed it. Voice notes are short, so they were unaffected.
+  - **Fix:** `AttachmentInsert.roomAfter` keeps the cursor off the final line under a picture. Attaching at the end leaves the cursor on a new line with one more below, and a tap below a note that ends in an attachment does the same. The file just ends with a trailing line break.
+  - Checked on the phone: a drawing attached at the end, the typed letter lands right under it, and the line doesn't move.
+  - A widget test checks that the cursor sits right under a 200 px picture.
+
 ### Fixed
 - **Photo and drawing previews spilled over the lines above them** (found on the phone, 2026-10-08). A drawing showed on top of the note's title and reached into the status bar.
   - **Cause:** Flutter's text field forces every line to the same height by default (`forceStrutHeight`), so a tall inline preview got no room and was centred on a one-line slot.

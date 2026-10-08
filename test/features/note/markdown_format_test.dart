@@ -20,14 +20,26 @@ void main() {
       expect(MarkdownFormat.toggleBold(once).text, 'a big idea');
     });
 
-    test('nothing selected: nothing happens', () {
-      final v = sel('abc', 1, 1);
-      expect(MarkdownFormat.toggleBold(v), v);
+    test('nothing selected between words: nothing happens', () {
+      final v = sel('ab  cd', 3, 3);
+      expect(MarkdownFormat.toggleBold(v).text, 'ab  cd');
     });
 
     test('Hindi text', () {
       final v = MarkdownFormat.toggleBold(sel('यह कहानी है', 3, 8));
       expect(v.text, 'यह **कहानी** है');
+    });
+  });
+
+  group('bold at the cursor', () {
+    test('the word the cursor is in, Hindi too; nothing between words', () {
+      final v = MarkdownFormat.toggleBold(sel('a big idea', 3, 3));
+      expect(v.text, 'a **big** idea');
+      expect(v.selection.isCollapsed, isTrue);
+      final hindi = MarkdownFormat.toggleBold(sel('आज की बात', 1, 1));
+      expect(hindi.text, '**आज** की बात');
+      final gap = MarkdownFormat.toggleBold(sel('a  b', 2, 2));
+      expect(gap.text, 'a  b');
     });
   });
 

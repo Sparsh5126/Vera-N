@@ -260,19 +260,20 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 **Writing**
 - Title is optional; if empty, the first line becomes the title.
 - New notes open with the keyboard up. Existing notes open showing the text; tap anywhere to edit. No separate edit mode.
-- Formatting is hidden until text is selected. A slim row above the keyboard offers bold, list, checklist, attach, and a `[[ ]]` link button.
+- A slim row above the keyboard offers bold, list, checklist, a `[[ ]]` link button and attach. Changed 2026-10-08 at the user's request: the row is always there while editing, not only while text is selected. With nothing selected, Bold acts on the word at the cursor (nothing happens between words), List and Checklist on the cursor's line, and Link inserts at the cursor.
   - Built 2026-10-03: the row appears only while text is selected, just above the keyboard. Every button is a toggle and writes plain Markdown: Bold wraps the selection in `**`; List and Checklist put `- ` / `- [ ] ` on the selected lines (a list line becomes a checklist line rather than getting both). Link opens the note picker and keeps the selected words as the link's title. Attach joins the row when attachments exist.
 - Typing `[[` opens a note picker for manual links (built 2026-10-03). Picking a note replaces the `[[` with `[[file-name|Title]]` (folder path added only when two notes share a file name); backing out leaves `[[` as typed. Links resolve by file name, like Obsidian, so a hand-typed `[[Some Title]]` only links if a file has that name.
 
 - **Attachments (built 2026-10-08, decided by the user):** photo, drawing and voice note.
   - **Where:** each one sits inline where the cursor was, on its own line, drawn in place:
-    - a photo as a picture with rounded corners, up to 280 tall; tapping opens it full screen with pinch to zoom;
-    - a drawing on a plate in the theme's ink; tapping reopens it to keep drawing;
+    - **a photo** in a rounded square, 220 on a side, filled and cropped to fit (changed 2026-10-08, user). Tapping opens the whole photo full screen with pinch to zoom.
+    - **a drawing** in the same rounded square, its lines framed and centred, in the theme's ink. Tapping reopens it to keep drawing.
     - a voice note as a pill with play / pause, "Voice note" and the time played.
-  - **Attach:** a paperclip in the slim row above the keyboard whenever the note is being edited (the formatting buttons join it while text is selected), and **Attach** in the ⋮ menu. It offers "Photo from gallery", "Take a photo", "Voice note" and "Drawing".
+  - **Attach:** a paperclip in the slim row above the keyboard whenever the note is being edited (next to the formatting buttons), and **Attach** in the ⋮ menu. It offers "Photo from gallery", "Take a photo", "Voice note" and "Drawing".
   - **Voice:** recording starts in a sheet with the time counting up, ended by Save or Cancel. The microphone is asked for the first time only; if refused, the sheet says "Voice notes need the microphone. You can allow it in Settings."
   - **Drawing:** a full screen with one ink, Undo last line, Clear and Save.
   - **Editing:** the cursor never rests on an attachment's line. Backspace at the start of the next line, or deleting into it, removes the attachment from the note; the file stays in `Attachments/`.
+  - **Cursor:** after a photo or drawing is added at the end, or a tap below a note that ends with one, the cursor lands on a fresh line right under it.
   - **Missing file:** an attachment whose file isn't there (still syncing) reads "This attachment isn't here yet."
   - **Elsewhere:** titles, card previews, search snippets and copies leave attachments out.
 

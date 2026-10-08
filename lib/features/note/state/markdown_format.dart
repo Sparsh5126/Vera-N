@@ -17,13 +17,41 @@ enum LineMark {
 abstract final class MarkdownFormat {
   static const _bold = '**';
 
+  /// A letter, digit or joining mark (Devanagari vowel signs count, so a
+  /// Hindi word is one word).
+  static final _wordChar = RegExp(r'[\p{L}\p{M}\p{N}_]', unicode: true);
+
+  /// Bold with nothing selected: the word the cursor is in or touches,
+  /// leaving the cursor at its end. Nothing happens between words.
+  static TextEditingValue _boldWordAt(TextEditingValue value) {
+    final text = value.text;
+    final at = value.selection.baseOffset;
+    var s = at, e = at;
+    while (s > 0 && _wordChar.hasMatch(text[s - 1])) {
+      s--;
+    }
+    while (e < text.length && _wordChar.hasMatch(text[e])) {
+      e++;
+    }
+    if (s == e) return value;
+    final done = toggleBold(
+      value.copyWith(
+        selection: TextSelection(baseOffset: s, extentOffset: e),
+      ),
+    );
+    return done.copyWith(
+      selection: TextSelection.collapsed(offset: done.selection.end),
+    );
+  }
+
   /// Any list or checklist marker at the start of a line.
   static final _anyMark = RegExp(r'^- (\[[ xX]\] )?');
 
   /// Wraps the selection in `**`, or unwraps it if already bold.
   static TextEditingValue toggleBold(TextEditingValue value) {
     final sel = value.selection;
-    if (!sel.isValid || sel.isCollapsed) return value;
+    if (!sel.isValid) return value;
+    if (sel.isCollapsed) return _boldWordAt(value);
     final text = value.text;
     final s = sel.start;
     final e = sel.end;

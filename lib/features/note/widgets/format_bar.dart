@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../core/copy/app_copy.dart';
 import '../../../core/styles/app_styles.dart';
 
-/// The slim row above the keyboard while editing (UI spec §7). With text
-/// selected it offers bold, list, checklist, link and attach; otherwise
-/// only attach, so a photo, drawing or voice note is one tap away without
-/// selecting anything.
+/// The slim row above the keyboard while editing (UI spec §7): bold,
+/// list, checklist, link and attach, always there (changed 2026-10-08 at
+/// the user's request). With nothing selected they act where the cursor
+/// is: bold on its word, list and checklist on its line, link at it.
 class FormatBar extends StatelessWidget {
   const FormatBar({
     super.key,
-    required this.selecting,
     required this.onBold,
     required this.onList,
     required this.onChecklist,
@@ -29,11 +28,10 @@ class FormatBar extends StatelessWidget {
     required VoidCallback onAttach,
   }) {
     return ListenableBuilder(
-      listenable: Listenable.merge([text, focus]),
+      listenable: focus,
       builder: (context, _) {
         if (!focus.hasFocus) return const SizedBox.shrink();
         return FormatBar(
-          selecting: !text.selection.isCollapsed,
           onBold: onBold,
           onList: onList,
           onChecklist: onChecklist,
@@ -44,8 +42,6 @@ class FormatBar extends StatelessWidget {
     );
   }
 
-  /// Text is selected: the formatting buttons show too.
-  final bool selecting;
   final VoidCallback onBold;
   final VoidCallback onList;
   final VoidCallback onChecklist;
@@ -64,12 +60,10 @@ class FormatBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: AppSpace.s),
         child: Row(
           children: [
-            if (selecting) ...[
-              _button(Icons.format_bold, AppCopy.formatBold, onBold),
-              _button(Icons.format_list_bulleted, AppCopy.formatList, onList),
-              _button(Icons.checklist, AppCopy.formatChecklist, onChecklist),
-              _button(Icons.link, AppCopy.formatLink, onLink),
-            ],
+            _button(Icons.format_bold, AppCopy.formatBold, onBold),
+            _button(Icons.format_list_bulleted, AppCopy.formatList, onList),
+            _button(Icons.checklist, AppCopy.formatChecklist, onChecklist),
+            _button(Icons.link, AppCopy.formatLink, onLink),
             _button(Icons.attach_file, AppCopy.attach, onAttach),
           ],
         ),

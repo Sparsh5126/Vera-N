@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,9 +6,10 @@ import '../../../core/copy/app_copy.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/styles/app_styles.dart';
 import 'embed_missing.dart';
+import 'embed_square.dart';
 
-/// A photo in the note, up to [AppSize.embedMaxHeight] tall with rounded
-/// corners. Tapping opens it full screen.
+/// A photo in the note, filling a rounded square (cropped to fit).
+/// Tapping opens it whole, full screen.
 class PhotoEmbed extends ConsumerWidget {
   const PhotoEmbed({super.key, required this.name, required this.onTap});
 
@@ -29,23 +31,31 @@ class PhotoEmbed extends ConsumerWidget {
           label: AppCopy.photo,
           child: GestureDetector(
             onTap: onTap,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: AppSize.embedMaxHeight,
-              ),
-              child: ClipRRect(
-                borderRadius: AppRadius.cardBorder,
-                child: Image.memory(
-                  data,
-                  fit: BoxFit.contain,
-                  gaplessPlayback: true,
-                  errorBuilder: (_, _, _) => const EmbedMissing(),
-                ),
+            child: EmbedSquare(
+              child: Image(
+                image: _small(context, data),
+                fit: BoxFit.cover,
+                gaplessPlayback: true,
+                errorBuilder: (_, _, _) => const EmbedMissing(),
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  /// The photo decoded small, not at full size: within twice the square,
+  /// so the short side of a photo up to 2:1 still covers it sharply.
+  static ImageProvider _small(BuildContext context, Uint8List data) {
+    final side =
+        (AppSize.embedSize * 2 * MediaQuery.devicePixelRatioOf(context))
+            .round();
+    return ResizeImage(
+      MemoryImage(data),
+      width: side,
+      height: side,
+      policy: ResizeImagePolicy.fit,
     );
   }
 }

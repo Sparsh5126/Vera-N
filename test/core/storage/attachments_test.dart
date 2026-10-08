@@ -58,9 +58,11 @@ void main() {
       final mid = AttachmentInsert.insert(at('Title\nab', 7), photo);
       expect(mid.text, 'Title\na\n$embed\nb');
       expect(mid.selection.baseOffset, 'Title\na\n$embed\n'.length);
+      // At the end, a line to write on with one after it, so the cursor
+      // isn't on the last line (drawn too low under a picture).
       final end = AttachmentInsert.insert(at('Title', 5), photo);
-      expect(end.text, 'Title\n$embed\n');
-      expect(end.selection.baseOffset, end.text.length);
+      expect(end.text, 'Title\n$embed\n\n');
+      expect(end.selection.baseOffset, end.text.length - 1);
       final beforeBreak = AttachmentInsert.insert(at('A\nB', 1), photo);
       expect(beforeBreak.text, 'A\n$embed\nB');
     });

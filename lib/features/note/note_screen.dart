@@ -212,7 +212,15 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   void _editAtEnd() {
     final text = _text;
     if (text == null) return;
-    text.selection = TextSelection.collapsed(offset: text.text.length);
+    final before = text.text;
+    // Under a final photo or drawing, a line to write on (see roomAfter).
+    text.value = AttachmentInsert.roomAfter(
+      TextEditingValue(
+        text: before,
+        selection: TextSelection.collapsed(offset: before.length),
+      ),
+    );
+    if (text.text != before) _onTextChanged(text.text);
     _focus.requestFocus();
   }
 
