@@ -14,7 +14,17 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
   - Bubbles use the folder amber (outline plus a 16% wash) with ink names; DESIGN.md's Folder Amber note is updated.
   - New pieces: `GraphBubbles` (grouping rule), `GraphBubble` and `GraphBubbleView` widgets, `GraphNode.folder`. New tokens: `AppSize.graphBubbleMin`/`Max`/`Spacing`, `AppOpacity.bubbleFill`.
   - Tests: 1 rule test and 2 widget tests.
-  - Not yet seen on the phone.
+  - Checked on the phone (2026-10-08) with 213 seeded notes in the test app.
+
+### Fixed
+- **Graph bubbles cut off at the edge.** On the phone, bubbles near the edge lost part of their circle. The bubble area now leaves room for the largest bubble on every side.
+- **Home's top row on a phone.** "5 new connections" broke mid-word ("connection / s") in the half-width card, and the two cards had different heights. The gap after the icon is now smaller and the chevron uses the small icon size, so the word fits. Both cards also share the taller one's height.
+- **Phone check (2026-10-08, test app only, seeded notes):**
+  - Revisit offered the 40-day-old trek note for the new Triund note; Not now and Undo work.
+  - The dashed #cooking tag suggestion appeared on an untagged recipe note.
+  - Rejecting a link wrote `.app/rejections-<device>.jsonl`.
+  - Similar in meaning answered within about 2.5 s with the real model, including its first load.
+  - Bubbles: tapping "No folder" filters to the top-level notes. The view comes up empty until "Show unlinked notes" is on, because those notes have no links.
 - **Revisit** (product spec §10, UI spec §5). Decided 2026-10-08 (user): old notes related to recent ones.
   - Background analysis compares each note changed in the last 7 days with notes untouched for 30 days or more. The best strong match at the learned link bar becomes a `resurface` suggestion (`noteA` = the old note, `noteB` = the recent note), unless the two are already linked or it was already offered. No new table; no schema change.
   - Home's top row shows a Revisit card beside "N new connections" when something is waiting. It has no count; either card takes the full width when it is alone. The **Revisit screen** lists up to 5 old notes with when they changed and which recent note they relate to. Opening one counts as revisited; **Not now** snoozes it for 30 days (new `snoozed` status) with Undo.

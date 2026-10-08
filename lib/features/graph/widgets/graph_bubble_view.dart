@@ -38,8 +38,11 @@ class _GraphBubbleViewState extends State<GraphBubbleView> {
     super.dispose();
   }
 
+  /// The bubbles' area, with room for the largest bubble on every side so
+  /// none is cut off at the edge.
   double get _side =>
-      AppSize.graphBubbleSpacing * max(sqrt(widget.bubbles.bubbles.length), 2);
+      AppSize.graphBubbleSpacing * max(sqrt(widget.bubbles.bubbles.length), 2) +
+      AppSize.graphBubbleMax * 2;
 
   double _radius(int count) {
     final most = widget.bubbles.bubbles.first.count;
@@ -63,7 +66,9 @@ class _GraphBubbleViewState extends State<GraphBubbleView> {
 
   Offset _at(int i, double side) {
     final p = widget.positions[i]!;
-    return Offset(p.x * side, p.y * side);
+    const edge = AppSize.graphBubbleMax;
+    final inner = side - edge * 2;
+    return Offset(edge + p.x * inner, edge + p.y * inner);
   }
 
   @override

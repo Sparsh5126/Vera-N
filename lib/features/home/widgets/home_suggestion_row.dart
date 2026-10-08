@@ -16,9 +16,13 @@ class HomeSuggestionRow extends StatelessWidget {
         right: AppSpace.m,
         bottom: AppSpace.m,
       ),
-      child: Row(
-        spacing: AppSpace.s,
-        children: [for (final card in cards) Expanded(child: card)],
+      // Side by side, both cards take the taller one's height.
+      child: IntrinsicHeight(
+        child: Row(
+          spacing: AppSpace.s,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [for (final card in cards) Expanded(child: card)],
+        ),
       ),
     );
   }

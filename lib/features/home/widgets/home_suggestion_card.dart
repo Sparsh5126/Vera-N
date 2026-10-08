@@ -27,9 +27,14 @@ class HomeSuggestionCard extends StatelessWidget {
           child: Row(
             children: [
               Icon(icon, color: context.colors.seal),
-              const SizedBox(width: AppSpace.m),
+              // Tight, so "connections" fits on a half-width card.
+              const SizedBox(width: AppSpace.s),
               Expanded(child: Text(label, style: context.textStyles.cardTitle)),
-              Icon(Icons.chevron_right, color: context.colors.textSecondary),
+              Icon(
+                Icons.chevron_right,
+                size: AppSize.iconSmall,
+                color: context.colors.textSecondary,
+              ),
             ],
           ),
         ),
