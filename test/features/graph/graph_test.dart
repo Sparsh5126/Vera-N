@@ -1,9 +1,14 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/core/copy/app_copy.dart';
 import 'package:vera_n/core/models/graph_data.dart';
+import 'package:vera_n/core/models/search_filters.dart';
 import 'package:vera_n/core/models/suggestion_draft.dart';
 import 'package:vera_n/core/storage/repositories/graph_repository.dart';
+import 'package:vera_n/features/graph/graph_screen.dart';
+import 'package:vera_n/features/graph/state/graph_controller.dart';
 import 'package:vera_n/features/graph/state/graph_layout.dart';
+import 'package:vera_n/features/graph/state/graph_view.dart';
 
 import '../../support/app_harness.dart';
 import '../../support/storage_harness.dart';
@@ -62,6 +67,28 @@ void main() {
       await tester.tap(find.bySemanticsLabel(AppCopy.navGraph).last);
       await tester.pumpAndSettle();
     }
+
+    testWidgets('a Folder filter turns the dots folder-amber', (tester) async {
+      final notes = app.storage.notes;
+      final a = await notes.create('Alpha\nOne.', folder: 'Ideas');
+      final b = await notes.create('Beta\nTwo.', folder: 'Ideas');
+      final name = (await notes.getNote(b))!.path.split('/').last;
+      await notes.updateBody(a, 'Alpha\n[[${name.replaceAll('.md', '')}]]');
+      await openGraph(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(GraphScreen)),
+      );
+      GraphPicture picture() => container.read(graphPictureProvider).value!;
+      expect(picture().inFolder, isFalse);
+
+      container
+          .read(graphViewProvider.notifier)
+          .setFilters(const SearchFilters(folder: 'Ideas'));
+      await tester.pumpAndSettle();
+      expect(picture().inFolder, isTrue);
+      expect(picture().nodes, hasLength(2));
+      await app.finish(tester);
+    });
 
     testWidgets('no links: the empty message', (tester) async {
       await app.storage.notes.create('Alone\nNo links here.');

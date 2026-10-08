@@ -21,6 +21,7 @@ class GraphPicture {
     required this.suggested,
     required this.degrees,
     required this.positions,
+    this.inFolder = false,
   });
 
   /// Every note the filters allow, shown or not (for the search jump).
@@ -32,6 +33,9 @@ class GraphPicture {
   final List<Suggestion> suggested;
   final Map<int, int> degrees;
   final GraphPositions positions;
+
+  /// A Folder filter is on: dots take the folder color (UI spec §10).
+  final bool inFolder;
 
   bool get isEmpty => nodes.isEmpty;
 }
@@ -118,6 +122,7 @@ final graphPictureProvider = FutureProvider.autoDispose<GraphPicture>((
     ],
     degrees: degrees,
     positions: positions,
+    inFolder: view.filters.folder != null,
   );
 });
 

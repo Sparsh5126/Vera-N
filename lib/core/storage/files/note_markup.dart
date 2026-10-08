@@ -152,14 +152,21 @@ abstract final class NoteMarkup {
 
   /// [text] as a reader sees it, for cards and search results: links as
   /// their titles, bold without `**`, checklists as ☐ / ☑, bullets as •.
-  static String display(String text) {
+  ///
+  /// [forScreen] draws checklists as □ / ✓ instead: the app's font (Inter)
+  /// has no ☐ / ☑, and Android then falls back to its color emoji, a blue
+  /// ☑️ that fights the palette. Text that leaves the screen (copy, the
+  /// AI's chunks) keeps ☐ / ☑, so copies and analysis are unchanged.
+  static String display(String text, {bool forScreen = false}) {
+    final open = forScreen ? '□ ' : '☐ ';
+    final done = forScreen ? '✓ ' : '☑ ';
     return text
         .replaceAllMapped(_link, (m) {
           final label = m.group(2)?.trim();
           return label == null || label.isEmpty ? m.group(1)!.trim() : label;
         })
         .replaceAllMapped(_bold, (m) => m.group(1)!)
-        .replaceAllMapped(_checkbox, (m) => m.group(1) == ' ' ? '☐ ' : '☑ ')
+        .replaceAllMapped(_checkbox, (m) => m.group(1) == ' ' ? open : done)
         .replaceAll(_bullet, '• ');
   }
 }

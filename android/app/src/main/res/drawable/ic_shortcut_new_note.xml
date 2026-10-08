@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Shortcut icon: amber plus on a dark circle (app palette, product spec §22). -->
+<!-- Shortcut icon: ivory plus on an ink circle (app palette, product spec §22). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="48dp"
     android:height="48dp"
     android:viewportWidth="48"
     android:viewportHeight="48">
     <path
-        android:fillColor="#1A1A1C"
+        android:fillColor="#16181A"
         android:pathData="M24,0a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
     <path
-        android:strokeColor="#F2B84B"
+        android:strokeColor="#ECEBE8"
         android:strokeWidth="3.5"
         android:strokeLineCap="round"
         android:pathData="M24,15V33M15,24H33" />

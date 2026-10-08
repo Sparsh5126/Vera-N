@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/styles/app_styles.dart';
 
 /// A link to another note, shown as text: normal text colour with the
-/// amber underline links use in the editor (amber is never a text colour).
+/// ink underline links use in the editor.
 /// Tappable across the full 48-point height.
 class TextLink extends StatelessWidget {
   const TextLink({super.key, required this.label, required this.onTap});

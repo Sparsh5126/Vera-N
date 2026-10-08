@@ -126,12 +126,10 @@ abstract final class AppBorder {
 
 /// Opacities.
 abstract final class AppOpacity {
-  /// AI suggestions: always paired with a dashed outline.
+  /// Fades a mark while it is being dragged (Review's faint ✓ / ✕).
   static const double dimmed = 0.55;
 
-  /// Text selection highlight.
-  static const double selection = 0.35;
-
-  /// Matched words in search results (amber fill behind normal text).
-  static const double searchMatch = 0.35;
+  /// The ink veil behind sheets in light, so the near-white page stays
+  /// pale instead of turning mid-grey (Material 3 scrim level).
+  static const double scrim = 0.32;
 }

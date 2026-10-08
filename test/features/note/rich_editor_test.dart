@@ -87,7 +87,8 @@ void main() {
   ) async {
     await app.storage.notes.create('Groceries\n- [ ] milk\n- [x] eggs\n- note');
     await app.pump(tester);
-    expect(find.text('☐ milk\n☑ eggs\n• note'), findsOneWidget);
+    // Glyphs the app's font has (□ / ✓), never the color-emoji ☑️.
+    expect(find.text('□ milk\n✓ eggs\n• note'), findsOneWidget);
     await app.finish(tester);
   });
 }

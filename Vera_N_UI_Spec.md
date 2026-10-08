@@ -43,8 +43,8 @@ Floating pill bottom bar: **Home | Search | Graph | Settings**
 - A pill-shaped **New note** button floats just above the bar, bottom right.
 - A soft fade at the bottom of scrolling content keeps cards from clashing with the floating controls; scroll areas get bottom padding so the last card is never hidden.
 - The bar hides while writing a note.
-- Switching tabs (2026-10-04, backlog #10): the amber pill slides to the chosen icon and the page fades in, 200 ms ease-out; both are instant when the system's "reduce motion" is on.
-- Theme: **follows system by default**; options for Dark and Light. Accent color is amber; colors, typography, shape, and motion are defined in section 22 of Vera_N_Product_Spec_v3.md.
+- Switching tabs (2026-10-04, backlog #10): the ink pill slides to the chosen icon and the page fades in, 200 ms ease-out; both are instant when the system's "reduce motion" is on.
+- Theme: **follows system by default**; options for Dark and Light. The world is the "plate section" (2026-10-08): ink and stock, with a periwinkle seal only for AI marks; colors, typography, shape, and motion are defined in section 22 of Vera_N_Product_Spec_v3.md.
 
 ---
 
@@ -139,8 +139,8 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 Purpose: the fastest possible route to a blank note. All entry points open a new note with the keyboard up, regardless of the "Open app to" setting. None of them ever show AI suggestions, counts, or badges.
 
 *1. Home-screen widgets* (native Android app widgets; a Flutter helper such as `home_widget` can connect them to the app)
-- **Quick note bar (4x1):** a pill reading "Write a thought…" with a small amber plus. Tapping anywhere opens a blank note. The main widget.
-- **New note button (2x1 or 2x2):** one large amber plus and the label "New note". For people who prefer a compact tap target.
+- **Quick note bar (4x1):** a pill reading "Write a thought…" with a small ink plus. Tapping anywhere opens a blank note. The main widget.
+- **New note button (2x1 or 2x2):** one large ink plus and the label "New note". For people who prefer a compact tap target.
 - **Recent notes (4x2), later version:** the last three note titles (titles only, no previews) plus a new-note button. Titles only, because a home screen can be seen by others. Tapping a title opens that note.
 - Style: follows the system theme, same card color and radius as the app, wordmark not shown.
 - Works fully offline, with no loading state.
@@ -268,10 +268,10 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 - **The editor shows formatting, never Markdown (2026-10-04, at the user's request: "for them it's just notes").** Bold is drawn bold; checklist lines show a real checkbox that ticks and unticks with a tap (ticked items are struck through in secondary text); bullet lines show •. The symbols stay in the file for Obsidian, hidden in the editor; the cursor steps over them, and backspacing into them removes the formatting (bold stars, the checkbox or bullet) but keeps the words. Enter on a checklist or bullet line starts the next item; Enter on an empty item ends the list. Cards and search show ☐ / ☑ / • and plain words. Each checkbox takes 32 points of width and the line's height to tap: below the 48 minimum, because a full-size target would spread every list line apart.
 - **Numbered lists** (2026-10-04, backlog #6 and #3): typing `1. ` at the start of a line starts one; Enter adds the next number and renumbers the items below; Enter on an empty item ends the list; backspace right after `3. ` removes the number, while the digits themselves edit like any text. Numbers stay visible as written. The List button on numbered points keeps them numbered, one point per line: "Plan: 1. call 2. write" becomes "Plan:", "1. call", "2. write". Only numbers that count on are split, so "costs 5. something" stays whole. List on an existing numbered list removes the numbers (it's a toggle).
 - **Tapping a link's title opens the linked note** (2026-10-04). A tap at the very start or end of the title only places the cursor, so text can still be added next to a link.
-- **Links in the editor (2026-10-03):** a link shows only its title, underlined in amber, e.g. "Time Loop". The file keeps the full `[[name|Time Loop]]`, so Obsidian still sees the link. The cursor steps over the hidden markup, and deleting into it removes the whole link, so a half-broken link can't be left behind. Link titles are capped at 40 characters ("…"), and chips cut long labels with "…" rather than overflowing.
+- **Links in the editor (2026-10-03):** a link shows only its title, underlined in ink, e.g. "Time Loop". The file keeps the full `[[name|Time Loop]]`, so Obsidian still sees the link. The cursor steps over the hidden markup, and deleting into it removes the whole link, so a half-broken link can't be left behind. Link titles are capped at 40 characters ("…"), and chips cut long labels with "…" rather than overflowing.
 - **Move to folder (built 2026-10-03; from 2026-10-04 reached through the Folder row, no longer the ⋮ menu):** a sheet with "No folder", the existing folders, and "New folder" (typed; `/` makes subfolders). The file keeps its name; an Undo snackbar follows. Disabled until a new note has text.
 - **Tags:** one row. Solid chips are confirmed tags (user-made or approved). Dimmed chips (no fill, dashed outline at about 55% opacity, readable secondary-text label) are AI-suggested tags waiting for approval. Tapping a dimmed tag opens the suggestion sheet (accept, reject, or close for not sure). The user can also add a tag by hand.
-- **Linked:** text links (2026-10-04, backlog #1 and #9; were chips): the linked note's current title in normal text with the amber link underline, tappable across 48 points; tapping opens the note. Links to notes that don't exist aren't shown. Tags and folders stay chips, so things that organise a note look different from notes it points to.
+- **Linked:** text links (2026-10-04, backlog #1 and #9; were chips): the linked note's current title in normal text with the ink link underline, tappable across 48 points; tapping opens the note. Links to notes that don't exist aren't shown. Tags and folders stay chips, so things that organise a note look different from notes it points to.
 - **Suggested links:** dimmed chips for AI link suggestions. Tapping opens the suggestion sheet. Built 2026-10-04: the sheet's reason names the other note; if accepting adds the link to the open note, the editor saves first and then shows the new text.
 - **Mentioned in:** backlinks, shown as text links like Linked, one per line.
 
@@ -323,7 +323,7 @@ One reusable card, two containers:
 - **Matches:** keyword results, highlighted, instant.
 - **Similar in meaning:** on-device meaning-based results, filled in a moment later so keyword results never wait.
 - Filters: thin pills for Folder, Tag, Date (decided 2026-10-03):
-  - Each holds one value, picked from a bottom sheet whose first row clears it ("Any folder", "Any tag", "Any time"). A set pill turns solid amber and shows its value; tapping it again reopens the sheet.
+  - Each holds one value, picked from a bottom sheet whose first row clears it ("Any folder", "Any tag", "Any time"). A set pill turns into a solid ink plate and shows its value; tapping it again reopens the sheet.
   - Folder includes its subfolders. Tag is one confirmed tag. Date is Today, Last 7 days, Last 30 days, or This year, by when the note was last changed (the date on its card).
   - With a filter set and nothing typed, Search lists the matching notes newest first, so filters also work as a quick browse.
   - Folder and Tag sheets say "No folders yet." / "No tags yet." when there is nothing to pick.
@@ -348,7 +348,8 @@ One reusable card, two containers:
 - Empty state: "Links between your notes will appear here."
 - Layout calculated once and cached; very large libraries switch to grouped bubbles.
 - **Built 2026-10-08 (first part):** dots and solid lines, dot size by links, "Show unlinked notes" pill (unlinked dots are quieter), pan and pinch with titles from 1.4× zoom, tap → preview card (title, start of the note, Open, ✕). Screen readers get one item per dot. Not yet built: Focus, search jump, Folder/Tag filters, Show suggestions, grouped bubbles.
-- **Built 2026-10-08 (second part):** Focus with "1 step / 2 steps / 3 steps" and "Show all"; the search icon finds a note by title and centres on it (showing it if it was hidden); Folder and Tag pills; "Show suggestions" (offered only while suggestions are on) with dimmed dashed lines whose tap opens the suggestion sheet. The layout ignores suggestion lines, so dots don't move when they are shown. Still to build: folder colours (none exist yet) and grouped bubbles for very large libraries.
+- **Built 2026-10-08 (second part):** Focus with "1 step / 2 steps / 3 steps" and "Show all"; the search icon finds a note by title and centres on it (showing it if it was hidden); Folder and Tag pills; "Show suggestions" (offered only while suggestions are on) with dimmed dashed lines whose tap opens the suggestion sheet. The layout ignores suggestion lines, so dots don't move when they are shown. Still to build: grouped bubbles for very large libraries.
+- **Built 2026-10-08 (folder colour):** with a Folder filter on, every dot is amber (the folder colour, chosen by the user); otherwise dots are ink. Amber is used nowhere else.
 
 ---
 

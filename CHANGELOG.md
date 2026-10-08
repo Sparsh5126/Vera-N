@@ -5,6 +5,9 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Graph folder colour** (UI spec §10, the last Graph item besides grouped bubbles): with a Folder filter on, the dots turn **amber**, the folder colour the user chose (2026-10-08); otherwise they stay ink. New token `AppPalette.folder` (`#B7791F` light, 3.3:1 against the stock, enough for a mark; `#F2B84B` dark, 10.4:1), the app's original ambers. Amber appears nowhere else. 1 widget test. DESIGN.md and `.impeccable/design.json` record it (Folder Rule).
+- **DESIGN.md** written from the shipped colour world (finish review disposition "ship" after one fix round), with its sidecar `.impeccable/design.json`, and `PRODUCT.md` (product context, confirmed by the user).
+- Spec text that still said "amber" for the pill, widget plus, link underline and set filter pills now says ink (UI spec §3, §5, §7, §9).
 - **Trash screen** (UI spec §11), from Settings → DATA → Trash.
   - Deleted notes, most recently deleted first: when, title and the start of the text, with **Restore** and **Delete forever** buttons. A line on top says notes stay 30 days.
   - Restore puts the note back where it was, with Undo.
@@ -239,6 +242,16 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - 14 new tests, 97 in total: folder choose, reconnect, access lost, name clash, migration from version 1, the onboarding screen, the empty-folder guard, restore of a missing file, and colons in note names.
 
 ### Changed
+- **New colour world: "plate section"** (backlog #2 and #4, product spec §22). Layout, buttons, shapes and fonts unchanged; only colours, surfaces and themes.
+  - **How it was chosen:** product context written down first (`PRODUCT.md`, confirmed by the user). Then a decision page with a rolled direction (Garhwal night miniature), a pick (bahi-khata ledger) and catalogue challengers; the user chose the challenger "design annual's plate section". The user's guardrails: keep dimmed + dashed for suggestions; avoid gaudy gold, a generic dark app, and any slowdown while typing.
+  - **Light:** near-white stock `#F5F4F6`, warmer plates `#FAF9F7`, ink `#16181A`, 1px hairlines `#C9C7C4`. **Dark:** the same section on black stock, `#121315` ground, warm plates `#1C1B19`, ivory ink `#ECEBE8`, hairlines `#393834`. No pure black or white anywhere.
+  - **Roles:** the amber accent is replaced by the solid **ink plate** (ivory in dark) for the primary action, the chosen tab or filter, confirmed chips and the caret. A new **seal** colour (periwinkle) belongs only to the AI: dashed suggestion outlines, the "has suggestions" dot, the connections mark and the Graph's suggestion lines. Its soft form highlights selected and matched text. Accept is bottle green, reject vermilion.
+  - **Contrast** measured for every pair: text at least 4.5:1, icons and marks at least 3:1, both themes.
+  - **Backlog #2's "gold texture and shadows" not taken:** gold was ruled out by the user ("gaudy"), and the chosen world is flat; shadows were left out with it and are offered to the user separately.
+  - **Finish review** (independent reviewer, verdict "fix"), all three material fixes applied: suggestion marks drawn at full seal strength (a 55%-faded seal measured 2.1:1 in light and read grey in dark); dark plates and hairlines warmed into the ivory family (they were cooler than the ground); in light, the veil behind sheets is ink at 32% instead of Material's grey, so the page stays pale.
+  - **Checklist glyphs on screen:** card previews, search snippets and suggestion passages show □ / ✓ (glyphs Inter has) instead of ☐ / ☑. Inter has no ☐ / ☑, so Android fell back to its color emoji and drew a blue ☑️, the only saturated blue in the app (user's choice after the review, 2026-10-08). Copied text and the AI's chunks keep ☐ / ☑, so copies are unchanged and no note is re-analysed.
+  - Decided 2026-10-08 (user): keep the world flat, no shadows on chips; the suggestion card's "NEW · date" / "OLDER · date" labels stay.
+  - Native widgets, launch screen and shortcut icons follow the same colours. Unused tokens `AppOpacity.selection` and `searchMatch` removed; new `AppOpacity.scrim`.
 - **Suggestions checked end to end on the phone** (2026-10-08, measurement build with its own fresh data, not the user's folder): 5 short notes (two about piano, two about pasta, one about a bike). One run while charging made exactly 2 suggestions, the piano pair and the pasta pair, with none for the bike note. Home showed "2 new connections" and the dots; Review showed both, and Accept linked the first.
 - **Background analysis checked on the phone** (2026-10-08, measurement build): requested on leaving the app, started 60 s later while charging, finished successfully. See BACKLOG.
 - **Background analysis now runs only while charging by default** (was: charging, or idle with battery not low). This follows the Settings default "Analyze only when charging: On"; the idle request is cancelled when the setting is on.

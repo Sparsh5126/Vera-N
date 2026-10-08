@@ -18,7 +18,7 @@ class PillNavItem {
 }
 
 /// The floating pill navigation bar: icons only, the current one on a
-/// small amber pill that slides to the chosen tab (instant when the
+/// small ink pill that slides to the chosen tab (instant when the
 /// system asks for less motion). Names are spoken by screen readers and
 /// shown on long press.
 class PillNavBar extends StatelessWidget {

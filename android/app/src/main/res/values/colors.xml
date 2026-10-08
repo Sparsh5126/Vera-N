@@ -3,11 +3,11 @@
     <!-- Native mirrors of lib/core/styles/app_palette.dart (light), for what
          Android draws before or outside Flutter. Keep the values identical. -->
     <!-- Shown before Flutter's first frame, so there is no flash. -->
-    <color name="launch_background">#F7F6F3</color>
+    <color name="launch_background">#F5F4F6</color>
     <!-- Home-screen widgets. -->
-    <color name="widget_card">#FFFFFF</color>
-    <color name="widget_border">#E4E2DD</color>
-    <color name="widget_text">#1A1A1A</color>
-    <color name="widget_text_secondary">#6B6B70</color>
-    <color name="widget_accent">#B7791F</color>
+    <color name="widget_card">#FAF9F7</color>
+    <color name="widget_border">#C9C7C4</color>
+    <color name="widget_text">#16181A</color>
+    <color name="widget_text_secondary">#5C5E66</color>
+    <color name="widget_accent">#16181A</color>
 </resources>

@@ -68,8 +68,8 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
 
   static const double _hiddenSize = 0.01;
 
-  /// A link's visible title in the editor: normal text color (amber is
-  /// never a text color), with an amber underline.
+  /// A link's visible title in the editor: normal text color, with an
+  /// ink underline (a confirmed link is the user's own mark).
   static TextStyle link(TextStyle base, AppPalette p) => base.copyWith(
     decoration: TextDecoration.underline,
     decorationColor: p.accent,

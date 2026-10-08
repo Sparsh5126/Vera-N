@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/styles/app_styles.dart';
 
 /// A thin filter pill (Search; later Graph). Unset: outlined with the
-/// filter's name. Set: solid amber with the chosen value.
+/// filter's name. Set: a solid ink plate with the chosen value.
 class FilterPill extends StatelessWidget {
   const FilterPill({
     super.key,

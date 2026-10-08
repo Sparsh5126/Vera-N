@@ -1,0 +1,563 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-08T00:00:00Z",
+  "title": "Design System: Vera N",
+  "extensions": {
+    "colorMeta": {
+      "stock": {
+        "role": "neutral",
+        "displayName": "Stock",
+        "canonical": "oklch(96.8% 0.003 308)",
+        "tonalRamp": [
+          "#0B0B0C",
+          "#252526",
+          "#424243",
+          "#626162",
+          "#838284",
+          "#A5A4A6",
+          "#C9C9CA",
+          "#EFEEF0"
+        ]
+      },
+      "plate": {
+        "role": "neutral",
+        "displayName": "Warm Plate",
+        "canonical": "oklch(98.2% 0.003 85)",
+        "tonalRamp": [
+          "#0C0B0A",
+          "#262523",
+          "#434240",
+          "#62615F",
+          "#838280",
+          "#A6A5A3",
+          "#CAC9C7",
+          "#EFEEEC"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Ink",
+        "canonical": "oklch(20.8% 0.005 248)",
+        "tonalRamp": [
+          "#0A0B0D",
+          "#232527",
+          "#404245",
+          "#5F6164",
+          "#808385",
+          "#A3A5A8",
+          "#C7C9CC",
+          "#ECEFF2"
+        ]
+      },
+      "ink-secondary": {
+        "role": "neutral",
+        "displayName": "Secondary Ink",
+        "canonical": "oklch(48.3% 0.013 275)",
+        "tonalRamp": [
+          "#090B11",
+          "#23252C",
+          "#404249",
+          "#5F6169",
+          "#80828A",
+          "#A2A5AD",
+          "#C6C9D2",
+          "#ECEEF7"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(83.0% 0.005 78)",
+        "tonalRamp": [
+          "#0C0B09",
+          "#262523",
+          "#43423F",
+          "#63615E",
+          "#84827F",
+          "#A7A5A2",
+          "#CBC9C6",
+          "#F0EEEB"
+        ]
+      },
+      "seal": {
+        "role": "secondary",
+        "displayName": "Periwinkle Seal",
+        "canonical": "oklch(54.1% 0.115 279)",
+        "tonalRamp": [
+          "#0A0039",
+          "#1E175A",
+          "#38377D",
+          "#5558A1",
+          "#757AC6",
+          "#969DEC",
+          "#BAC1FF",
+          "#DEE7FF"
+        ]
+      },
+      "seal-soft": {
+        "role": "secondary",
+        "displayName": "Pressed Seal",
+        "canonical": "oklch(90.3% 0.030 284)",
+        "tonalRamp": [
+          "#0A0917",
+          "#232333",
+          "#404052",
+          "#5F5F72",
+          "#808094",
+          "#A2A3B8",
+          "#C6C7DD",
+          "#EBECFF"
+        ]
+      },
+      "bottle-green": {
+        "role": "tertiary",
+        "displayName": "Bottle Green",
+        "canonical": "oklch(47.6% 0.078 162)",
+        "tonalRamp": [
+          "#001402",
+          "#003019",
+          "#0B4E35",
+          "#326F54",
+          "#559174",
+          "#77B596",
+          "#9BD9BA",
+          "#C0FFDF"
+        ]
+      },
+      "vermilion": {
+        "role": "tertiary",
+        "displayName": "Vermilion",
+        "canonical": "oklch(52.2% 0.162 29)",
+        "tonalRamp": [
+          "#2D0000",
+          "#510000",
+          "#752018",
+          "#9A4238",
+          "#C06458",
+          "#E68779",
+          "#FFAB9C",
+          "#FFD0C0"
+        ]
+      },
+      "stock-dark": {
+        "role": "neutral",
+        "displayName": "Black Stock",
+        "canonical": "oklch(18.6% 0.004 264)",
+        "tonalRamp": [
+          "#0A0B0D",
+          "#242527",
+          "#414244",
+          "#606164",
+          "#818285",
+          "#A4A5A8",
+          "#C8C9CC",
+          "#EDEEF1"
+        ]
+      },
+      "plate-dark": {
+        "role": "neutral",
+        "displayName": "Ivory-Family Plate",
+        "canonical": "oklch(22.2% 0.004 85)",
+        "tonalRamp": [
+          "#0C0B09",
+          "#262523",
+          "#434240",
+          "#62615F",
+          "#838280",
+          "#A6A5A2",
+          "#CAC9C6",
+          "#F0EEEB"
+        ]
+      },
+      "ivory-ink": {
+        "role": "primary",
+        "displayName": "Ivory Ink",
+        "canonical": "oklch(94.0% 0.004 91)",
+        "tonalRamp": [
+          "#0C0B09",
+          "#262523",
+          "#43423F",
+          "#62615F",
+          "#83827F",
+          "#A6A5A2",
+          "#CAC9C6",
+          "#EFEEEB"
+        ]
+      },
+      "ink-secondary-dark": {
+        "role": "neutral",
+        "displayName": "Secondary Ink (dark)",
+        "canonical": "oklch(71.5% 0.011 286)",
+        "tonalRamp": [
+          "#0B0A10",
+          "#24242B",
+          "#414148",
+          "#606068",
+          "#818189",
+          "#A4A4AC",
+          "#C8C8D0",
+          "#EDEDF6"
+        ]
+      },
+      "hairline-dark": {
+        "role": "neutral",
+        "displayName": "Hairline (dark)",
+        "canonical": "oklch(34.0% 0.007 95)",
+        "tonalRamp": [
+          "#0C0B08",
+          "#262521",
+          "#43423E",
+          "#62615D",
+          "#83827E",
+          "#A6A5A0",
+          "#CAC9C4",
+          "#F0EEE9"
+        ]
+      },
+      "seal-dark": {
+        "role": "secondary",
+        "displayName": "Periwinkle Seal (dark)",
+        "canonical": "oklch(75.8% 0.089 282)",
+        "tonalRamp": [
+          "#0A002E",
+          "#201C4E",
+          "#3B3A6F",
+          "#595A92",
+          "#7A7CB6",
+          "#9C9EDC",
+          "#BFC3FF",
+          "#E4E8FF"
+        ]
+      },
+      "seal-soft-dark": {
+        "role": "secondary",
+        "displayName": "Pressed Seal (dark)",
+        "canonical": "oklch(34.9% 0.062 280)",
+        "tonalRamp": [
+          "#080624",
+          "#202142",
+          "#3C3E63",
+          "#5A5D84",
+          "#7B7FA8",
+          "#9DA1CC",
+          "#C1C5F2",
+          "#E6EBFF"
+        ]
+      },
+      "bottle-green-dark": {
+        "role": "tertiary",
+        "displayName": "Bottle Green (dark)",
+        "canonical": "oklch(74.0% 0.102 161)",
+        "tonalRamp": [
+          "#001500",
+          "#003213",
+          "#00522F",
+          "#16734E",
+          "#41956E",
+          "#66B990",
+          "#8BDEB4",
+          "#B0FFD8"
+        ]
+      },
+      "vermilion-dark": {
+        "role": "tertiary",
+        "displayName": "Vermilion (dark)",
+        "canonical": "oklch(71.1% 0.131 30)",
+        "tonalRamp": [
+          "#2D0000",
+          "#510000",
+          "#752016",
+          "#9A4235",
+          "#BF6455",
+          "#E68777",
+          "#FFAB9A",
+          "#FFD0BE"
+        ]
+      },
+      "folder-amber": {
+        "role": "tertiary",
+        "displayName": "Folder Amber",
+        "canonical": "oklch(62.6% 0.125 70)",
+        "tonalRamp": [
+          "#2A0C00",
+          "#492300",
+          "#6A3B00",
+          "#8D5500",
+          "#B2792B",
+          "#D3A063",
+          "#F4C896",
+          "#FFE7BC"
+        ]
+      },
+      "folder-amber-dark": {
+        "role": "tertiary",
+        "displayName": "Folder Amber (dark)",
+        "canonical": "oklch(81.7% 0.140 80)",
+        "tonalRamp": [
+          "#290E00",
+          "#472500",
+          "#683D00",
+          "#8A5800",
+          "#AE7C00",
+          "#CFA354",
+          "#F1CB8B",
+          "#FFEAB3"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "\"Vera N\" on Home and onboarding only."
+      },
+      "headline": {
+        "displayName": "Note Title",
+        "purpose": "Title in the note view."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Note text and the editor."
+      },
+      "title": {
+        "displayName": "Card Title",
+        "purpose": "Card titles and the connections line."
+      },
+      "body-card": {
+        "displayName": "Card Preview",
+        "purpose": "Card previews, fading from 60% of card height."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, pills, tabs, chips, snackbars."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Dates and metadata, secondary ink."
+      },
+      "section-label": {
+        "displayName": "Section Label",
+        "purpose": "Sentence-case headings such as Pinned, Tags, Linked; secondary ink."
+      }
+    },
+    "shadows": [],
+    "borders": [
+      {
+        "name": "hairline",
+        "value": "1px solid",
+        "purpose": "Rules every plate and outlined control."
+      },
+      {
+        "name": "suggestion-dash",
+        "value": "4px dash, 3px gap",
+        "purpose": "Suggested chips; graph suggestion lines use the dashes doubled."
+      }
+    ],
+    "opacities": [
+      {
+        "name": "scrim",
+        "value": "0.32",
+        "purpose": "Ink veil behind sheets in light; dark uses the platform default."
+      },
+      {
+        "name": "dimmed",
+        "value": "0.55",
+        "purpose": "Ceiling of the faint check / cross mark while a Review card is dragged. Not used to dim suggestions."
+      }
+    ],
+    "motion": [
+      {
+        "name": "standard",
+        "value": "200ms ease-out",
+        "purpose": "Default transition, including the nav bar's sliding ink plate."
+      },
+      {
+        "name": "reduced",
+        "value": "0ms",
+        "purpose": "Used when the system asks to reduce motion."
+      },
+      {
+        "name": "card-spring",
+        "value": "mass 1, stiffness 400, damping 28; tilt up to 0.14 rad",
+        "purpose": "Review card swipe settle and fly-out."
+      },
+      {
+        "name": "saved-tick-hold",
+        "value": "1200ms",
+        "purpose": "The note's saved tick before it fades."
+      },
+      {
+        "name": "brief-notice",
+        "value": "2s",
+        "purpose": "Notices with nothing to tap."
+      },
+      {
+        "name": "undo-window",
+        "value": "5s",
+        "purpose": "Snackbars with Undo."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "readable-width",
+        "value": "680px",
+        "purpose": "Widest a text column grows on large screens."
+      }
+    ],
+    "themes": {
+      "light": [
+        "stock",
+        "plate",
+        "ink",
+        "ink-secondary",
+        "hairline",
+        "seal",
+        "seal-soft",
+        "bottle-green",
+        "vermilion",
+        "folder-amber"
+      ],
+      "dark": [
+        "stock-dark",
+        "plate-dark",
+        "ivory-ink",
+        "ink-secondary-dark",
+        "hairline-dark",
+        "seal-dark",
+        "seal-soft-dark",
+        "bottle-green-dark",
+        "vermilion-dark",
+        "folder-amber-dark"
+      ]
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid ink plate for the one primary action per screen (New note).",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z\"/></svg>New note</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 24px; background: #16181A; color: #F5F4F6; border: none; border-radius: 9999px; font-family: Inter, 'Noto Sans Devanagari', sans-serif; font-size: 15px; font-weight: 500; line-height: 20px; transition: opacity 200ms ease-out; } .ds-btn-primary:hover { opacity: 0.9; } .ds-btn-primary:focus-visible { outline: 2px solid #16181A; outline-offset: 2px; } .ds-btn-primary:active { opacity: 0.8; }"
+    },
+    {
+      "name": "Text Button",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Ink label, no fill, pill-shaped 48px target; secondary actions such as Add tag.",
+      "html": "<button class=\"ds-btn-text\">+ Add tag</button>",
+      "css": ".ds-btn-text { min-height: 48px; padding: 0 16px; background: transparent; color: #16181A; border: none; border-radius: 9999px; font-family: Inter, 'Noto Sans Devanagari', sans-serif; font-size: 15px; font-weight: 500; transition: background 200ms ease-out; } .ds-btn-text:hover { background: #F5F4F6; } .ds-btn-text:focus-visible { outline: 2px solid #16181A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Filter Pills",
+      "kind": "chip",
+      "refersTo": "filter-pill",
+      "description": "Recent / Folders / Tags: hairline plate pills, the active one a solid ink plate.",
+      "html": "<div class=\"ds-filters\"><button class=\"ds-filter ds-filter-active\">Recent</button><button class=\"ds-filter\">Folders</button><button class=\"ds-filter\">Tags</button></div>",
+      "css": ".ds-filters { display: flex; gap: 8px; } .ds-filter { min-height: 48px; padding: 0 16px; background: #FAF9F7; color: #16181A; border: 1px solid #C9C7C4; border-radius: 9999px; font-family: Inter, 'Noto Sans Devanagari', sans-serif; font-size: 15px; font-weight: 500; transition: background 200ms ease-out, color 200ms ease-out; } .ds-filter:hover { border-color: #16181A; } .ds-filter:focus-visible { outline: 2px solid #16181A; outline-offset: 2px; } .ds-filter-active { background: #16181A; color: #F5F4F6; border-color: #16181A; }"
+    },
+    {
+      "name": "Confirmed and Suggested Chips",
+      "kind": "chip",
+      "refersTo": "chip-confirmed",
+      "description": "Confirmed: solid ink plate. Suggested: empty fill, secondary-ink label, dashed seal outline at full strength.",
+      "html": "<div class=\"ds-chips\"><span class=\"ds-chip ds-chip-solid\" tabindex=\"0\">#music</span><span class=\"ds-chip ds-chip-suggested\" tabindex=\"0\">Learning piano</span></div>",
+      "css": ".ds-chips { display: flex; gap: 8px; } .ds-chip { display: inline-flex; align-items: center; min-height: 48px; padding: 0 16px; border-radius: 9999px; font-family: Inter, 'Noto Sans Devanagari', sans-serif; font-size: 15px; font-weight: 500; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-chip-solid { background: #16181A; color: #F5F4F6; border: 1px solid #16181A; } .ds-chip-suggested { background: transparent; color: #5C5E66; border: 1px dashed #6266B0; } .ds-chip-suggested:hover { color: #16181A; } .ds-chip:focus-visible { outline: 2px solid #16181A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Note Card",
+      "kind": "card",
+      "refersTo": "note-card",
+      "description": "Warm plate with a hairline and 24px corners; a seal dot marks a waiting suggestion; preview fades from 60%.",
+      "html": "<article class=\"ds-note-card\" tabindex=\"0\"><div class=\"ds-note-meta\"><span>Today</span><span class=\"ds-seal-dot\"></span></div><h3>Piano practice</h3><p>Practice scales slowly every morning. See music-theory and songs.</p></article>",
+      "css": ".ds-note-card { width: 168px; height: 168px; box-sizing: border-box; padding: 16px; background: #FAF9F7; border: 1px solid #C9C7C4; border-radius: 24px; overflow: hidden; font-family: Inter, 'Noto Sans Devanagari', sans-serif; color: #16181A; } .ds-note-meta { display: flex; justify-content: space-between; align-items: center; font-size: 12px; line-height: 16px; color: #5C5E66; } .ds-seal-dot { width: 8px; height: 8px; border-radius: 50%; background: #6266B0; } .ds-note-card h3 { margin: 4px 0; font-size: 15px; line-height: 22px; font-weight: 600; } .ds-note-card p { margin: 0; font-size: 15px; line-height: 22px; -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent); mask-image: linear-gradient(to bottom, #000 60%, transparent); } .ds-note-card:hover { border-color: #16181A; } .ds-note-card:focus-visible { outline: 2px solid #16181A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Connections Card",
+      "kind": "custom",
+      "refersTo": "note-card",
+      "description": "Home's entry to waiting suggestions, signed by the seal-coloured connections icon.",
+      "html": "<a class=\"ds-connections\" href=\"#\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#6266B0\" stroke-width=\"1.6\"><circle cx=\"12\" cy=\"12\" r=\"2.5\"/><circle cx=\"12\" cy=\"4\" r=\"2\"/><circle cx=\"12\" cy=\"20\" r=\"2\"/><circle cx=\"4.5\" cy=\"8\" r=\"2\"/><circle cx=\"19.5\" cy=\"8\" r=\"2\"/><circle cx=\"4.5\" cy=\"16\" r=\"2\"/><circle cx=\"19.5\" cy=\"16\" r=\"2\"/><path d=\"M12 6v3.5M12 14.5V18M6.3 9l3.5 2M17.7 9l-3.5 2M6.3 15l3.5-2M17.7 15l-3.5-2\"/></svg><span>1 new connection</span><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#5C5E66\"><path d=\"M10 6 8.6 7.4 13.2 12l-4.6 4.6L10 18l6-6z\"/></svg></a>",
+      "css": ".ds-connections { display: flex; align-items: center; gap: 16px; padding: 16px; background: #FAF9F7; border: 1px solid #C9C7C4; border-radius: 24px; color: #16181A; text-decoration: none; font-family: Inter, 'Noto Sans Devanagari', sans-serif; font-size: 15px; line-height: 22px; font-weight: 600; } .ds-connections span { flex: 1; } .ds-connections:hover { border-color: #16181A; } .ds-connections:focus-visible { outline: 2px solid #16181A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Pill Nav Bar",
+      "kind": "nav",
+      "refersTo": "nav-bar",
+      "description": "Floating plate stadium; the selected tab is a sliding 64px ink plate.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-selected\" href=\"#\" aria-label=\"Home\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z\"/></svg></a><a class=\"ds-nav-item\" href=\"#\" aria-label=\"Search\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14\"/></svg></a></nav>",
+      "css": ".ds-nav { display: inline-flex; gap: 4px; height: 64px; box-sizing: border-box; padding: 8px; background: #FAF9F7; border: 1px solid #C9C7C4; border-radius: 9999px; } .ds-nav-item { display: flex; align-items: center; justify-content: center; width: 64px; border-radius: 9999px; color: #5C5E66; transition: background 200ms ease-out, color 200ms ease-out; } .ds-nav-item:hover { color: #16181A; } .ds-nav-item:focus-visible { outline: 2px solid #16181A; outline-offset: 2px; } .ds-nav-selected { background: #16181A; color: #F5F4F6; } .ds-nav-selected:hover { color: #F5F4F6; }"
+    },
+    {
+      "name": "Snackbar",
+      "kind": "custom",
+      "refersTo": "snackbar",
+      "description": "Floating flat ink pill with an Undo action (stays 5s).",
+      "html": "<div class=\"ds-snack\"><span>Moved to Trash</span><button>Undo</button></div>",
+      "css": ".ds-snack { display: inline-flex; align-items: center; gap: 24px; min-height: 48px; padding: 0 8px 0 24px; background: #16181A; color: #F5F4F6; border-radius: 9999px; font-family: Inter, 'Noto Sans Devanagari', sans-serif; font-size: 15px; font-weight: 500; } .ds-snack button { min-height: 48px; padding: 0 16px; background: none; border: none; border-radius: 9999px; color: #F5F4F6; font: inherit; } .ds-snack button:hover { text-decoration: underline; } .ds-snack button:focus-visible { outline: 2px solid #F5F4F6; outline-offset: -4px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Plate Section",
+    "overview": "Vera N is a design annual's plate section. Every note is a plate on uncoated stock, ruled by a single hairline; the user's words are printed in ink that is never pure black or pure white; and the only hue in the whole book is a quiet periwinkle seal that the on-device AI uses to sign what it proposes. What the user confirmed is solid ink. What the AI suggests is open, dashed and sealed, so its voice is always recognisable and never loud.\n\nLight is near-white stock with plates a shade warmer. Dark is the same section printed on black stock, composed rather than inverted: the ground stays cool, the plates sit in the ivory family, and the ink is ivory. Both themes follow the system setting. The world is colour-and-role only: layout, type, radii and spacing predate it and were deliberately left as they were.\n\nThe world is flat by the user's explicit choice. It refuses the near-black-plus-one-bright-accent dark app and the cream-and-serif notebook.",
+    "keyCharacteristics": [
+      "Two inks and a seal: ink for the user, secondary ink for metadata, periwinkle only for the AI.",
+      "Solid ink plate means chosen or confirmed: primary action, active tab or filter, confirmed chip, caret.",
+      "Plates ruled by 1px hairlines; no shadows, gradients, glow or texture.",
+      "Generous, fully rounded pills and 24px card corners, unchanged from the incumbent app.",
+      "Dark is composed, not inverted: cool ground, warm ivory plates."
+    ],
+    "rules": [
+      {
+        "name": "The Seal Rule",
+        "body": "Periwinkle belongs to the AI. It appears only on suggestions (dashed outlines, the waiting dot, the connections mark, graph suggestion lines) and never on anything the user confirmed, never as a button, link or brand colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Open Plate Rule",
+        "body": "\"Dimmed\" means an empty fill, a secondary-ink label and a dashed seal outline at full strength. Do not fade the dashes: a faded seal measured 2.1:1 in light and read grey in dark. Meaning never relies on colour alone.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Plate Rule",
+        "body": "A solid ink plate means chosen: the primary action, the selected tab or filter, a confirmed chip. Never use it decoratively.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mirror Rule",
+        "body": "Android resources drawn outside Flutter (`values/colors.xml`, `values-night/colors.xml`: launch background, widget card, border, text, secondary text, accent) carry the exact palette values. Change both together.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Serif Rule",
+        "body": "Instrument Serif is the wordmark and nothing else.",
+        "section": "typography"
+      },
+      {
+        "name": "The Inline Mark Rule",
+        "body": "In the editor, confirmed links are body text with a 2px ink underline; bold is Inter 700; a ticked checklist item is secondary ink, struck through. Read-only text on screen draws checklists as □ / ✓ (Inter has no ☐ / ☑ and Android would fall back to colour emoji); text that leaves the screen keeps ☐ / ☑.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Plate Rule",
+        "body": "A plate is separated from the stock by colour and a 1px hairline, never by a shadow. If something needs to read as raised, it is a sheet with a scrim, not a shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** use the seal (#6266B0 / #A7AAE8) only for AI marks, at full strength.",
+      "**Do** show a suggestion as an empty fill, secondary-ink label and dashed seal outline, so meaning never relies on colour.",
+      "**Do** use a solid ink plate for the one primary action and for whatever is selected or confirmed.",
+      "**Do** separate plates from the stock with tone and a 1px hairline.",
+      "**Do** keep Android's native colour resources identical to the palette in both themes.",
+      "**Do** keep text at 4.5:1 and controls, including dashed outlines, at 3:1 or better in both themes."
+    ],
+    "donts": [
+      "**Don't** use periwinkle for buttons, links, brand moments or anything the user confirmed.",
+      "**Don't** fade suggestion dashes to signal \"dimmed\".",
+      "**Don't** add shadows, gradients, glows or texture; the two existing preview and bottom fades are the only fades.",
+      "**Don't** use pure black or pure white for ink or ground.",
+      "**Don't** invert light into dark; dark plates stay warm ivory-family, never cool graphite.",
+      "**Don't** use Instrument Serif for anything but the wordmark."
+    ]
+  }
+}

@@ -66,6 +66,9 @@ abstract final class AppTheme {
         ),
         showDragHandle: true,
         dragHandleColor: p.border,
+        modalBarrierColor: brightness == Brightness.light
+            ? p.text.withValues(alpha: AppOpacity.scrim)
+            : null,
       ),
       inputDecorationTheme: InputDecorationTheme(
         border: InputBorder.none,
@@ -81,7 +84,7 @@ abstract final class AppTheme {
       ),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: p.accent,
-        selectionColor: p.accent.withValues(alpha: AppOpacity.selection),
+        selectionColor: p.sealSoft,
         selectionHandleColor: p.accent,
       ),
     );

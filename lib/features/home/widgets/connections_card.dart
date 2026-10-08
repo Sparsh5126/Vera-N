@@ -36,7 +36,7 @@ class ConnectionsCard extends ConsumerWidget {
             padding: AppSpace.card,
             child: Row(
               children: [
-                Icon(Icons.hub_outlined, color: context.colors.accent),
+                Icon(Icons.hub_outlined, color: context.colors.seal),
                 const SizedBox(width: AppSpace.m),
                 Expanded(
                   child: Text(

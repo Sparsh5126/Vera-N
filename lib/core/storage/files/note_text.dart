@@ -26,7 +26,10 @@ abstract final class NoteText {
     final lines = const LineSplitter().convert(body);
     final titleAt = lines.indexWhere((l) => l.trim().isNotEmpty);
     if (titleAt == -1) return '';
-    return NoteMarkup.display(lines.skip(titleAt + 1).join('\n').trim());
+    return NoteMarkup.display(
+      lines.skip(titleAt + 1).join('\n').trim(),
+      forScreen: true,
+    );
   }
 
   /// SHA-256 of the body with line endings normalized, so the same text

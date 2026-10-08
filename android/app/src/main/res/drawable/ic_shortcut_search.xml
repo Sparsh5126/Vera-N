@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Shortcut icon: amber magnifier on a dark circle (app palette). -->
+<!-- Shortcut icon: ivory magnifier on an ink circle (app palette). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="48dp"
     android:height="48dp"
     android:viewportWidth="48"
     android:viewportHeight="48">
     <path
-        android:fillColor="#1A1A1C"
+        android:fillColor="#16181A"
         android:pathData="M24,0a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
     <path
-        android:strokeColor="#F2B84B"
+        android:strokeColor="#ECEBE8"
         android:strokeWidth="3.5"
         android:pathData="M21.5,15a6.5,6.5 0,1 1,0 13a6.5,6.5 0,1 1,0 -13z" />
     <path
-        android:strokeColor="#F2B84B"
+        android:strokeColor="#ECEBE8"
         android:strokeWidth="3.5"
         android:strokeLineCap="round"
         android:pathData="M26.5,26.5L33,33" />

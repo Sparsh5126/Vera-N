@@ -46,3 +46,9 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Impeccable working files (screenshots, downloaded references, decision-page logs)
+.impeccable/review/
+.impeccable/refs/
+.impeccable/questions/
+.impeccable/config.local.json

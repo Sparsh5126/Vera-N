@@ -293,24 +293,31 @@ The phone detects a strong match and shows a dimmed suggestion. In the review ba
 
 ## 22. Brand and Visual Design
 
-**Mood:** calm, quiet, private. One accent color; the interface stays out of the way of the user's words.
+**Mood:** calm, quiet, private. The interface stays out of the way of the user's words.
+
+**Visual world (decided 2026-10-08, backlog #2 and #4):** a design annual's plate section. Notes are plates on uncoated stock ruled by hairlines; the user's words and everything they confirmed are ink; the only hue is a quiet periwinkle **seal** the AI uses to sign its suggestions. Flat: no gradients, glows, shadows or texture (also keeps typing fast). Dark is the same section printed on black stock, composed rather than inverted. Layout, shapes and fonts were unchanged by this decision. Chosen by the user over the alternatives on 2026-10-08; it replaces the earlier amber palette.
 
 **Colors**
 
 | Role | Dark | Light |
 |---|---|---|
-| Background | `#0B0B0C` | `#F7F6F3` |
-| Card | `#1A1A1C` | `#FFFFFF` |
-| Text | `#F2F2F0` | `#1A1A1A` |
-| Secondary text | `#9A9A9F` | `#6B6B70` |
-| Accent (links, buttons) | `#F2B84B` (amber) | `#B7791F` |
-| Accept | `#4CAF7A` | `#4CAF7A` |
-| Reject | `#E5484D` | `#E5484D` |
+| Background (stock) | `#121315` | `#F5F4F6` |
+| Card (plate), warmer than the stock | `#1C1B19` | `#FAF9F7` |
+| Text (ink, never pure black or white) | `#ECEBE8` | `#16181A` |
+| Secondary text | `#A2A2AA` | `#5C5E66` |
+| Primary plate (primary action, chosen tab or filter, confirmed chips, caret) | `#ECEBE8` | `#16181A` |
+| On the primary plate | `#121315` | `#F5F4F6` |
+| Seal (AI marks only) | `#A7AAE8` | `#6266B0` |
+| Soft seal (selected and matched text) | `#34365A` | `#DCDDF3` |
+| Accept (bottle green) | `#6CBF96` | `#2D6A4F` |
+| Reject (vermilion) | `#E8806F` | `#B4382D` |
+| Hairline | `#393834` | `#C9C7C4` |
+| Folder (Graph dots while a Folder filter is on; never text) | `#F2B84B` | `#B7791F` |
 
 - Theme follows the system by default, with Dark and Light options.
-- The accent is amber so it never clashes with Accept/Reject green and red.
-- **Confirmed vs suggested:** confirmed links and tags are solid chips in the accent color. AI suggestions use the same chip shape with no fill and a dashed accent outline at about 55% opacity; the label stays full-strength secondary text so it remains readable (4.5:1). The meaning never relies on color alone.
-- **Accent in light mode:** `#B7791F` is used only for fills, outlines, and icons (it meets 3:1 for those, not 4.5:1 for text). Link labels and other text use the normal text color. A second, darker amber is added only if a real text use comes up.
+- **Confirmed vs suggested:** confirmed links and tags are solid chips in the primary plate. AI suggestions use the same chip shape with no fill, a dashed seal outline, and a secondary-text label; the dashes keep at least 3:1 so the meaning never relies on color alone, and the seal never appears on anything the user confirmed.
+- All text pairs meet 4.5:1 and all icons, seal marks and accept/reject at least 3:1 in both themes (measured 2026-10-08).
+- Android widgets, the launch screen and shortcut icons mirror these values in `res/values*/colors.xml`.
 
 **Typography**
 - UI and notes: **Inter**, with **Noto Sans Devanagari** as fallback so Hindi text renders cleanly.
@@ -320,7 +327,7 @@ The phone detects a strong match and shows a dimmed suggestion. In the review ba
 
 **Shape and spacing**
 - Cards radius 24; buttons, tabs, and the nav bar fully rounded (pill).
-- Flat surfaces with a thin subtle border, no shadows.
+- Flat surfaces ruled by a 1px hairline, no shadows.
 - 8-point spacing grid; tap targets at least 48.
 - Line icons with rounded strokes, one consistent style.
 

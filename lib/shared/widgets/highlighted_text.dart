@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/styles/app_styles.dart';
 
-/// Text with some ranges marked by a soft amber fill (search matches).
+/// Text with some ranges marked by the soft seal fill (search matches,
+/// matched passages).
 /// The words keep the normal text color, so contrast stays the same.
 class HighlightedText extends StatelessWidget {
   const HighlightedText({
@@ -20,11 +21,7 @@ class HighlightedText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final marked = style.copyWith(
-      backgroundColor: context.colors.accent.withValues(
-        alpha: AppOpacity.searchMatch,
-      ),
-    );
+    final marked = style.copyWith(backgroundColor: context.colors.sealSoft);
     final spans = <TextSpan>[];
     var at = 0;
     for (final m in matches) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// The app's primary pill button (amber fill), e.g. "New note".
+/// The app's primary pill button (the solid ink plate), e.g. "New note".
 class PillButton extends StatelessWidget {
   const PillButton({
     super.key,

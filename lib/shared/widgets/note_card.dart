@@ -83,7 +83,7 @@ class NoteCard extends StatelessWidget {
         height: AppSpace.s,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: context.colors.accent.withValues(alpha: AppOpacity.dimmed),
+          color: context.colors.seal,
         ),
       ),
     ),

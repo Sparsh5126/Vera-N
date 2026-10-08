@@ -72,7 +72,7 @@ class OptionSheet<T> extends StatelessWidget {
           ? Icon(Icons.check, color: context.colors.text)
           : null,
       selected: isSelected,
-      // Amber is never a text color; the tick marks the choice.
+      // The tick, not a text color, marks the choice.
       selectedColor: context.colors.text,
       onTap: () => Navigator.of(context).pop(option),
     );

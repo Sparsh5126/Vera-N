@@ -9,7 +9,7 @@ import '../../../core/styles/app_styles.dart';
 import '../state/graph_controller.dart';
 
 /// Draws the graph: solid lines for confirmed links, one dot per note
-/// (bigger with more links), dimmed dashed lines for suggestions when
+/// (bigger with more links), dashed seal lines for suggestions when
 /// shown, and titles once zoomed in. Each dot is also
 /// a screen-reader item that selects it, since a drawing can't be read.
 class GraphPainter extends CustomPainter {
@@ -60,7 +60,8 @@ class GraphPainter extends CustomPainter {
       canvas.drawLine(_at(e.a, size), _at(e.b, size), touches ? near : line);
     }
     _suggested(canvas, size);
-    final dot = Paint()..color = colors.accent;
+    final dot = Paint()
+      ..color = picture.inFolder ? colors.folder : colors.accent;
     final dim = Paint()..color = colors.textSecondary;
     final showTitles = zoom.value >= AppSize.graphTitleZoom;
     for (final ref in picture.nodes.keys) {
@@ -82,10 +83,11 @@ class GraphPainter extends CustomPainter {
     }
   }
 
-  /// Waiting suggestions: dimmed and dashed, so they never read as links.
+  /// Waiting suggestions: seal-coloured and dashed, so they never read as
+  /// links (the user's confirmed links are solid ink).
   void _suggested(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = colors.accent.withValues(alpha: AppOpacity.dimmed)
+      ..color = colors.seal
       ..strokeWidth = AppSize.graphLine / zoom.value;
     final dash = AppBorder.dashLength * 2 / zoom.value;
     final gap = AppBorder.dashGap * 2 / zoom.value;

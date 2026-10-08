@@ -121,7 +121,10 @@ class SearchRepository {
       title: MarkedText.parse(r.read<String>('marked_title')),
       snippet: rawBody == null
           ? MarkedText.parse(
-              NoteMarkup.display(r.read<String>('marked_snippet')),
+              NoteMarkup.display(
+                r.read<String>('marked_snippet'),
+                forScreen: true,
+              ),
             )
           : MarkedText(NoteText.preview(rawBody), const []),
       modified: r.read<DateTime>('modified'),

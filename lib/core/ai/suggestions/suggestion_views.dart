@@ -44,7 +44,7 @@ class SuggestionViews {
       ref: note.ref,
       title: note.title,
       created: note.created,
-      passage: NoteMarkup.display(raw).trim(),
+      passage: NoteMarkup.display(raw, forScreen: true).trim(),
     );
   }
 }
