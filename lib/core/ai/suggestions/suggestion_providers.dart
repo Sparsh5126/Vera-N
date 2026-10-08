@@ -1,10 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/linked_note.dart';
+import '../../models/revisit_item.dart';
 import '../../models/suggested_link.dart';
 import '../../models/suggestion.dart';
 import '../../settings/app_prefs_controller.dart';
+import '../../storage/files/note_text.dart';
 import '../../storage/storage_providers.dart';
+import '../ai_settings.dart';
 import 'suggestion_actions.dart';
 import 'suggestion_views.dart';
 
@@ -38,7 +41,7 @@ final suggestedLinksProvider = StreamProvider.autoDispose
       final storage = ref.watch(storageProvider);
       return storage.suggestions.watchFor(note).asyncMap((list) async {
         final links = <SuggestedLink>[];
-        for (final s in list.where((s) => !s.isTag)) {
+        for (final s in list.where((s) => s.isLink)) {
           final other = await storage.notes.getNote(s.otherThan(note));
           if (other == null) continue;
           links.add(
@@ -65,3 +68,30 @@ final suggestedTagsProvider = StreamProvider.autoDispose
             ],
           );
     });
+
+/// Old notes to revisit, for Home's Revisit card and the Revisit screen
+/// (product spec §10). Empty while suggestions are off.
+final revisitProvider = StreamProvider.autoDispose<List<RevisitItem>>((ref) {
+  if (!ref.watch(suggestionsOnProvider)) return Stream.value(const []);
+  final storage = ref.watch(storageProvider);
+  return storage.suggestions
+      .watchRevisit(limit: AiSettings.revisitShown)
+      .asyncMap((list) async {
+        final items = <RevisitItem>[];
+        for (final s in list) {
+          final old = await storage.notes.getNote(s.noteA);
+          final recent = await storage.notes.getNote(s.noteB);
+          if (old == null || recent == null) continue;
+          items.add(
+            RevisitItem(
+              suggestion: s,
+              title: old.title,
+              preview: NoteText.preview(old.body),
+              modified: old.modified,
+              recentTitle: recent.title,
+            ),
+          );
+        }
+        return items;
+      });
+});

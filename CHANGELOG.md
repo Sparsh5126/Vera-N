@@ -5,6 +5,11 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Revisit** (product spec §10, UI spec §5). Decided 2026-10-08 (user): old notes related to recent ones.
+  - Background analysis compares each note changed in the last 7 days with notes untouched for 30 days or more. The best strong match at the learned link bar becomes a `resurface` suggestion (`noteA` = the old note, `noteB` = the recent note), unless the two are already linked or it was already offered. No new table; no schema change.
+  - Home's top row shows a Revisit card beside "N new connections" when something is waiting. It has no count; either card takes the full width when it is alone. The **Revisit screen** lists up to 5 old notes with when they changed and which recent note they relate to. Opening one counts as revisited; **Not now** snoozes it for 30 days (new `snoozed` status) with Undo.
+  - Revisits stay apart from Review: no batches, no Home dot, no suggested-link chips and no Graph dashes. The pending queries now filter by kind.
+  - Tests: 3 analysis/snooze, 4 widget.
 - **Tag suggestions** (product spec §11, UI spec §6–7). Decided 2026-10-08 (user): on the phone, suggest only **existing** tags; new tag names come later with the laptop layer.
   - Rule (`TagSuggester`): among a changed note's closest notes (strong matches at the learned `tag` bar, up to 10), a tag at least 2 of them share, which the note lacks and which was never rejected for it, is suggested; at most 2 per note, best first. Tags are compared ignoring letter case and keep the existing spelling, so no near-duplicates.
   - Shown as dimmed chips (dashed seal outline) after the confirmed tags in the note's Tags row, read out as "Suggested tag: #music", and as tag cards in Review. The card shows this note, then the closest note that already has the tag, with "Notes like this one are tagged #music."

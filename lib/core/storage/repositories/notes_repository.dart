@@ -63,8 +63,11 @@ class NotesRepository {
         .customSelect(
           'SELECT n.id, n.title, n.pinned, n.modified, n.folder, n.conflict, '
           'substr(n.body, 1, ${NoteRows.previewLength}) AS body, '
-          'EXISTS (SELECT 1 FROM suggestions s WHERE s.note_a = n.id '
-          "OR (s.note_b = n.id AND s.kind != 'tag')) AS suggested "
+          // A waiting link (either note) or tag (its note); not revisits.
+          'EXISTS (SELECT 1 FROM suggestions s WHERE '
+          "s.status != 'snoozed' AND ((s.kind = 'link' AND "
+          '(s.note_a = n.id OR s.note_b = n.id)) OR '
+          "(s.kind = 'tag' AND s.note_a = n.id))) AS suggested "
           'FROM notes n '
           'WHERE ${where.sql} ORDER BY n.modified DESC, n.id DESC',
           variables: where.variables,

@@ -15,13 +15,17 @@ class SuggestionsRepository {
   static const fresh = 'fresh';
   static const notSure = 'notSure';
 
+  /// A revisit the user put off ("Not now"): hidden until it expires.
+  static const snoozed = 'snoozed';
+
   /// Stores new suggestions. A pair already suggested keeps its status
   /// and expiry date, so a suggestion can't live forever by re-matching.
   Future<void> add(List<SuggestionDraft> drafts, DateTime now, Duration ttl) {
     return _db.batch((b) {
       for (final d in drafts) {
-        // A link is a pair, stored lower id first; a tag belongs to noteA.
-        final (a, z) = d.kind == Suggestion.tagKind || d.noteA < d.noteB
+        // A link is a pair, stored lower id first; a tag or a revisit
+        // belongs to noteA.
+        final (a, z) = d.kind != Suggestion.linkKind || d.noteA < d.noteB
             ? (d.noteA, d.noteB)
             : (d.noteB, d.noteA);
         final swapped = a != d.noteA;
@@ -75,6 +79,30 @@ class SuggestionsRepository {
   Stream<List<Suggestion>> watchPending() =>
       _pending().watch().map((rows) => rows.map(_suggestion).toList());
 
+  /// Old notes to revisit (product spec §10), newest first, at most
+  /// [limit]. Put-off ones stay hidden until they expire.
+  Stream<List<Suggestion>> watchRevisit({required int limit}) {
+    final query = _pendingJoin(revisit: true)
+      ..orderBy([OrderingTerm.desc(_db.suggestions.createdAt)])
+      ..limit(limit);
+    return query.watch().map(
+      (rows) => [
+        for (final r in rows) _suggestion(r.readTable(_db.suggestions)),
+      ],
+    );
+  }
+
+  /// "Not now": the revisit stays hidden until [until], then expires, and
+  /// may come back later if it is still relevant.
+  Future<void> snooze(int id, DateTime until) {
+    return (_db.update(_db.suggestions)..where((s) => s.id.equals(id))).write(
+      SuggestionsCompanion(
+        status: const Value(snoozed),
+        expiresAt: Value(until),
+      ),
+    );
+  }
+
   /// Suggestions waiting that involve note [ref], for its note view.
   Stream<List<Suggestion>> watchFor(int ref) => _pending().watch().map(
     (rows) => [
@@ -119,7 +147,11 @@ class SuggestionsRepository {
         );
   }
 
-  JoinedSelectStatement<HasResultSet, dynamic> _pendingJoin() {
+  /// Waiting suggestions with both notes in place. Reviewable ones (links,
+  /// tags) by default; with [revisit], the old notes to revisit instead.
+  JoinedSelectStatement<HasResultSet, dynamic> _pendingJoin({
+    bool revisit = false,
+  }) {
     final a = _db.alias(_db.notes, 'a');
     final b = _db.alias(_db.notes, 'b');
     return _db.select(_db.suggestions).join([
@@ -129,7 +161,11 @@ class SuggestionsRepository {
       a.trashedAt.isNull() &
           b.trashedAt.isNull() &
           NoteRows.notArchived(a) &
-          NoteRows.notArchived(b),
+          NoteRows.notArchived(b) &
+          _db.suggestions.status.equals(snoozed).not() &
+          (revisit
+              ? _db.suggestions.kind.equals(Suggestion.resurfaceKind)
+              : _db.suggestions.kind.equals(Suggestion.resurfaceKind).not()),
     );
   }
 

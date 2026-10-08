@@ -61,7 +61,7 @@ final graphPictureProvider = FutureProvider.autoDispose<GraphPicture>((
   final pending = ref.watch(suggestionsOnProvider)
       ? [
           for (final s in await ref.watch(_pendingProvider.future))
-            if (!s.isTag) s,
+            if (s.isLink) s,
         ]
       : const <Suggestion>[];
   final all = {for (final n in data.nodes) n.ref: n};

@@ -11,6 +11,7 @@ import '../../storage/repositories/rejections_repository.dart';
 import '../../storage/repositories/settings_repository.dart';
 import '../../storage/repositories/suggestions_repository.dart';
 import '../matching/word_signature.dart';
+import '../ai_settings.dart';
 import 'suggestion_learning.dart';
 
 /// Undoes the choice just made.
@@ -150,6 +151,16 @@ class SuggestionActions {
       await rejections.remove(rejection.pairKey, deviceId);
       await suggestions.putBack(s);
     };
+  }
+
+  /// A revisit was opened: it has done its job and leaves the list.
+  Future<void> revisited(Suggestion s) => suggestions.remove(s.id);
+
+  /// "Not now" on a revisit: hidden for a month (then it may come back if
+  /// still relevant). Undo shows it again.
+  Future<Undo> putOff(Suggestion s) async {
+    await suggestions.snooze(s.id, _clock().add(AiSettings.revisitAfter));
+    return () => suggestions.putBack(s);
   }
 
   /// Keeps it dimmed; it comes back in a later batch until it expires.

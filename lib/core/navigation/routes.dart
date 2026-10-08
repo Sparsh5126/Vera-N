@@ -8,6 +8,7 @@ abstract final class Routes {
   static const welcome = '/welcome';
   static const newNote = '/note/new';
   static const review = '/review';
+  static const revisit = '/revisit';
   static const notePattern = '/note/:ref';
   static const noteParam = 'ref';
 

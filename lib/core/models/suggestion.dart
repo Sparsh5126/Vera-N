@@ -16,7 +16,7 @@ class Suggestion {
 
   final int id;
 
-  /// `link` or `tag`.
+  /// `link`, `tag` or `resurface`.
   final String kind;
 
   /// A link joins [noteA] and [noteB]. A tag is suggested for [noteA];
@@ -28,9 +28,15 @@ class Suggestion {
   final String tag;
 
   bool get isTag => kind == tagKind;
+  bool get isLink => kind == linkKind;
 
   static const linkKind = 'link';
   static const tagKind = 'tag';
+
+  /// Revisit (product spec §10): [noteA] is an old note worth another
+  /// look, [noteB] the recent note it relates to. Never reviewed in
+  /// batches; it has its own Home card and screen.
+  static const resurfaceKind = 'resurface';
   final double score;
 
   /// The best-matching chunk of each note, for highlighting.

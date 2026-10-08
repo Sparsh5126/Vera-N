@@ -118,12 +118,14 @@ class AnalysisRun {
   Future<void> _match(List<int> changed, String model) async {
     if (changed.isEmpty) return;
     final all = await analysis.allChunks(model);
+    final dates = await analysis.modifiedTimes();
     final drafts = <SuggestionDraft>[];
     for (final ref in changed) {
       final own = all.where((c) => c.note == ref).toList();
       drafts
         ..addAll(await _linkDrafts(ref, own, all))
-        ..addAll(await _tagDrafts(ref, own, all));
+        ..addAll(await _tagDrafts(ref, own, all))
+        ..addAll(await _revisitDrafts(ref, own, all, dates));
     }
     await suggestions.add(drafts, _clock(), AiSettings.suggestionLifetime);
   }
@@ -193,6 +195,51 @@ class AnalysisRun {
           score: c.score,
           chunkA: c.evidence.ownChunk,
           chunkB: c.evidence.otherChunk,
+        ),
+    ];
+  }
+
+  /// Revisit (product spec §10): when [ref] changed recently, the old note
+  /// (untouched for a month) it matches best, if any, is worth another
+  /// look. Notes already linked to it or already offered are skipped.
+  Future<List<SuggestionDraft>> _revisitDrafts(
+    int ref,
+    List<ChunkVector> own,
+    List<ChunkVector> all,
+    Map<int, DateTime> dates,
+  ) async {
+    final now = _clock();
+    final changed = dates[ref];
+    if (changed == null ||
+        changed.isBefore(now.subtract(AiSettings.recentWindow))) {
+      return const [];
+    }
+    final oldBefore = now.subtract(AiSettings.revisitAfter);
+    final old = {
+      for (final e in dates.entries)
+        if (e.value.isBefore(oldBefore)) e.key,
+    };
+    if (old.isEmpty) return const [];
+    final best = NoteMatcher.strongMatches(
+      own,
+      all.where((c) => old.contains(c.note)),
+      threshold: linkThreshold,
+      limit: 1,
+      exclude: {
+        ref,
+        ...await analysis.linkedWith(ref),
+        ...await analysis.revisitNotes(),
+      },
+    );
+    return [
+      for (final m in best)
+        SuggestionDraft(
+          kind: Suggestion.resurfaceKind,
+          noteA: m.note,
+          noteB: ref,
+          score: m.score,
+          chunkA: m.otherChunk,
+          chunkB: m.ownChunk,
         ),
     ];
   }

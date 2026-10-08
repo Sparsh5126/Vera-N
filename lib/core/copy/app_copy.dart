@@ -66,6 +66,10 @@ abstract final class AppCopy {
       count == 1 ? '1 new connection' : '$count new connections';
   static const revisit = 'Revisit';
   static const revisitBody = 'You might want to revisit this.';
+  static String relatedToRecent(String title) =>
+      'Related to your recent note on $title.';
+  static const putOff = 'Back in a month';
+  static const nothingToRevisit = 'Nothing to revisit right now.';
   static const viewRecent = 'Recent';
   static const viewFolders = 'Folders';
   static const viewTags = 'Tags';

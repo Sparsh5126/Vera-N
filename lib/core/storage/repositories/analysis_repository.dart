@@ -155,6 +155,23 @@ class AnalysisRepository {
     ];
   }
 
+  /// When each live, unarchived note last changed, for Revisit.
+  Future<Map<int, DateTime>> modifiedTimes() async {
+    final rows = await (_db.select(
+      _db.notes,
+    )..where((n) => n.trashedAt.isNull() & NoteRows.notArchived(n))).get();
+    return {for (final r in rows) r.id: r.modified};
+  }
+
+  /// Old notes already offered to revisit (waiting or put off): not
+  /// offered again until that expires.
+  Future<Set<int>> revisitNotes() async {
+    final rows = await (_db.select(
+      _db.suggestions,
+    )..where((s) => s.kind.equals('resurface'))).get();
+    return {for (final r in rows) r.noteA};
+  }
+
   /// The tags of each of [refs] (notes without tags are left out).
   Future<Map<int, Set<String>>> tagsOf(Iterable<int> refs) async {
     final ids = refs.toList();

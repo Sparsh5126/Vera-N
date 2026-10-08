@@ -170,6 +170,7 @@ Rules:
 - Appears as a **separate button on the homepage**. The user chooses whether to open it.
 - No push notifications, no interruptions.
 - Possibly one of the most valuable features of the app.
+- Built 2026-10-08 (decided by the user: old notes related to recent ones). During background analysis, a note changed in the last 7 days is compared with notes untouched for 30 days or more; its best strong match (the learned link bar) that is not already linked or offered becomes a `resurface` suggestion (old note, recent note). These never enter the Review batches, Home's dot, suggested-link chips or the Graph. Opening one removes it; "Not now" snoozes it for 30 days; it stays known meanwhile, so it is not offered again, and after that it can come back if the notes still match. Unopened offers expire after 30 days like other suggestions.
 
 ---
 

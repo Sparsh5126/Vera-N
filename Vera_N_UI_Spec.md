@@ -122,6 +122,7 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 - Two rounded rectangular cards side by side: **connections** ("5 new connections") and **Revisit**.
 - If only one is active it takes the full width. If neither is, the row is hidden.
 - Revisit is silent: no notification, the user opens it by choice.
+- Built 2026-10-08: the Revisit card shows no count. It opens the **Revisit screen**: the line "You might want to revisit this.", then up to 5 old notes, newest offer first. Each card shows when the note last changed, its title and start, "Related to your recent note on <title>.", and **Not now**. Tapping a card opens the note and counts as revisited (it leaves the list). Not now hides it for a month ("Back in a month", with Undo). Empty state: "Nothing to revisit right now."
 
 **View switch:** thin rounded pills **Recent | Folders | Tags**. Recent is the default. Folders and Tags swap the notes area to folder or tag pills and their notes.
 - Built 2026-10-04: Folders shows a pill for every folder (parents included, e.g. `Ideas` and `Ideas/Story`); tapping one shows its notes below, subfolders included, newest first; tapping it again clears the choice. Tags works the same with `#tag` pills. Pinned notes appear in place (with their pin icon), not in a separate row. "No folders yet." / "No tags yet." when there are none. The view and the picked folder or tag are kept while the app runs, so returning from a note keeps the user's place.

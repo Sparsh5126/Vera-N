@@ -36,6 +36,14 @@ abstract final class AiSettings {
   static const tagNeighbours = 10;
   static const tagsPerNote = 2;
 
+  /// Revisit (product spec §10; decided 2026-10-08): a note untouched for
+  /// [revisitAfter] that strongly matches a note changed within
+  /// [recentWindow]. At most [revisitShown] at a time; "Not now" hides one
+  /// for [revisitAfter].
+  static const revisitAfter = Duration(days: 30);
+  static const recentWindow = Duration(days: 7);
+  static const revisitShown = 5;
+
   /// Unreviewed suggestions disappear after this (product spec §7).
   static const suggestionLifetime = Duration(days: 30);
 
