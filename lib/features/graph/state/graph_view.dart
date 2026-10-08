@@ -7,7 +7,7 @@ import '../../../core/models/search_filters.dart';
 @immutable
 class GraphViewState {
   const GraphViewState({
-    this.showUnlinked = false,
+    this.showUnlinked = true,
     this.showSuggestions = false,
     this.filters = const SearchFilters(),
     this.selected,
@@ -16,7 +16,8 @@ class GraphViewState {
     this.centerRequest = 0,
   });
 
-  /// Notes with no links are hidden by default (UI spec §10).
+  /// Notes with no links are shown, quieter, by default (UI spec §10;
+  /// changed 2026-10-08 so a new library's Graph isn't empty).
   final bool showUnlinked;
 
   /// Dimmed dashed lines for waiting suggestions; off by default.

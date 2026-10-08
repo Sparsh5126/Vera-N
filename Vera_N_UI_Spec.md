@@ -94,7 +94,7 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 │ Good evening, Sparsh    │
 │                         │
 │ ┌─────────┐ ┌─────────┐ │
-│ │ 5 new   │ │ Revisit │ │
+│ │ New     │ │ Revisit │ │
 │ │ connect.│ │         │ │
 │ └─────────┘ └─────────┘ │
 │                         │
@@ -119,10 +119,10 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 - No search bar on Home (the Search tab covers it).
 
 **Suggestion cards (top row)**
-- Two rounded rectangular cards side by side: **connections** ("5 new connections") and **Revisit**.
+- Two rounded rectangular cards side by side: **connections** ("New connections", no number, changed 2026-10-08 so it never feels urgent) and **Revisit**.
 - If only one is active it takes the full width. If neither is, the row is hidden.
 - Revisit is silent: no notification, the user opens it by choice.
-- Built 2026-10-08: the Revisit card shows no count. It opens the **Revisit screen**: the line "You might want to revisit this.", then up to 5 old notes, newest offer first. Each card shows when the note last changed, its title and start, "Related to your recent note on <title>.", and **Not now**. Tapping a card opens the note and counts as revisited (it leaves the list). Not now hides it for a month ("Back in a month", with Undo). Empty state: "Nothing to revisit right now."
+- Built 2026-10-08: the Revisit card shows no count. It opens the **Revisit screen**, laid out like Review (changed 2026-10-08, user): one old note at a time in a centred card under "You might want to revisit this.", showing when it last changed, its title and start, and "Related to your recent note on <title>.". Below, in thumb reach: **Not now** and **Open**. Open (or tapping the card) opens the note and counts as revisited; the next one, if any, takes its place. Up to 5 are waiting at a time. Not now hides it for a month ("Back in a month", with Undo). Empty state: "Nothing to revisit right now."
 
 **View switch:** thin rounded pills **Recent | Folders | Tags**. Recent is the default. Folders and Tags swap the notes area to folder or tag pills and their notes.
 - Built 2026-10-04: Folders shows a pill for every folder (parents included, e.g. `Ideas` and `Ideas/Story`); tapping one shows its notes below, subfolders included, newest first; tapping it again clears the choice. Tags works the same with `#tag` pills. Pinned notes appear in place (with their pin icon), not in a separate row. "No folders yet." / "No tags yet." when there are none. The view and the picked folder or tag are kept while the app runs, so returning from a note keeps the user's place.
@@ -220,7 +220,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 
 **Built 2026-10-04:**
 - Accepting writes the link into the newer note's "Linked notes" footer, pointing at the older note.
-- The Home card counts at most one batch ("5 new connections" even when more wait).
+- The Home card shows no count ("New connections"), however many wait (changed 2026-10-08, user: a number creates urgency).
 - "Review 5 more" counts only suggestions the finished batch didn't show, so "Not sure" ones return in a later visit, not immediately.
 - "Why?" shows the matched passages in full; a fuller explanation needs the laptop layer.
 
@@ -341,7 +341,7 @@ One reusable card, two containers:
 
 - Each note is a dot; solid lines are confirmed links. Default view shows confirmed links only.
 - Dot size grows with link count. One dot color (folder color only when filtering by folder).
-- Notes with no links are hidden by default (toggle to show).
+- Notes with no links are shown, quieter, by default; the toggle hides them (changed 2026-10-08, user).
 - **Show suggestions** toggle (off by default) adds dimmed dashed lines; tapping one opens the suggestion sheet.
 - Pan and pinch to zoom; titles appear only when zoomed in.
 - Tap a dot → preview card at the bottom (title, snippet, **Open**, **Focus**). Focus shows that note and neighbors 1 to 3 hops out.

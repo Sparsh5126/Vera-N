@@ -62,8 +62,8 @@ abstract final class AppCopy {
   static const greetingEvening = 'Good evening';
   static String greetingWithName(String greeting, String? name) =>
       (name == null || name.trim().isEmpty) ? greeting : '$greeting, $name';
-  static String newConnections(int count) =>
-      count == 1 ? '1 new connection' : '$count new connections';
+  // No count: a number would turn connections into a pile to clear.
+  static const newConnections = 'New connections';
   static const revisit = 'Revisit';
   static const revisitBody = 'You might want to revisit this.';
   static String relatedToRecent(String title) =>

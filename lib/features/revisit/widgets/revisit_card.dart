@@ -4,15 +4,15 @@ import '../../../core/copy/app_copy.dart';
 import '../../../core/models/revisit_item.dart';
 import '../../../core/styles/app_styles.dart';
 
-/// One old note worth another look: its title, the start of its text,
-/// which recent note made it relevant, and "Not now". Tapping opens it.
+/// One old note worth another look, shown on its own like a Review card:
+/// when it last changed, its title and the start of its text, and which
+/// recent note made it relevant. Tapping it opens the note.
 class RevisitCard extends StatelessWidget {
   const RevisitCard({
     super.key,
     required this.item,
     required this.dateLabel,
     required this.onOpen,
-    required this.onNotNow,
   });
 
   final RevisitItem item;
@@ -20,7 +20,8 @@ class RevisitCard extends StatelessWidget {
   /// When the old note last changed, in words.
   final String dateLabel;
   final VoidCallback onOpen;
-  final VoidCallback onNotNow;
+
+  static const _previewLines = 8;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +33,7 @@ class RevisitCard extends StatelessWidget {
         child: Padding(
           padding: AppSpace.card,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(dateLabel, style: styles.small),
@@ -47,20 +49,15 @@ class RevisitCard extends StatelessWidget {
                 Text(
                   item.preview,
                   style: styles.card,
-                  maxLines: 3,
+                  maxLines: _previewLines,
                   overflow: TextOverflow.ellipsis,
                 ),
-              const SizedBox(height: AppSpace.s),
+              const SizedBox(height: AppSpace.m),
+              const Divider(height: 1),
+              const SizedBox(height: AppSpace.m),
               Text(
                 AppCopy.relatedToRecent(item.recentTitle),
                 style: styles.small,
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: onNotNow,
-                  child: const Text(AppCopy.notNow),
-                ),
               ),
             ],
           ),

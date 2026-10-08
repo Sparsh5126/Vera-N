@@ -133,7 +133,7 @@ Every relationship records who created it (user or AI) and a confidence value.
 
 1. **Detected:** only strong matches pass the threshold; weak ones are dropped and never shown.
 2. **Dimmed:** the match appears as a faded "suggested" tag or link on the note.
-3. **Reviewed:** the home screen shows a card such as **"5 new connections"**. Open it to go through a batch of 5. Each card has three outcomes: **accept** (swipe right or ✓ button), **reject** (swipe left or ✕ button), **not sure** (swipe up or a "Not sure" button). Swipe down or an Undo button reverses the last choice.
+3. **Reviewed:** the home screen shows a **"New connections"** card (no number, so it never feels urgent). Open it to go through a batch of 5. Each card has three outcomes: **accept** (swipe right or ✓ button), **reject** (swipe left or ✕ button), **not sure** (swipe up or a "Not sure" button). Swipe down or an Undo button reverses the last choice.
 4. **Resolved:** accepted → solid, confirmed link. Rejected → stored (see section 8). Not sure → stays dimmed and comes back in a later batch until it expires.
 5. **Expired:** unreviewed suggestions disappear after **30 days**.
 

@@ -49,7 +49,7 @@ void main() {
     await openRevisit(tester);
     expect(find.text('Trip ideas'), findsOneWidget);
     expect(find.text(AppCopy.relatedToRecent('Spring plan')), findsOneWidget);
-    expect(find.textContaining('new connection'), findsNothing);
+    expect(find.text(AppCopy.newConnections), findsNothing);
     await app.finish(tester);
   });
 
@@ -65,15 +65,19 @@ void main() {
     await app.finish(tester);
   });
 
-  testWidgets('opening the note counts as revisited', (tester) async {
+  testWidgets('one at a time; Open opens the note and counts as revisited', (
+    tester,
+  ) async {
+    await offer();
     await offer();
     await openRevisit(tester);
-    await tester.tap(find.text('Trip ideas'));
+    expect(find.text('Trip ideas'), findsOneWidget);
+    await tester.tap(find.text(AppCopy.open));
     await tester.pumpAndSettle();
     final left = await tester.runAsync(
       () => app.storage.suggestions.watchRevisit(limit: 5).first,
     );
-    expect(left, isEmpty);
+    expect(left, hasLength(1));
     await app.finish(tester);
   });
 }

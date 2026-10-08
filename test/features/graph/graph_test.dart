@@ -90,10 +90,19 @@ void main() {
       await app.finish(tester);
     });
 
-    testWidgets('no links: the empty message', (tester) async {
-      await app.storage.notes.create('Alone\nNo links here.');
+    testWidgets('no notes: the empty message', (tester) async {
       await openGraph(tester);
       expect(find.text(AppCopy.emptyGraph), findsOneWidget);
+      await app.finish(tester);
+    });
+
+    testWidgets('unlinked notes are shown by default', (tester) async {
+      await app.storage.notes.create('Alone\nNo links here.');
+      final semantics = tester.ensureSemantics();
+      await openGraph(tester);
+      expect(find.text(AppCopy.emptyGraph), findsNothing);
+      expect(find.semantics.byLabel(AppCopy.graphDot('Alone', 0)), findsOne);
+      semantics.dispose();
       await app.finish(tester);
     });
 
@@ -179,7 +188,6 @@ void main() {
       );
       final semantics = tester.ensureSemantics();
       await openGraph(tester);
-      expect(find.text(AppCopy.emptyGraph), findsOneWidget);
 
       await tester.tap(find.text(AppCopy.showSuggestions));
       await tester.pumpAndSettle();

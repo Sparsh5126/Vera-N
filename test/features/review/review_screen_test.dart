@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vera_n/core/copy/app_copy.dart';
 import 'package:vera_n/core/models/suggestion_draft.dart';
 import 'package:vera_n/core/storage/files/note_footer.dart';
 
@@ -38,7 +39,7 @@ void main() {
 
   Future<void> openReview(WidgetTester tester) async {
     await app.pump(tester);
-    await tester.tap(find.textContaining('new connection'));
+    await tester.tap(find.text(AppCopy.newConnections));
     await tester.pumpAndSettle();
   }
 
@@ -50,14 +51,15 @@ void main() {
   testWidgets('no suggestions: no card on Home', (tester) async {
     await app.storage.notes.create('Just a note');
     await app.pump(tester);
-    expect(find.textContaining('new connection'), findsNothing);
+    expect(find.text(AppCopy.newConnections), findsNothing);
     await app.finish(tester);
   });
 
-  testWidgets('Home counts at most one batch', (tester) async {
+  testWidgets('Home shows no count, however many wait', (tester) async {
     await suggest(count: 7);
     await app.pump(tester);
-    expect(find.text('5 new connections'), findsOneWidget);
+    expect(find.text(AppCopy.newConnections), findsOneWidget);
+    expect(find.textContaining('7'), findsNothing);
     await app.finish(tester);
   });
 

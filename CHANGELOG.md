@@ -16,6 +16,14 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
   - Tests: 1 rule test and 2 widget tests.
   - Checked on the phone (2026-10-08) with 213 seeded notes in the test app.
 
+### Changed
+These three changes were asked for by the user on 2026-10-08.
+- **Revisit looks like Review.** It shows one old note at a time in a centred card, with **Not now** and **Open** below in thumb reach. Open, or tapping the card, opens the note, and the next one takes its place.
+  - New `RevisitButtons` widget; `RevisitCard` no longer has its own Not now.
+- **Home's connections card shows no number.** It reads "New connections" however many wait, because a count creates urgency. `AppCopy.newConnections` is now a constant.
+- **Graph shows unlinked notes by default.** They are drawn quieter, and the toggle hides them. A new library's Graph, or a folder picked from a bubble, is no longer empty. The empty message now shows only when there are no notes.
+- Tests updated, plus 1 new Graph test. UI spec §5, §6 and §10 and product spec §5 are updated.
+
 ### Fixed
 - **Graph bubbles cut off at the edge.** On the phone, bubbles near the edge lost part of their circle. The bubble area now leaves room for the largest bubble on every side.
 - **Home's top row on a phone.** "5 new connections" broke mid-word ("connection / s") in the half-width card, and the two cards had different heights. The gap after the icon is now smaller and the chevron uses the small icon size, so the word fits. Both cards also share the taller one's height.
