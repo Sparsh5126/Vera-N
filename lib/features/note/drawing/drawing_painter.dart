@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -49,22 +48,4 @@ class DrawingPainter extends CustomPainter {
   @override
   bool shouldRepaint(DrawingPainter old) =>
       old.drawing != drawing || old.ink != ink || old.current != current;
-
-  /// The drawing as a PNG other apps can open: printed in light ink on a
-  /// light plate, whatever the app's theme, at [pixelRatio] for sharpness.
-  static Future<Uint8List> png(Drawing drawing, {double pixelRatio = 2}) async {
-    const paper = AppPalette.light;
-    final size = drawing.size;
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder)..scale(pixelRatio);
-    canvas.drawRect(Offset.zero & size, Paint()..color = paper.card);
-    DrawingPainter(drawing: drawing, ink: paper.text).paint(canvas, size);
-    final image = await recorder.endRecording().toImage(
-      (size.width * pixelRatio).ceil(),
-      (size.height * pixelRatio).ceil(),
-    );
-    final data = await image.toByteData(format: ui.ImageByteFormat.png);
-    image.dispose();
-    return data!.buffer.asUint8List();
-  }
 }

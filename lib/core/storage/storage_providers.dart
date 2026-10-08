@@ -46,9 +46,3 @@ final attachmentBytesProvider = FutureProvider.autoDispose
     .family<Uint8List?, String>(
       (ref, name) => ref.watch(attachmentsRepositoryProvider).read(name),
     );
-
-/// A drawing's strokes, so the app draws it in the current theme's ink.
-final drawingStrokesProvider = FutureProvider.autoDispose
-    .family<String?, String>(
-      (ref, name) => ref.watch(attachmentsRepositoryProvider).strokes(name),
-    );

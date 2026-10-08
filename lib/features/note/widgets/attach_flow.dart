@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,9 +10,8 @@ import '../../../core/storage/files/attachment_name.dart';
 import '../../../core/storage/repositories/attachments_repository.dart';
 import '../../../shared/widgets/notice_snack_bar.dart';
 import '../../../shared/widgets/option_sheet.dart';
-import '../drawing/drawing.dart';
-import '../drawing/drawing_painter.dart';
 import '../drawing/drawing_screen.dart';
+import '../drawing/drawing_svg.dart';
 import 'voice_recorder_sheet.dart';
 
 /// The ways to attach (UI spec §7).
@@ -66,22 +66,22 @@ class AttachFlow {
       case AttachChoice.drawing:
         final drawing = await DrawingScreen.open(context);
         if (drawing == null || drawing.isEmpty) return null;
-        return attachments.addDrawing(await _png(drawing), drawing.toJson());
+        return attachments.addDrawing(DrawingSvg.encode(drawing));
     }
   }
 
   /// Tapping a drawing opens it to keep drawing; Save writes it again.
   Future<void> editDrawing(BuildContext context, String name) async {
-    final json = await attachments.strokes(name);
-    final initial = json == null ? null : Drawing.fromJson(json);
+    final bytes = await attachments.read(name);
+    final initial = bytes == null
+        ? null
+        : DrawingSvg.decode(utf8.decode(bytes, allowMalformed: true));
     if (!context.mounted) return;
     final drawing = await DrawingScreen.open(context, initial: initial);
     if (drawing == null || drawing.isEmpty) return;
-    await attachments.saveDrawing(name, await _png(drawing), drawing.toJson());
+    await attachments.saveDrawing(name, DrawingSvg.encode(drawing));
     onDrawingSaved(name);
   }
-
-  static Future<Uint8List> _png(Drawing d) => DrawingPainter.png(d);
 
   /// Device trouble (no camera app, storage full) is said plainly.
   Future<void> _guarded(

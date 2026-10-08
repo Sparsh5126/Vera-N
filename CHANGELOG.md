@@ -4,6 +4,14 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Changed
+- **Drawings are vector (SVG)** (user, 2026-10-08: "vector, so it never blurs"). A drawing is now one file, `<id>.drawing.svg`, with each line a path.
+  - It stays sharp at any size and opens in any app, printed in light ink on a light plate.
+  - The app reads its own SVG back to keep drawing, so the separate strokes file and the PNG are gone.
+  - SVGs from other apps (curves, shapes) can't be drawn on and show as "This attachment isn't here yet."
+  - Saving no longer renders an image, so it is instant.
+  - Tests: an SVG round trip (lines, a tap as a dot, foreign SVGs refused).
+
 ### Added
 - **Attachments, part 1: storage and the embed** (product spec §2–3, UI spec §7). Decided 2026-10-08 (user):
   - Three kinds: photo, drawing and voice.

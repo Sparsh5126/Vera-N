@@ -6,13 +6,12 @@ import 'note_id.dart';
 /// Attachment file names in `MyNotes/Attachments/`: a note id plus the
 /// file's extension, e.g. `20261008-183000-a7f3.jpg`, never renamed.
 ///
-/// A drawing is `<id>.drawing.png`, a picture any app can open, with its
-/// strokes beside it in `<id>.drawing.json` so the app can reopen it for
-/// more drawing.
+/// A drawing is `<id>.drawing.svg`: vector lines, so it stays sharp at any
+/// size, opens in any app, and the app reads its lines back to keep
+/// drawing.
 abstract final class AttachmentName {
   static const photoExtension = '.jpg';
-  static const drawingExtension = '.drawing.png';
-  static const strokesExtension = '.drawing.json';
+  static const drawingExtension = '.drawing.svg';
   static const voiceExtension = '.m4a';
 
   static const _photos = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.heic'];
@@ -33,13 +32,4 @@ abstract final class AttachmentName {
     if (_voices.any(lower.endsWith)) return AttachmentKind.voice;
     return null;
   }
-
-  /// The strokes file of drawing [name].
-  static String strokesOf(String name) =>
-      '${name.substring(0, name.length - drawingExtension.length)}'
-      '$strokesExtension';
-
-  /// [name] and the files that belong with it (a drawing's strokes).
-  static List<String> withCompanions(String name) =>
-      kindOf(name) == AttachmentKind.drawing ? [name, strokesOf(name)] : [name];
 }

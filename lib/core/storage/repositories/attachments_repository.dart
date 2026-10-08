@@ -21,30 +21,18 @@ class AttachmentsRepository {
     return name;
   }
 
-  /// Saves a new drawing: the picture and its strokes. Returns its name.
-  Future<String> addDrawing(Uint8List png, String strokes) async {
+  /// Saves a new drawing (SVG text); returns its name.
+  Future<String> addDrawing(String svg) async {
     final name = await _freeName(AttachmentName.drawingExtension);
-    await saveDrawing(name, png, strokes);
+    await saveDrawing(name, svg);
     return name;
   }
 
   /// Writes drawing [name] again after more drawing.
-  Future<void> saveDrawing(String name, Uint8List png, String strokes) async {
-    await _store.writeAttachment(
-      AttachmentName.strokesOf(name),
-      utf8.encode(strokes),
-    );
-    await _store.writeAttachment(name, png);
-  }
+  Future<void> saveDrawing(String name, String svg) =>
+      _store.writeAttachment(name, utf8.encode(svg));
 
   Future<Uint8List?> read(String name) => _store.readAttachment(name);
-
-  /// The strokes of drawing [name], or null if it has none (a drawing
-  /// made elsewhere).
-  Future<String?> strokes(String name) async {
-    final bytes = await _store.readAttachment(AttachmentName.strokesOf(name));
-    return bytes == null ? null : utf8.decode(bytes);
-  }
 
   Future<String> _freeName(String extension) async {
     while (true) {

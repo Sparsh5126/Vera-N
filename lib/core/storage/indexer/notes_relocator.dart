@@ -4,7 +4,6 @@ import 'package:drift/drift.dart';
 
 import '../db/app_database.dart';
 import '../db/note_rows.dart';
-import '../files/attachment_name.dart';
 import '../files/note_file_store.dart';
 import '../files/note_markup.dart';
 
@@ -47,12 +46,10 @@ class NotesRelocator {
     NoteFileStore from,
     NoteFileStore to,
   ) async {
-    for (final embedded in NoteMarkup.embeds(text)) {
-      for (final name in AttachmentName.withCompanions(embedded)) {
-        if (await to.readAttachment(name) != null) continue;
-        final bytes = await from.readAttachment(name);
-        if (bytes != null) await to.writeAttachment(name, bytes);
-      }
+    for (final name in NoteMarkup.embeds(text)) {
+      if (await to.readAttachment(name) != null) continue;
+      final bytes = await from.readAttachment(name);
+      if (bytes != null) await to.writeAttachment(name, bytes);
     }
   }
 

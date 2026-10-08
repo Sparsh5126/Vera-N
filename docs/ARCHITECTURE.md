@@ -57,7 +57,7 @@ lib/
 │   ├── onboarding/
 │   ├── home/
 │   ├── note/                      editor + note view + suggestion sheet container
-│   │   └── drawing/               drawing model (strokes file), canvas, painter, drawing screen
+│   │   └── drawing/               drawing model, SVG read/write, canvas, painter, drawing screen
 │   ├── review/                    swipe stack container
 │   ├── search/
 │   ├── graph/

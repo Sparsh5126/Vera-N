@@ -69,7 +69,7 @@ App-private storage (per device, not synced, lost on uninstall)
 - **Attachments (built 2026-10-08):** photos, drawings and voice notes live in `MyNotes/Attachments/` as `<id>.<ext>` (the note id scheme). A note embeds one as a standard Markdown line, `![](Attachments/<name>)`, the path from `MyNotes/`, so Obsidian and other apps show it too.
   - Photos are shrunk to 2048 px and saved as JPEG at quality 80.
   - Voice notes are AAC in `.m4a`.
-  - A drawing is `<id>.drawing.png`, which any app can open, plus `<id>.drawing.json` holding its strokes so it can be drawn on again.
+  - A drawing is one vector file, `<id>.drawing.svg` (changed 2026-10-08, user: "vector, so it never blurs"). Each line is a path, so it is sharp at any size and opens in any app; the app reads its own SVGs back to keep drawing.
   - Attachment files are the user's and are never deleted by the app; removing one from a note leaves its file.
   - The AI never reads attachments; their lines are left out of the text it analyzes.
 

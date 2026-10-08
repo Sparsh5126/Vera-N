@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/core/models/attachment_kind.dart';
@@ -38,15 +40,11 @@ void main() {
       expect(NoteMarkup.display('A\n$embed\nB'), 'A\nB');
     });
 
-    test('kinds come from the name; a drawing has its strokes', () {
+    test('kinds come from the name', () {
       expect(AttachmentName.kindOf(photo), AttachmentKind.photo);
-      expect(AttachmentName.kindOf('a.drawing.png'), AttachmentKind.drawing);
+      expect(AttachmentName.kindOf('a.drawing.svg'), AttachmentKind.drawing);
       expect(AttachmentName.kindOf('a.M4A'), AttachmentKind.voice);
       expect(AttachmentName.kindOf('a.pdf'), isNull);
-      expect(AttachmentName.withCompanions('a.drawing.png'), [
-        'a.drawing.png',
-        'a.drawing.json',
-      ]);
     });
   });
 
@@ -95,12 +93,12 @@ void main() {
   });
 
   group('files', () {
-    test('a drawing keeps its strokes; names never collide', () async {
+    test('drawings are saved as text; names never collide', () async {
       final store = MemoryNoteFileStore();
       final repo = AttachmentsRepository(store);
-      final name = await repo.addDrawing(Uint8List.fromList([1]), '{}');
+      final name = await repo.addDrawing('<svg/>');
       expect(AttachmentName.kindOf(name), AttachmentKind.drawing);
-      expect(await repo.strokes(name), '{}');
+      expect(utf8.decode((await repo.read(name))!), '<svg/>');
       final other = await repo.add(Uint8List.fromList([2]), '.jpg');
       expect(other, isNot(name));
       expect(await repo.read(other), [2]);
@@ -123,12 +121,11 @@ void main() {
       final h = StorageHarness();
       addTearDown(h.dispose);
       final target = MemoryNoteFileStore();
-      h.store.put('trip.md', 'Trip\n${NoteMarkup.embed('d.drawing.png')}');
-      await h.store.writeAttachment('d.drawing.png', Uint8List.fromList([1]));
-      await h.store.writeAttachment('d.drawing.json', Uint8List.fromList([2]));
+      h.store.put('trip.md', 'Trip\n${NoteMarkup.embed('d.drawing.svg')}');
+      await h.store.writeAttachment('d.drawing.svg', Uint8List.fromList([1]));
       await h.store.writeAttachment('unused.jpg', Uint8List.fromList([3]));
       await NotesRelocator(h.db).relocate(h.store, target);
-      expect(target.attachments.keys, {'d.drawing.png', 'd.drawing.json'});
+      expect(target.attachments.keys, {'d.drawing.svg'});
     });
   });
 }

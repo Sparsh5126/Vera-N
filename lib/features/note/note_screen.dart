@@ -325,9 +325,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
   /// A drawing drawn on again shows its new lines.
   void _drawingSaved(String name) {
-    ref
-      ..invalidate(attachmentBytesProvider(name))
-      ..invalidate(drawingStrokesProvider(name));
+    ref.invalidate(attachmentBytesProvider(name));
   }
 
   Widget _embed(String name) => AttachmentEmbed(
