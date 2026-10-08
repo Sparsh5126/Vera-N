@@ -41,6 +41,8 @@ class NoteCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
+        // Right-click with a mouse does what a long press does.
+        onSecondaryTap: onLongPress,
         child: Padding(
           padding: AppSpace.card,
           child: Column(

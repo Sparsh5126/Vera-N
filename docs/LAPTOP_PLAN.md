@@ -42,7 +42,7 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 - **Window:** a sensible minimum size; the window size and position are remembered.
 - **Tests:** a conflict file becomes a conflict, not a note; the watcher re-indexes; analysis waits for idle.
 
-### L1. Desktop layout
+### L1. Desktop layout: code done 2026-10-09 (window size and place left for the Windows build)
 - The same screens, laid out for a wide window when wider than a breakpoint. One adaptive shell, not duplicate screens (CLAUDE.md §5):
   - a sidebar with Home, Search, Graph, Review, Folders, Tags and Settings;
   - a note list and the open note side by side;

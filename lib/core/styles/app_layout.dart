@@ -122,6 +122,12 @@ abstract final class AppSize {
   static const double graphMinZoom = 0.3;
   static const double graphMaxZoom = 4;
 
+  /// Wide windows (a laptop, docs/LAPTOP_PLAN.md L1): from this width the
+  /// sidebar replaces the pill bar and a note opens beside the list.
+  static const double wideLayout = 900;
+  static const double sidebarWidth = 240;
+  static const double listPaneWidth = 400;
+
   /// Widest a column of text grows on large screens.
   static const double readableWidth = 680;
 }
@@ -146,4 +152,11 @@ abstract final class AppOpacity {
 
   /// The light amber wash inside a Graph folder bubble.
   static const double bubbleFill = 0.16;
+}
+
+/// Which layout a window gets (docs/LAPTOP_PLAN.md, L1).
+abstract final class AppBreakpoints {
+  /// Sidebar and two panes instead of the phone's single column.
+  static bool wide(BuildContext context) =>
+      MediaQuery.sizeOf(context).width >= AppSize.wideLayout;
 }

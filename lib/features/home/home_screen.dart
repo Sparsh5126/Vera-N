@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/copy/app_copy.dart';
+import '../../core/navigation/open_note.dart';
 import '../../core/navigation/routes.dart';
 import '../../core/settings/app_prefs_controller.dart';
 import '../../core/storage/storage_providers.dart';
@@ -31,23 +32,30 @@ class HomeScreen extends ConsumerWidget {
     final view = ref.watch(homeViewProvider.select((v) => v.view));
     final now = DateTime.now();
     final menu = HomeNoteMenu(ref.read(notesRepositoryProvider));
+    // A wide window opens notes beside the list, and "New note" is in the
+    // sidebar (docs/LAPTOP_PLAN.md, L1).
+    final wide = AppBreakpoints.wide(context);
     final cards = CardCallbacks(
-      open: (noteRef) => context.push(Routes.note(noteRef)),
+      open: (noteRef) => wide
+          ? ref.read(openNoteProvider.notifier).open(noteRef)
+          : context.push(Routes.note(noteRef)),
       menu: (note) => unawaited(menu.show(context, note)),
     );
 
     return Scaffold(
       // Sits just above the floating nav bar, in thumb reach.
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(
-          bottom: AppSize.navBarHeight + AppSpace.s,
-        ),
-        child: PillButton(
-          label: AppCopy.newNote,
-          icon: Icons.add,
-          onPressed: () => context.push(Routes.newNote),
-        ),
-      ),
+      floatingActionButton: wide
+          ? null
+          : Padding(
+              padding: const EdgeInsets.only(
+                bottom: AppSize.navBarHeight + AppSpace.s,
+              ),
+              child: PillButton(
+                label: AppCopy.newNote,
+                icon: Icons.add,
+                onPressed: () => context.push(Routes.newNote),
+              ),
+            ),
       body: SafeArea(
         bottom: false,
         child: Stack(

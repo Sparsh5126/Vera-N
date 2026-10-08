@@ -323,6 +323,9 @@ abstract final class AppCopy {
     return '${(bytes / mb).toStringAsFixed(1)} MB';
   }
 
+  // Laptop layout (docs/LAPTOP_PLAN.md, L1).
+  static const pickANote = 'Pick a note, or start a new one.';
+
   // Reminders (decided 2026-10-08).
   static const reminderTitle = 'Reminder';
   static const remindersChannel = 'Reminders';

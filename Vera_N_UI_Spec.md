@@ -385,6 +385,18 @@ One reusable card, two containers:
 
 ---
 
+## 10b. Laptop layout (built 2026-10-09, docs/LAPTOP_PLAN.md L1)
+
+- **From 900 wide:** a sidebar (wordmark, New note, Home / Search / Graph / Settings with their names) replaces the floating pill bar.
+- **Home:** the notes list (400 wide) and the open note side by side. A click opens a note beside the list; Back, Delete and Archive close it there. With none open: "Pick a note, or start a new one."
+- **Keyboard:**
+  - Ctrl+N new note, Ctrl+F Search;
+  - Ctrl+B bold, Ctrl+K link to a note;
+  - in Review: Ctrl+Enter accept, Delete reject, Ctrl+U not sure, Ctrl+Z undo.
+  Every shortcut has a visible button.
+- **Mouse:** right-click on a card opens the long-press menu.
+- **Reminders** don't appear on the laptop (phone-only).
+
 ## 11. Settings
 
 Single scrollable page.

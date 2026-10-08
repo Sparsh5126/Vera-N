@@ -5,6 +5,21 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Laptop, phase L1: desktop layout (code; tested in a wide window, not yet run on Windows)** (docs/LAPTOP_PLAN.md).
+  - **A sidebar from 900 px wide** (`SideNav`, shared): the wordmark, New note, and the four places with their names, the current one on the ink plate. It replaces the floating pill bar and the floating New note button. Narrower windows and phones are unchanged.
+  - **Home in two panes** (`app/home_tab.dart`, so features still don't import each other): the notes list on the left (400 px) and the open note on the right. Clicking a card opens it there, and Back, Delete or Archive close it there. With nothing open: "Pick a note, or start a new one." The open note is shared state in `core/navigation/open_note.dart`.
+  - **Keyboard:**
+    - anywhere in the app: Ctrl+N new note, Ctrl+F Search;
+    - in a note: Ctrl+B bold, Ctrl+K link to a note;
+    - in Review: Ctrl+Enter accept, Delete reject, Ctrl+U not sure, Ctrl+Z undo.
+    These sit beside the same buttons, never instead of them.
+  - **Mouse:** right-click on a note card opens the same menu as a long press. Hover states come from the existing ink wells.
+  - **Tidy-up:** the note screen's attachment wiring moved to `NoteAttachments`, so the screen stays under 400 lines (now 373).
+  - **New tokens:** `AppSize.wideLayout` (900), `sidebarWidth` (240), `listPaneWidth` (400), and the `AppBreakpoints.wide` helper.
+  - **Still to do on Windows:** a minimum window size and remembering the window's size and place (needs the Windows build).
+  - Tests: 5 widget tests in a 1400×900 window (sidebar, two panes, Ctrl+N / Ctrl+F, right-click, Review by keyboard); the phone layout is unchanged.
+
+### Added
 - **Laptop, phase L0 (code; not yet run on Windows)** (docs/LAPTOP_PLAN.md).
   - **Syncthing conflict copies** (`x.sync-conflict-<date>-<device>.md`) are no longer indexed as notes.
     - A copy marks its note as in conflict, and the existing Compare / Keep this / Keep the other / Keep both use the copy as the other version, then delete it.

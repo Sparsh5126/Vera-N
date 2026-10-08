@@ -5,7 +5,6 @@ import '../core/feedback/motion.dart';
 import '../core/navigation/routes.dart';
 import '../core/styles/app_styles.dart';
 import '../features/graph/graph_screen.dart';
-import '../features/home/home_screen.dart';
 import '../features/note/note_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/review/review_screen.dart';
@@ -14,6 +13,7 @@ import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/trash/trash_screen.dart';
 import 'app_shell.dart';
+import 'home_tab.dart';
 
 /// The route table. URL-style paths so widgets, the Quick Settings tile
 /// and app shortcuts can deep-link later (e.g. straight to a new note).
@@ -38,7 +38,7 @@ GoRouter buildRouter({
         builder: (_, state, child) =>
             AppShell(location: state.uri.path, child: child),
         routes: [
-          _tab(Routes.home, const HomeScreen()),
+          _tab(Routes.home, const HomeTab()),
           _tab(Routes.search, const SearchScreen()),
           _tab(Routes.graph, const GraphScreen()),
           _tab(Routes.settings, const SettingsScreen()),

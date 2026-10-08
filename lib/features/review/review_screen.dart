@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -83,6 +84,32 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(reviewProvider);
     final current = state.current;
+    // A keyboard (laptop, docs/LAPTOP_PLAN.md L1), beside the buttons:
+    // Ctrl+Enter accept, Delete reject, Ctrl+U not sure, Ctrl+Z undo.
+    return CallbackShortcuts(
+      bindings: current == null
+          ? const {}
+          : {
+              const SingleActivator(
+                LogicalKeyboardKey.enter,
+                control: true,
+              ): () =>
+                  unawaited(_choose(ReviewChoice.accept)),
+              const SingleActivator(LogicalKeyboardKey.delete): () =>
+                  unawaited(_choose(ReviewChoice.reject)),
+              const SingleActivator(
+                LogicalKeyboardKey.keyU,
+                control: true,
+              ): () =>
+                  unawaited(_choose(ReviewChoice.notSure)),
+              const SingleActivator(LogicalKeyboardKey.keyZ, control: true):
+                  _undo,
+            },
+      child: Focus(autofocus: true, child: _screen(state, current)),
+    );
+  }
+
+  Widget _screen(ReviewState state, SuggestionView? current) {
     return Scaffold(
       body: SafeArea(
         child: Padding(

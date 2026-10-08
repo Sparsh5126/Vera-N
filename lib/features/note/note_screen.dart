@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +10,6 @@ import '../../core/copy/app_copy.dart';
 import '../../core/models/archive_folder.dart';
 import '../../core/models/locked_folder.dart';
 import '../../core/models/note.dart';
-import '../../core/platform/attachment_capture.dart';
 import '../../core/platform/device_lock.dart';
 import '../../core/security/locked_session.dart';
 import '../../core/navigation/routes.dart';
@@ -24,27 +24,29 @@ import 'state/link_typing.dart';
 import 'state/markup_editing.dart';
 import 'state/note_editor_controller.dart';
 import 'state/note_providers.dart';
-import 'widgets/attach_flow.dart';
-import 'widgets/attachment_embed.dart';
 import 'widgets/conflict_flow.dart';
 import 'widgets/conflict_notice.dart';
 import 'widgets/locked_note_gate.dart';
+import 'widgets/note_attachments.dart';
 import 'widgets/format_bar.dart';
 import 'widgets/note_actions.dart';
 import 'widgets/note_details_section.dart';
 import 'widgets/note_editor_view.dart';
 import 'widgets/note_format_actions.dart';
 import 'widgets/note_top_bar.dart';
-import 'widgets/photo_viewer.dart';
 import 'widgets/titled_text_controller.dart';
 
 /// Write and read one note. New notes open with the keyboard up; existing
 /// ones open showing the text, and a tap anywhere starts editing.
 class NoteScreen extends ConsumerStatefulWidget {
-  const NoteScreen({super.key, this.noteRef});
+  const NoteScreen({super.key, this.noteRef, this.onClose});
 
   /// Null for a new note.
   final int? noteRef;
+
+  /// On a wide window the note sits beside the list: back, delete and
+  /// archive close it there instead of leaving a screen.
+  final VoidCallback? onClose;
 
   @override
   ConsumerState<NoteScreen> createState() => _NoteScreenState();
@@ -69,11 +71,11 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     afterChange: _reloadText,
     onOpenNote: _openNote,
   );
-  late final _attach = AttachFlow(
-    capture: ref.read(attachmentCaptureProvider),
-    attachments: ref.read(attachmentsRepositoryProvider),
-    onAttached: _insertAttachment,
-    onDrawingSaved: _drawingSaved,
+  late final _attachments = NoteAttachments(
+    ref: ref,
+    text: () => _text,
+    mounted: () => mounted,
+    onEdited: _onTextChanged,
   );
   final _focus = FocusNode();
   TitledTextController? _text;
@@ -120,7 +122,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   TitledTextController _newText(String body) {
     final text = TitledTextController(text: body);
     text.onCheckboxToggled = () => _onTextChanged(text.text);
-    text.embedBuilder = _embed;
+    text.embedBuilder = (name) => _attachments.embed(context, name);
     return text;
   }
 
@@ -150,6 +152,8 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   /// Back to where the user came from, or Home when the note was opened
   /// straight from a capture shortcut.
   void _leave() {
+    final onClose = widget.onClose;
+    if (onClose != null) return onClose();
     if (context.canPop()) {
       context.pop();
     } else {
@@ -305,6 +309,21 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   }
 
   Widget _body(TitledTextController text) {
+    final format = NoteFormatActions(text, _actions, _onTextChanged);
+    // A keyboard (laptop, docs/LAPTOP_PLAN.md L1): Ctrl+B bold, Ctrl+K
+    // link to a note, beside the same buttons above the keyboard.
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.keyB, control: true):
+            format.bold,
+        const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
+            unawaited(format.link(context, _editor.noteRef.value)),
+      },
+      child: _editorView(text),
+    );
+  }
+
+  Widget _editorView(TitledTextController text) {
     return NoteEditorView(
       text: text,
       focus: _focus,
@@ -350,24 +369,5 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     leave: _leave,
   );
 
-  void _chooseAttachment() => unawaited(_attach.choose(context));
-
-  /// The new attachment goes where the cursor is, on its own line.
-  void _insertAttachment(String name) {
-    final text = _text;
-    if (text == null || !mounted) return;
-    text.value = AttachmentInsert.insert(text.value, name);
-    _onTextChanged(text.text);
-  }
-
-  /// A drawing drawn on again shows its new lines.
-  void _drawingSaved(String name) {
-    ref.invalidate(attachmentBytesProvider(name));
-  }
-
-  Widget _embed(String name) => AttachmentEmbed(
-    name: name,
-    onOpenPhoto: (n) => unawaited(PhotoViewer.open(context, n)),
-    onEditDrawing: (n) => unawaited(_attach.editDrawing(context, n)),
-  );
+  void _chooseAttachment() => _attachments.choose(context);
 }
