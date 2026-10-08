@@ -1,6 +1,8 @@
 import 'package:characters/characters.dart';
 import 'package:drift/drift.dart';
 
+import 'note_placement.dart';
+import '../../models/locked_folder.dart';
 import '../../models/trashed_note.dart';
 import '../db/app_database.dart';
 import '../db/note_rows.dart';
@@ -20,24 +22,37 @@ class TrashRepository {
   final AppDatabase _db;
   final NoteFileStore _store;
 
+  static TrashedNote _trashed(NoteRow r) {
+    // In the trash a note sits in `.trash/<its folder>`.
+    const prefix = '${NotePlacement.trashFolder}/';
+    final from = r.folder.startsWith(prefix)
+        ? r.folder.substring(prefix.length)
+        : r.folder;
+    if (LockedFolder.contains(from)) {
+      return TrashedNote(
+        ref: r.id,
+        title: '',
+        preview: '',
+        trashedAt: r.trashedAt!,
+        locked: true,
+      );
+    }
+    return TrashedNote(
+      ref: r.id,
+      title: NoteMarkup.display(r.title),
+      preview: NoteText.preview(
+        r.body.characters.take(NoteRows.previewLength).toString(),
+      ),
+      trashedAt: r.trashedAt!,
+    );
+  }
+
   /// Notes in the trash, most recently deleted first.
   Stream<List<TrashedNote>> watch() {
     final query = _db.select(_db.notes)
       ..where((n) => n.trashedAt.isNotNull())
       ..orderBy([(n) => OrderingTerm.desc(n.trashedAt)]);
-    return query.watch().map(
-      (rows) => [
-        for (final r in rows)
-          TrashedNote(
-            ref: r.id,
-            title: NoteMarkup.display(r.title),
-            preview: NoteText.preview(
-              r.body.characters.take(NoteRows.previewLength).toString(),
-            ),
-            trashedAt: r.trashedAt!,
-          ),
-      ],
-    );
+    return query.watch().map((rows) => [for (final r in rows) _trashed(r)]);
   }
 
   /// Removes a trashed note for good: its file in `.trash/` and everything

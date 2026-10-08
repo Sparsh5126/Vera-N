@@ -60,6 +60,7 @@ class AnalysisRun {
   Future<bool> run() async {
     _stopwatch.start();
     await suggestions.expire(_clock());
+    await analysis.forgetLocked();
     final model = embedder.model;
     final stale = await analysis.stale(model, limit: AiSettings.notesPerRun);
     if (stale.isEmpty) return true;

@@ -228,6 +228,12 @@ Defaults: notes stored locally, AI processing local, no account, no cloud storag
 
 Cloud sync or cloud AI, if ever added, must be opt-in and clearly show when data leaves the device.
 
+**Locked folder (built 2026-10-08; decided by the user: an app lock, the phone's own lock, one folder).** Notes moved into `Notes/Locked/` (keeping their folder inside, like Archive) are private inside the app:
+- **Never touched by the AI:** no analysis, suggestions, tag suggestions, Revisit or meaning search. Locking a note deletes its stored passages, vectors, analysis record and suggestions, and every analysis run first forgets any note found in `Locked/` (moved there by another app). Taking a note out lets the AI read it again.
+- **Hidden** from Home, Search, the Graph, the folder and tag lists, the link picker and the Linked / Mentioned-in lists of open notes (a locked note may still list open ones). In the trash it shows as "Locked note", without its words.
+- **Opening it** needs the phone's lock (fingerprint, face, PIN or pattern) through the system prompt. Once open, the folder stays open while the app is in use, and closes when the app has been away for more than 30 seconds, or with "Lock now". A phone without a screen lock can't lock notes, so a note can never get stuck.
+- **Not encryption:** the files stay plain Markdown, so Obsidian and sync keep working, and anyone with a file manager could read them. This was the user's choice.
+
 ---
 
 ## 16. Data Model

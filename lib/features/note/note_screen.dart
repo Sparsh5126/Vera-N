@@ -7,8 +7,11 @@ import 'package:go_router/go_router.dart';
 import '../../core/ai/suggestions/suggestion_providers.dart';
 import '../../core/copy/app_copy.dart';
 import '../../core/models/archive_folder.dart';
+import '../../core/models/locked_folder.dart';
 import '../../core/models/note.dart';
 import '../../core/platform/attachment_capture.dart';
+import '../../core/platform/device_lock.dart';
+import '../../core/security/locked_session.dart';
 import '../../core/navigation/routes.dart';
 import '../../core/platform/launch_channel.dart';
 import '../../core/storage/storage_providers.dart';
@@ -25,6 +28,7 @@ import 'widgets/attach_flow.dart';
 import 'widgets/attachment_embed.dart';
 import 'widgets/conflict_flow.dart';
 import 'widgets/conflict_notice.dart';
+import 'widgets/locked_note_gate.dart';
 import 'widgets/format_bar.dart';
 import 'widgets/note_actions.dart';
 import 'widgets/note_details_section.dart';
@@ -107,6 +111,10 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     if (!mounted) return;
     _lastText = note?.body ?? '';
     setState(() => _text = _newText(_lastText));
+    // A locked note asks for the phone's lock right away.
+    if (note != null && LockedFolder.contains(note.folder)) {
+      unawaited(ref.read(lockedSessionProvider.notifier).open());
+    }
   }
 
   TitledTextController _newText(String body) {
@@ -220,9 +228,20 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
             _watchNote(_topBar),
             _watchNote(_conflict),
             Expanded(
-              child: text == null ? const SizedBox.shrink() : _body(text),
+              child: LockedNoteGate(
+                noteRef: widget.noteRef,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: text == null
+                          ? const SizedBox.shrink()
+                          : _body(text),
+                    ),
+                    if (text != null) _formatBar(text),
+                  ],
+                ),
+              ),
             ),
-            if (text != null) _formatBar(text),
           ],
         ),
       ),
@@ -256,6 +275,8 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       onDelete: () => unawaited(_delete()),
       onAttach: _chooseAttachment,
       archived: note != null && ArchiveFolder.contains(note.folder),
+      locked: note != null && LockedFolder.contains(note.folder),
+      onLock: note == null ? null : () => unawaited(_toggleLock(note)),
       onArchive: note == null
           ? null
           : () =>
@@ -312,6 +333,14 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       onAttach: _chooseAttachment,
     );
   }
+
+  Future<void> _toggleLock(Note note) => _actions.toggleLock(
+    context,
+    note,
+    hasScreenLock: ref.read(deviceLockProvider).hasScreenLock,
+    forgetLocked: ref.read(storageProvider).analysis.forgetLocked,
+    leave: _leave,
+  );
 
   void _chooseAttachment() => unawaited(_attach.choose(context));
 

@@ -2,6 +2,8 @@ import 'package:characters/characters.dart';
 import 'package:drift/drift.dart';
 
 import '../../models/archive_folder.dart';
+import '../../models/locked_folder.dart';
+import '../../models/special_folder.dart';
 import '../../models/note.dart';
 import '../../models/note_header.dart';
 import '../../models/note_summary.dart';
@@ -15,10 +17,17 @@ import 'app_database.dart';
 /// Converts between note files, database rows and models.
 abstract final class NoteRows {
   /// Drift condition: note [n] is not archived (see [ArchiveFolder]).
-  static Expression<bool> notArchived($NotesTable n) {
-    final archive = ArchiveFolder.name.toLowerCase();
-    return n.folder.lower().equals(archive).not() &
-        n.folder.lower().like('$archive/%').not();
+  static Expression<bool> notArchived($NotesTable n) =>
+      _notIn(n, ArchiveFolder.folder);
+
+  /// Drift condition: note [n] is not locked (see [LockedFolder]).
+  static Expression<bool> notLocked($NotesTable n) =>
+      _notIn(n, LockedFolder.folder);
+
+  static Expression<bool> _notIn($NotesTable n, SpecialFolder folder) {
+    final name = folder.name.toLowerCase();
+    return n.folder.lower().equals(name).not() &
+        n.folder.lower().like('$name/%').not();
   }
 
   /// Characters of body kept for a card preview.

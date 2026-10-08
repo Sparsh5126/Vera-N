@@ -6,7 +6,7 @@ import '../../../core/styles/app_styles.dart';
 import 'saved_tick.dart';
 
 /// Back, the saved tick, copy, pin, and the ⋮ menu (attach, archive,
-/// delete).
+/// lock, delete).
 class NoteTopBar extends StatelessWidget {
   const NoteTopBar({
     super.key,
@@ -19,6 +19,8 @@ class NoteTopBar extends StatelessWidget {
     required this.onAttach,
     this.archived = false,
     this.onArchive,
+    this.locked = false,
+    this.onLock,
   });
 
   final ValueListenable<int> saves;
@@ -40,6 +42,11 @@ class NoteTopBar extends StatelessWidget {
   /// note doesn't exist yet.
   final VoidCallback? onArchive;
   final bool archived;
+
+  /// In the ⋮ menu: Move to Locked folder, or take it out when [locked].
+  /// Null while the note doesn't exist yet.
+  final VoidCallback? onLock;
+  final bool locked;
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +84,13 @@ class NoteTopBar extends StatelessWidget {
                 PopupMenuItem(
                   value: onArchive,
                   child: Text(archived ? AppCopy.unarchive : AppCopy.archive),
+                ),
+              if (onLock != null)
+                PopupMenuItem(
+                  value: onLock,
+                  child: Text(
+                    locked ? AppCopy.moveOutOfLocked : AppCopy.moveToLocked,
+                  ),
                 ),
               PopupMenuItem(value: onDelete, child: const Text(AppCopy.delete)),
             ],

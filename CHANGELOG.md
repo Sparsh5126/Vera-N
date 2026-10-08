@@ -5,6 +5,15 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Locked folder** (product spec §15, UI spec §5 and §7). Decided 2026-10-08 (user): an app lock (not encryption), opened with the phone's own lock, one folder.
+  - **Locking:** ⋮ → Move to Locked folder moves the note into `Notes/Locked/`, keeping its folder inside like Archive, and leaves it with Undo. It needs a screen lock on the phone, so a note can't get stuck.
+  - **The AI never touches it:** locking deletes the note's passages, vectors, analysis record and suggestions, and each analysis run first forgets anything found in `Locked/`. Queries leave locked notes out of analysis, pending suggestions and the matching pool.
+  - **Hidden** from Home, Search, the Graph, the folder and tag lists, the link picker, and the links lists of open notes. The trash shows it as "Locked note".
+  - **Opening:** the Folders view ends with a Locked pill (lock icon) that opens with the phone's lock and offers Lock now. A locked note asks right away, and shows a lock with Unlock while closed. The folder closes after 30 s away (a camera trip doesn't relock), or with Lock now.
+  - **New pieces:** `SpecialFolder` (shared by Archive and Locked), `LockedFolder`, `DeviceLock` with `FakeDeviceLock` in tests, `LockedSession`, and `LockedGate` (shared widget). `MainActivity` is now a `FlutterFragmentActivity`, which the system prompt needs.
+  - **New package:** `local_auth` (official Flutter plugin; adds `USE_BIOMETRIC`, an install-time permission with no prompt). No battery cost: it runs only when asked.
+  - Tests: 5 rule/query tests and 3 widget tests.
+  - Not yet checked on the phone (fingerprint / PIN prompt).
 - **Attachment clean-up in Settings → DATA** (user, 2026-10-08).
   - **Attachments** shows the room they take and how many no note uses. Notes in the trash or archive count, so restoring one brings its attachments back.
   - **Remove unused attachments** removes them at once with Undo. The files are deleted only when the Undo message goes away, and one a note uses again by then is kept.

@@ -78,11 +78,28 @@ class NotesRepository {
   }
 
   /// Notes not in the trash, most recently changed first (one read).
-  Future<List<NoteSummary>> allNotes() async {
+  /// Locked notes only with [includeLocked].
+  Future<List<NoteSummary>> allNotes({bool includeLocked = false}) async {
     final query = _db.select(_db.notes)
-      ..where((n) => n.trashedAt.isNull())
+      ..where(
+        (n) =>
+            n.trashedAt.isNull() &
+            (includeLocked ? const Constant(true) : NoteRows.notLocked(n)),
+      )
       ..orderBy([(n) => OrderingTerm.desc(n.modified)]);
     return (await query.get()).map(NoteRows.toSummary).toList();
+  }
+
+  /// Whether any note (not in the trash) is in the Locked folder, so Home
+  /// shows its pill. Says nothing else about them.
+  Stream<bool> watchHasLocked() {
+    final query = _db.selectOnly(_db.notes)
+      ..addColumns([_db.notes.id])
+      ..where(
+        _db.notes.trashedAt.isNull() & NoteRows.notLocked(_db.notes).not(),
+      )
+      ..limit(1);
+    return query.watch().map((rows) => rows.isNotEmpty);
   }
 
   Future<Note?> getNote(int ref) async {

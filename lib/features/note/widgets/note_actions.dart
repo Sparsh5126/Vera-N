@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../../core/copy/app_copy.dart';
 import '../../../core/models/archive_folder.dart';
+import '../../../core/models/locked_folder.dart';
 import '../../../core/models/note.dart';
 import '../../../core/storage/files/note_markup.dart';
 import '../../../core/storage/repositories/links_repository.dart';
@@ -41,7 +42,13 @@ class NoteActions {
     int? currentRef, {
     String? label,
   }) async {
-    final notes = await _notes.allNotes();
+    // Locked notes can be linked only from a note that is locked too.
+    final current = currentRef == null
+        ? null
+        : await _notes.getNote(currentRef);
+    final notes = await _notes.allNotes(
+      includeLocked: current != null && LockedFolder.contains(current.folder),
+    );
     if (!context.mounted) return null;
     final picked = await NotePickerSheet.show(context, [
       for (final n in notes)
@@ -134,6 +141,43 @@ class NoteActions {
       messenger,
       archiving ? AppCopy.archived : AppCopy.unarchived,
       () => _editor.moveToFolder(old),
+    );
+  }
+
+  /// Locking moves the note into `Locked/` (keeping its folder inside),
+  /// forgets what the AI stored about it, and leaves it; taking it out
+  /// puts it back (the AI may read it again). Both offer Undo. Locking
+  /// needs a screen lock on the phone, or the note couldn't be opened.
+  Future<void> toggleLock(
+    BuildContext context,
+    Note note, {
+    required Future<bool> Function() hasScreenLock,
+    required Future<void> Function() forgetLocked,
+    required VoidCallback leave,
+  }) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final locking = !LockedFolder.contains(note.folder);
+    if (locking && !await hasScreenLock()) {
+      NoticeSnackBar.show(messenger, AppCopy.needScreenLock, long: true);
+      return;
+    }
+    final target = locking
+        ? LockedFolder.into(note.folder)
+        : LockedFolder.outOf(note.folder);
+    final old = await _editor.moveToFolder(target);
+    if (old == null) return;
+    if (locking) {
+      await forgetLocked();
+      leave();
+    }
+    _undo(
+      messenger,
+      locking ? AppCopy.movedToLocked : AppCopy.movedOutOfLocked,
+      () async {
+        await _editor.moveToFolder(old);
+        if (!locking) await forgetLocked();
+        return null;
+      },
     );
   }
 

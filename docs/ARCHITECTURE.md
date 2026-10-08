@@ -35,7 +35,10 @@ lib/
 │   ├── platform/
 │   │   ├── launch_channel.dart    capture entry points and startup timing (Android bridge)
 │   │   ├── attachment_capture.dart camera, gallery, microphone behind one interface (tests use a fake)
-│   │   └── voice_player.dart      plays a voice note
+│   │   ├── voice_player.dart      plays a voice note
+│   │   └── device_lock.dart       the phone's lock (system prompt) for the Locked folder
+│   ├── security/
+│   │   └── locked_session.dart    whether the Locked folder is open (closes 30 s after leaving)
 │   ├── settings/
 │   │   └── app_prefs_controller.dart  the user's Settings choices (AppPrefs), read once at start
 │   ├── navigation/

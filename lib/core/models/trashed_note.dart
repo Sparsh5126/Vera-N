@@ -8,10 +8,14 @@ class TrashedNote {
     required this.title,
     required this.preview,
     required this.trashedAt,
+    this.locked = false,
   });
 
   final int ref;
   final String title;
   final String preview;
   final DateTime trashedAt;
+
+  /// From the Locked folder: shown without its title or text.
+  final bool locked;
 }

@@ -11,6 +11,7 @@ class FilterPill extends StatelessWidget {
     required this.active,
     required this.onTap,
     this.showArrow = true,
+    this.icon,
   });
 
   /// The filter's name when unset, or its value when set.
@@ -20,6 +21,9 @@ class FilterPill extends StatelessWidget {
 
   /// The ▾ that says "opens a list"; off for plain choices.
   final bool showArrow;
+
+  /// A small icon before the label (the Locked folder's lock).
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +56,10 @@ class FilterPill extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  if (icon case final icon?) ...[
+                    Icon(icon, size: AppSize.iconSmall, color: fg),
+                    const SizedBox(width: AppSpace.xs),
+                  ],
                   Text(
                     label,
                     style: context.textStyles.label.copyWith(color: fg),

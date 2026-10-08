@@ -51,6 +51,10 @@ final homeFoldersProvider = StreamProvider.autoDispose<List<String>>(
   (ref) => ref.watch(searchRepositoryProvider).watchFolders(),
 );
 
+final hasLockedNotesProvider = StreamProvider.autoDispose<bool>(
+  (ref) => ref.watch(notesRepositoryProvider).watchHasLocked(),
+);
+
 final homeTagsProvider = StreamProvider.autoDispose<List<String>>(
   (ref) => ref.watch(searchRepositoryProvider).watchTags(),
 );

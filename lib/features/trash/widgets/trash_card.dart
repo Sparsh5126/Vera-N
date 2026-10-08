@@ -39,7 +39,10 @@ class TrashCard extends StatelessWidget {
           children: [
             Text(AppCopy.deletedOn(dateLabel), style: styles.small),
             const SizedBox(height: AppSpace.xs),
-            if (note.title.isNotEmpty)
+            // A locked note shows neither its title nor its text here.
+            if (note.locked)
+              Text(AppCopy.lockedTrashNote, style: styles.cardTitle)
+            else if (note.title.isNotEmpty)
               Text(
                 note.title,
                 style: styles.cardTitle,

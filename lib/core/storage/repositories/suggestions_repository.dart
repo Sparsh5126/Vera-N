@@ -162,6 +162,8 @@ class SuggestionsRepository {
           b.trashedAt.isNull() &
           NoteRows.notArchived(a) &
           NoteRows.notArchived(b) &
+          NoteRows.notLocked(a) &
+          NoteRows.notLocked(b) &
           _db.suggestions.status.equals(snoozed).not() &
           (revisit
               ? _db.suggestions.kind.equals(Suggestion.resurfaceKind)

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../models/archive_folder.dart';
+import '../../models/locked_folder.dart';
 import '../../models/search_filters.dart';
 
 /// The SQL conditions for [SearchFilters] on the `notes n` table, shared
@@ -8,12 +9,19 @@ import '../../models/search_filters.dart';
 ///
 /// Archived notes are left out unless [includeArchived] (Search) or the
 /// folder filter is the archive itself (browsing it under Folders).
+/// Locked notes are left out unless the folder filter is the Locked
+/// folder.
 class NoteFilterSql {
   NoteFilterSql(SearchFilters f, DateTime now, {bool includeArchived = false}) {
     final folder = f.folder;
     if (!includeArchived &&
         !(folder != null && ArchiveFolder.contains(folder))) {
       _add(ArchiveFolder.notArchivedSql, const []);
+    }
+    // Locked notes show only when the Locked folder itself is browsed
+    // (after the phone's lock).
+    if (!(folder != null && LockedFolder.contains(folder))) {
+      _add(LockedFolder.notLockedSql(), const []);
     }
     if (folder != null) {
       // The folder itself or any subfolder; folders compare without case.

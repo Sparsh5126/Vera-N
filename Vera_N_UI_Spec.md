@@ -125,6 +125,7 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 - Built 2026-10-08: the Revisit card shows no count. It opens the **Revisit screen**, laid out like Review (changed 2026-10-08, user): one old note at a time in a centred card under "You might want to revisit this.", showing when it last changed, its title and start, and "Related to your recent note on <title>.". Below, in thumb reach: **Not now** and **Open**. Open (or tapping the card) opens the note and counts as revisited; the next one, if any, takes its place. Up to 5 are waiting at a time. Not now hides it for a month ("Back in a month", with Undo). Empty state: "Nothing to revisit right now."
 
 **View switch:** thin rounded pills **Recent | Folders | Tags**. Recent is the default. Folders and Tags swap the notes area to folder or tag pills and their notes.
+- **Locked pill (built 2026-10-08):** when the Locked folder has notes, the Folders view ends with a **Locked** pill with a lock icon. Tapping it asks for the phone's lock, then shows those notes with a **Lock now** button above them. If the folder closes while picked, the notes give way to the lock, "Notes here open with your phone's lock." and **Unlock**.
 - Built 2026-10-04: Folders shows a pill for every folder (parents included, e.g. `Ideas` and `Ideas/Story`); tapping one shows its notes below, subfolders included, newest first; tapping it again clears the choice. Tags works the same with `#tag` pills. Pinned notes appear in place (with their pin icon), not in a separate row. "No folders yet." / "No tags yet." when there are none. The view and the picked folder or tag are kept while the app runs, so returning from a note keeps the user's place.
 
 **Notes area**
@@ -254,7 +255,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 └─────────────────────────┘
 ```
 
-**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (attach, archive, delete; move to folder moved below the text, as the Folder row, 2026-10-04, backlog #5). A tiny "saved" tick fades in and out; there is no save button (autosave).
+**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (attach, archive, Move to Locked folder / Take out of Locked folder, delete; move to folder moved below the text, as the Folder row, 2026-10-04, backlog #5). A tiny "saved" tick fades in and out; there is no save button (autosave).
 
 **Writing**
 - Title is optional; if empty, the first line becomes the title.
@@ -274,6 +275,11 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
   - **Editing:** the cursor never rests on an attachment's line. Backspace at the start of the next line, or deleting into it, removes the attachment from the note; the file stays in `Attachments/`.
   - **Missing file:** an attachment whose file isn't there (still syncing) reads "This attachment isn't here yet."
   - **Elsewhere:** titles, card previews, search snippets and copies leave attachments out.
+
+- **Locked folder (built 2026-10-08):**
+  - **Locking:** ⋮ → **Move to Locked folder** leaves the note with "Moved to Locked folder" and Undo. A phone with no screen lock gets "Set a screen lock on your phone first, then the Locked folder works." and nothing moves.
+  - **Opening:** a locked note asks for the phone's lock right away. While closed it shows a lock, "This note is in the Locked folder." and **Unlock** in place of the text.
+  - **Taking out:** ⋮ → **Take out of Locked folder** puts the note back in its folder.
 
 **Below the text** (visible only when not typing; empty sections hidden)
 - **Tags (built 2026-10-03):** a note with no tags shows only a small "+ Add tag" button, no heading. "Add tag" opens a sheet with a name field and the user's existing tags listed first (filtered as they type), so tags get reused rather than near-duplicated. Typed tags lose a leading `#` and spaces become `-` (Obsidian tags can't hold spaces). Tapping a solid tag offers "Remove #tag", followed by an Undo snackbar.

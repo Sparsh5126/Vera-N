@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../../models/locked_folder.dart';
 import '../../models/search_filters.dart';
 import '../../models/search_hit.dart';
 import '../db/app_database.dart';
@@ -60,8 +61,8 @@ class SearchRepository {
   Stream<List<String>> watchTags() => _tagRows().watch().map(_tagNames);
 
   Selectable<QueryRow> _folderRows() => _db.customSelect(
-    "SELECT DISTINCT folder FROM notes WHERE folder != '' "
-    'AND trashed_at IS NULL',
+    "SELECT DISTINCT folder FROM notes n WHERE folder != '' "
+    'AND trashed_at IS NULL AND ${LockedFolder.notLockedSql()}',
     readsFrom: {_db.notes},
   );
 
@@ -80,6 +81,7 @@ class SearchRepository {
   Selectable<QueryRow> _tagRows() => _db.customSelect(
     'SELECT DISTINCT t.tag FROM note_tags t '
     'JOIN notes n ON n.id = t.note WHERE n.trashed_at IS NULL '
+    'AND ${LockedFolder.notLockedSql()} '
     'ORDER BY t.tag COLLATE NOCASE',
     readsFrom: {_db.notes, _db.noteTags},
   );

@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../../models/locked_folder.dart';
 import '../../models/linked_note.dart';
 import '../db/app_database.dart';
 import '../files/note_links.dart';
@@ -26,6 +27,9 @@ class LinksRepository {
       'SELECT n.id, n.title, MIN(l.position) AS pos FROM links l '
       'JOIN notes n ON $_matches '
       'WHERE l.source = ? AND n.trashed_at IS NULL AND n.id != ? '
+      // A locked note shows here only to a note that is locked too.
+      'AND (${LockedFolder.notLockedSql()} OR EXISTS (SELECT 1 FROM notes v '
+      'WHERE v.id = l.source AND NOT ${LockedFolder.notLockedSql('v')})) '
       'GROUP BY n.id ORDER BY pos',
       [Variable(ref), Variable(ref)],
     );
@@ -37,6 +41,8 @@ class LinksRepository {
       'SELECT DISTINCT s.id, s.title, s.modified FROM notes n '
       'JOIN links l ON $_matches JOIN notes s ON s.id = l.source '
       'WHERE n.id = ? AND s.trashed_at IS NULL AND s.id != n.id '
+      'AND (${LockedFolder.notLockedSql('s')} '
+      'OR NOT ${LockedFolder.notLockedSql()}) '
       'ORDER BY s.modified DESC',
       [Variable(ref)],
     );

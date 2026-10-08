@@ -7,6 +7,7 @@ import 'package:vera_n/app/app.dart';
 import 'package:vera_n/core/ai/search/meaning_search_provider.dart';
 import 'package:vera_n/core/models/app_prefs.dart';
 import 'package:vera_n/core/platform/attachment_capture.dart';
+import 'package:vera_n/core/platform/device_lock.dart';
 import 'package:vera_n/core/settings/app_prefs_controller.dart';
 import 'package:vera_n/core/storage/db/app_database.dart';
 import 'package:vera_n/core/storage/files/folder_access.dart';
@@ -14,6 +15,7 @@ import 'package:vera_n/core/storage/storage_providers.dart';
 import 'package:vera_n/core/storage/storage_services.dart';
 
 import 'fake_attachment_capture.dart';
+import 'fake_device_lock.dart';
 import 'fake_embedder.dart';
 import 'memory_note_file_store.dart';
 
@@ -36,6 +38,9 @@ class AppHarness {
   /// Camera, gallery and microphone in widget tests.
   final capture = FakeAttachmentCapture();
 
+  /// The phone's lock (Locked folder) in widget tests.
+  final lock = FakeDeviceLock();
+
   Future<void> pump(
     WidgetTester tester, {
     bool startWithOnboarding = false,
@@ -49,6 +54,7 @@ class AppHarness {
           // Meaning search uses the fake model, never the real one.
           embedderFactoryProvider.overrideWithValue(() => embedder),
           attachmentCaptureProvider.overrideWithValue(capture),
+          deviceLockProvider.overrideWithValue(lock),
         ],
         child: App(startWithOnboarding: startWithOnboarding),
       ),

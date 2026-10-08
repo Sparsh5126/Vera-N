@@ -296,6 +296,21 @@ abstract final class AppCopy {
     return '${(bytes / mb).toStringAsFixed(1)} MB';
   }
 
+  // Locked folder (decided 2026-10-08).
+  static const lockedFolder = 'Locked';
+  static const unlockReason = 'Open the Locked folder';
+  static const lockedNoteHint = 'This note is in the Locked folder.';
+  static const lockedFolderHint = "Notes here open with your phone's lock.";
+  static const unlock = 'Unlock';
+  static const lockNow = 'Lock now';
+  static const moveToLocked = 'Move to Locked folder';
+  static const moveOutOfLocked = 'Take out of Locked folder';
+  static const movedToLocked = 'Moved to Locked folder';
+  static const movedOutOfLocked = 'Taken out of Locked folder';
+  static const lockedTrashNote = 'Locked note';
+  static const needScreenLock =
+      'Set a screen lock on your phone first, then the Locked folder works.';
+
   static const exportNotes = 'Export notes';
   static const exportValue = 'Markdown .zip';
   static const exporting = 'Making the .zip…';

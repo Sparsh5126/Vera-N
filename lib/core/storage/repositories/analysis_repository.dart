@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../models/archive_folder.dart';
+import '../../models/locked_folder.dart';
 import '../../models/chunk_vector.dart';
 import '../../models/note_to_analyze.dart';
 import '../../models/rejected_pair.dart';
@@ -23,6 +24,7 @@ class AnalysisRepository {
           'SELECT n.id, n.body, n.content_hash FROM notes n '
           'LEFT JOIN note_analysis a ON a.note = n.id '
           'WHERE n.trashed_at IS NULL AND ${ArchiveFolder.notArchivedSql} '
+          'AND ${LockedFolder.notLockedSql()} '
           'AND (a.note IS NULL '
           'OR a.content_hash != n.content_hash OR a.model != ?) '
           'ORDER BY n.modified LIMIT ?',
@@ -58,7 +60,8 @@ class AnalysisRepository {
         ])..where(
           _db.chunks.model.equals(model) &
               _db.notes.trashedAt.isNull() &
-              NoteRows.notArchived(_db.notes),
+              NoteRows.notArchived(_db.notes) &
+              NoteRows.notLocked(_db.notes),
         );
     final rows = await query.get();
     return [for (final r in rows) _vector(r.readTable(_db.chunks))];
@@ -101,6 +104,29 @@ class AnalysisRepository {
               analyzedAt: now,
             ),
           );
+    });
+  }
+
+  /// Locked notes are never touched by the AI: their passages, vectors,
+  /// analysis record and suggestions are deleted. Runs when a note is
+  /// locked and before every analysis run (a note may reach `Locked/`
+  /// through another app).
+  Future<void> forgetLocked() {
+    final locked =
+        'SELECT n.id FROM notes n WHERE NOT ${LockedFolder.notLockedSql()}';
+    Future<void> delete(String sql, TableInfo table) =>
+        _db.customUpdate(sql, updates: {table}, updateKind: UpdateKind.delete);
+    return _db.transaction(() async {
+      await delete('DELETE FROM chunks WHERE note IN ($locked)', _db.chunks);
+      await delete(
+        'DELETE FROM note_analysis WHERE note IN ($locked)',
+        _db.noteAnalysis,
+      );
+      await delete(
+        'DELETE FROM suggestions WHERE note_a IN ($locked) '
+        'OR note_b IN ($locked)',
+        _db.suggestions,
+      );
     });
   }
 
@@ -157,9 +183,14 @@ class AnalysisRepository {
 
   /// When each live, unarchived note last changed, for Revisit.
   Future<Map<int, DateTime>> modifiedTimes() async {
-    final rows = await (_db.select(
-      _db.notes,
-    )..where((n) => n.trashedAt.isNull() & NoteRows.notArchived(n))).get();
+    final rows =
+        await (_db.select(_db.notes)..where(
+              (n) =>
+                  n.trashedAt.isNull() &
+                  NoteRows.notArchived(n) &
+                  NoteRows.notLocked(n),
+            ))
+            .get();
     return {for (final r in rows) r.id: r.modified};
   }
 
