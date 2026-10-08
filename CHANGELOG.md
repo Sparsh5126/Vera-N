@@ -5,6 +5,20 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Capture outside the app** (UI spec §5): every entry point opens its screen directly, with no new package (plain Android code).
+  - **App-icon shortcuts:** New note (first), Search, and Review connections only while suggestions are waiting. They are published at run time (`CaptureShortcuts.kt`) instead of from `res/xml/shortcuts.xml`, so they point at the installed build's own package (the test build's static shortcut pointed at the wrong one). Dart turns Review on and off as the waiting count changes.
+  - **Quick Settings tile "New note"** (`NewNoteTileService`): closes the shade and opens a blank note; on a locked phone it asks to unlock first.
+  - **Home-screen widgets:** Quick note bar (4x1, "Write a thought…" and an amber plus) and New note button (2x1). One tap opens a blank note; nothing to load or refresh. They follow the system theme through Android resources (`values` / `values-night`), which mirror `app_palette.dart` and `app_layout.dart` because native widgets can't read the Dart styles file.
+  - **Settings → Quick capture** (APP section, Android only): Add quick note bar, Add New note button, Add Quick Settings tile, using Android's own add prompts. Where a prompt isn't available (older Android or launcher), a short line says how to add it by hand. Nothing is added automatically.
+  - Entry points now share one route mapping (`CaptureIntents.kt`): new note, search, review. A running app switches tabs or opens the screen on top.
+  - Floating messages on tab screens (Undo, notices) now share one margin token, `AppSpace.aboveNavBar`.
+  - **Checked on the phone** (Android 15, test build):
+    - New note and Search shortcuts are published (Review hidden with nothing waiting).
+    - Settings → Quick capture shows Android's own prompts for the tile and both widgets, with correct previews.
+    - The tile opens a blank note with the keyboard up: Android reports it drawn 1.16 s after the tap from a cold start.
+    - The quick note bar opens a blank note with the keyboard up, **839 ms from tap to typing cursor** with the app not running (Android: drawn at 989 ms). Meets the ~1 s target.
+  - **Fixed on the phone:** a widget added just before the app was force-stopped stayed a blank placeholder, because Android drops a stopped app's widget updates. The app now redraws its widgets every time it starts. (A force stop also cancels the app's tap actions until it runs again; that is Android behaviour for every app's widgets.)
+  - **Measurement caveat:** the "ms to typing cursor" log counts from when the app's process started. Opening the Quick Settings panel starts the process early (to show the tile), so that log read 17 s for the tile; Android's own "Displayed" time (1.16 s) is the right number there. The same effect may explain the 15 s first launch in BACKLOG.
 - **Onboarding** (UI spec §4): the full first-launch flow, on every platform (was: the folder question only, on Android).
   - All five screens are one swipeable set of pages with dots, in one route (`/welcome`); at the user's request the folder and name are pages of it, not separate screens.
   - Pages 1–3 ("Notes that stay yours.", "Just write.", "The thinking happens on your phone.") have Next; Skip at the top goes straight to the folder page. Moving between pages uses the standard motion, or jumps with reduce motion on.

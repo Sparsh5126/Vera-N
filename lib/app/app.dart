@@ -5,14 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/ai/scheduler/analysis_scheduler.dart';
+import '../core/ai/suggestions/suggestion_providers.dart';
 import '../core/copy/app_copy.dart';
 import '../core/models/app_prefs.dart';
-import '../core/navigation/routes.dart';
 import '../core/platform/frame_stats.dart';
 import '../core/platform/launch_channel.dart';
 import '../core/settings/app_prefs_controller.dart';
 import '../core/storage/storage_providers.dart';
 import '../core/styles/app_styles.dart';
+import 'app_shell.dart';
 import 'router.dart';
 
 /// Root widget. Theme and start page come from Settings.
@@ -55,10 +56,7 @@ class _AppState extends ConsumerState<App> {
       },
       onResume: storage.onResume,
     );
-    LaunchChannel.listen(
-      onNewNote: () => _router.push(Routes.newNote),
-      onWindowFocused: _showKeyboardIfTyping,
-    );
+    LaunchChannel.listen(onOpen: _open, onWindowFocused: _showKeyboardIfTyping);
   }
 
   /// On a cold start into a new note the editor is focused before Android
@@ -67,6 +65,16 @@ class _AppState extends ConsumerState<App> {
     final editor = FocusManager.instance.primaryFocus?.context
         ?.findAncestorStateOfType<EditableTextState>();
     editor?.requestKeyboard();
+  }
+
+  /// An entry point while running: tabs are switched to, other screens
+  /// (a new note, Review) open on top.
+  void _open(String route) {
+    if (AppShell.tabs.contains(route)) {
+      _router.go(route);
+    } else {
+      unawaited(_router.push(route));
+    }
   }
 
   @override
@@ -78,6 +86,11 @@ class _AppState extends ConsumerState<App> {
 
   @override
   Widget build(BuildContext context) {
+    // "Review connections" on the app icon only while suggestions wait.
+    ref.listen(pendingSuggestionsProvider, (_, next) {
+      final waiting = (next.value ?? 0) > 0;
+      unawaited(LaunchChannel.setReviewShortcut(waiting: waiting));
+    });
     return MaterialApp.router(
       title: AppCopy.appName,
       debugShowCheckedModeBanner: false,

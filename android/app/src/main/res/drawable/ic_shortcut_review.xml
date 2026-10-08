@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shortcut icon: two amber dots joined by a line, on a dark circle. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="#1A1A1C"
+        android:pathData="M24,0a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
+    <path
+        android:strokeColor="#F2B84B"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M17,30L31,18" />
+    <path
+        android:fillColor="#F2B84B"
+        android:pathData="M17,26a4,4 0,1 1,0 8a4,4 0,1 1,0 -8zM31,14a4,4 0,1 1,0 8a4,4 0,1 1,0 -8z" />
+</vector>

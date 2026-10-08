@@ -10,9 +10,11 @@ import '../../../shared/widgets/setting_choice.dart';
 import '../../../shared/widgets/setting_row.dart';
 import '../../../shared/widgets/text_entry_sheet.dart';
 import '../state/settings_controller.dart';
+import 'quick_capture_row.dart';
 import 'settings_group.dart';
 
-/// YOU and APP: name, layout, where the app opens, and theme.
+/// YOU and APP: name, layout, where the app opens, theme, and quick
+/// capture (widgets and tile).
 class AppSection extends ConsumerWidget {
   const AppSection({super.key});
 
@@ -65,6 +67,7 @@ class AppSection extends ConsumerWidget {
               selected: prefs.theme,
               onChanged: (v) => settings.change((p) => p.copyWith(theme: v)),
             ),
+            const QuickCaptureRow(),
           ],
         ),
       ],

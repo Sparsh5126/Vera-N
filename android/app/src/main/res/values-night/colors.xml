@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Mirrors the dark app background in lib/core/styles/app_palette.dart. -->
+    <!-- Native mirrors of lib/core/styles/app_palette.dart (dark). -->
     <color name="launch_background">#0B0B0C</color>
+    <color name="widget_card">#1A1A1C</color>
+    <color name="widget_border">#2A2A2E</color>
+    <color name="widget_text">#F2F2F0</color>
+    <color name="widget_text_secondary">#9A9A9F</color>
+    <color name="widget_accent">#F2B84B</color>
 </resources>

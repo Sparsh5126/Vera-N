@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Native mirrors of lib/core/styles/app_layout.dart and text styles,
+         for the home-screen widgets. -->
+    <dimen name="widget_radius">24dp</dimen>
+    <dimen name="widget_padding">16dp</dimen>
+    <dimen name="widget_gap">8dp</dimen>
+    <dimen name="widget_border">1dp</dimen>
+    <dimen name="widget_icon">24dp</dimen>
+    <dimen name="widget_icon_large">32dp</dimen>
+    <dimen name="widget_text">16sp</dimen>
+</resources>

@@ -15,6 +15,14 @@ abstract final class AppSpace {
   /// Inner padding of cards.
   static const EdgeInsets card = EdgeInsets.all(m);
 
+  /// Margin of a floating message on tab screens, so the floating nav bar
+  /// never covers it.
+  static const EdgeInsets aboveNavBar = EdgeInsets.only(
+    left: m,
+    right: m,
+    bottom: AppSize.navBarClearance,
+  );
+
   /// Horizontal padding inside pills and buttons.
   static const EdgeInsets pill = EdgeInsets.symmetric(horizontal: l);
 }

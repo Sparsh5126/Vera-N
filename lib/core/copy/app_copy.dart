@@ -197,7 +197,13 @@ abstract final class AppCopy {
   static const quickCapture = 'Quick capture';
   static const quickCaptureValue = 'Widget and tile';
   static const addWidget = 'Add widget';
+  static const addQuickNoteBar = 'Add quick note bar';
+  static const addNewNoteButton = 'Add New note button';
   static const addQuickSettingsTile = 'Add Quick Settings tile';
+  static const addWidgetByHand =
+      'Long-press your home screen, choose Widgets, and find Vera N.';
+  static const addTileByHand =
+      'Open Quick Settings, choose Edit, and drag New note in.';
   static const notesFolder = 'Notes folder';
   static const notesFolderNone = 'On this phone only';
   static const notesFolderNoneHint =

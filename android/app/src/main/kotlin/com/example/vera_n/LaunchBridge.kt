@@ -1,26 +1,30 @@
 package com.example.vera_n
 
+import android.app.Activity
+import android.app.StatusBarManager
+import android.content.ComponentName
 import android.content.Intent
+import android.graphics.drawable.Icon
+import android.os.Build
 import android.os.Process
 import android.os.SystemClock
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 /**
- * The `vera_n/launch` channel: capture entry points (app shortcut now;
- * widget and Quick Settings tile later), startup timing, and the app
- * version for Settings.
+ * The `vera_n/launch` channel: capture and shortcut entry points (app
+ * shortcuts, widgets, Quick Settings tile), the add prompts for widgets and
+ * the tile, startup timing, and the app version for Settings.
  */
 class LaunchBridge(
+    private val activity: Activity,
     private val channel: MethodChannel,
-    private val versionName: () -> String?,
 ) : MethodChannel.MethodCallHandler {
     companion object {
         const val CHANNEL = "vera_n/launch"
-        const val ACTION_NEW_NOTE = "com.example.vera_n.NEW_NOTE"
-        const val NEW_NOTE_ROUTE = "/note/new"
 
-        fun isNewNote(intent: Intent?): Boolean = intent?.action == ACTION_NEW_NOTE
+        /** The Flutter route an entry point opens, or null for a normal start. */
+        fun routeFor(intent: Intent?): String? = CaptureIntents.routes[intent?.action]
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -28,9 +32,36 @@ class LaunchBridge(
             // Milliseconds since this process started, for the startup log.
             "sinceProcessStart" ->
                 result.success(SystemClock.uptimeMillis() - Process.getStartUptimeMillis())
-            "versionName" -> result.success(versionName())
+            "versionName" -> result.success(
+                activity.packageManager.getPackageInfo(activity.packageName, 0).versionName,
+            )
+            "setReviewShortcut" -> {
+                CaptureShortcuts.publish(activity, call.arguments as Boolean)
+                result.success(null)
+            }
+            "addWidget" -> result.success(
+                CaptureWidget.requestPin(
+                    activity,
+                    if (call.arguments == "bar") QuickNoteWidget::class.java
+                    else NewNoteWidget::class.java,
+                ),
+            )
+            "addTile" -> result.success(requestTile())
             else -> result.notImplemented()
         }
+    }
+
+    /** Android 13+ can ask to add the tile; older versions can't. */
+    private fun requestTile(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return false
+        val bar = activity.getSystemService(StatusBarManager::class.java) ?: return false
+        bar.requestAddTileService(
+            ComponentName(activity, NewNoteTileService::class.java),
+            activity.getString(R.string.tile_new_note),
+            Icon.createWithResource(activity, R.drawable.ic_tile_new_note),
+            activity.mainExecutor,
+        ) {}
+        return true
     }
 
     private var windowFocusedOnce = false
@@ -46,8 +77,8 @@ class LaunchBridge(
         channel.invokeMethod("windowFocused", null)
     }
 
-    /** A capture entry point was used while the app was already running. */
+    /** An entry point was used while the app was already running. */
     fun onNewIntent(intent: Intent) {
-        if (isNewNote(intent)) channel.invokeMethod("newNote", null)
+        routeFor(intent)?.let { channel.invokeMethod("open", it) }
     }
 }

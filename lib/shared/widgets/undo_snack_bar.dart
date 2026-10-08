@@ -23,13 +23,7 @@ abstract final class UndoSnackBar {
           persist: false,
           // Tab screens without a floating button would otherwise show it
           // under the floating nav bar.
-          margin: aboveNavBar
-              ? const EdgeInsets.only(
-                  left: AppSpace.m,
-                  right: AppSpace.m,
-                  bottom: AppSize.navBarClearance,
-                )
-              : null,
+          margin: aboveNavBar ? AppSpace.aboveNavBar : null,
           action: SnackBarAction(label: AppCopy.undo, onPressed: onUndo),
         ),
       );

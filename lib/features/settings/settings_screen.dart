@@ -8,7 +8,7 @@ import 'widgets/folder_section.dart';
 import 'widgets/suggestions_section.dart';
 
 /// Settings: one scrollable page (UI spec §11). Rows for features not built
-/// yet (quick capture, sync status, laptop, trash, export) join later.
+/// yet (sync status, laptop, trash, export) join later.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 

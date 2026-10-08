@@ -156,6 +156,8 @@ Purpose: the fastest possible route to a blank note. All entry points open a new
 
 *Speed target:* from tapping a widget, tile, or shortcut to a typing cursor in about one second. If a cold Flutter start is too slow, add a minimal capture entry point that loads only the editor. Notes created this way are saved immediately and analyzed later, as usual.
 
+- **Built 2026-10-08:** the two widgets (Quick note bar, New note button), the Quick Settings tile, and the three app shortcuts (Review connections only while suggestions wait). Quick capture in Settings lists "Add quick note bar", "Add New note button" and "Add Quick Settings tile"; where Android can't show its add prompt, a short line explains how to add it by hand. Recent notes widget not built (later version).
+
 **Settings option:** "Open app to" → Home (default) or New note.
 
 ---

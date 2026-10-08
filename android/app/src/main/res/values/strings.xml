@@ -2,4 +2,11 @@
 <resources>
     <!-- Native labels; keep in step with lib/core/copy/app_copy.dart. -->
     <string name="shortcut_new_note">New note</string>
+    <string name="shortcut_search">Search</string>
+    <string name="shortcut_review">Review connections</string>
+    <string name="tile_new_note">New note</string>
+    <string name="widget_quick_note_hint">Write a thought…</string>
+    <string name="widget_new_note">New note</string>
+    <string name="widget_quick_note_name">Quick note bar</string>
+    <string name="widget_new_note_name">New note button</string>
 </resources>

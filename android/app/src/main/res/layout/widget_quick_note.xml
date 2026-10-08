@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quick note bar (4x1): a pill reading "Write a thought…" and a plus. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:contentDescription="@string/widget_new_note"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/widget_padding"
+    android:paddingEnd="@dimen/widget_padding">
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:maxLines="1"
+        android:text="@string/widget_quick_note_hint"
+        android:textColor="@color/widget_text_secondary"
+        android:textSize="@dimen/widget_text" />
+    <ImageView
+        android:layout_width="@dimen/widget_icon"
+        android:layout_height="@dimen/widget_icon"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_widget_plus" />
+</LinearLayout>

@@ -17,6 +17,13 @@ void main() {
     (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
   );
 
+  /// Scrolls to the end, where the page leaves room above the nav bar, so
+  /// the rows tapped are never under it.
+  Future<void> toBottom(WidgetTester tester) async {
+    await tester.fling(page.first, const Offset(0, -3000), 3000);
+    await tester.pumpAndSettle();
+  }
+
   Future<void> openSettings(
     WidgetTester tester, {
     AppPrefs prefs = const AppPrefs(),
@@ -97,19 +104,10 @@ void main() {
       ),
     );
     await openSettings(tester);
-    // Scroll to the last row, so the rows tapped aren't under the nav bar.
-    await tester.scrollUntilVisible(
-      find.text(AppCopy.licenses),
-      200,
-      scrollable: page,
-    );
+    await toBottom(tester);
     await tester.tap(find.text(AppCopy.showAdvanced));
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.text(AppCopy.licenses),
-      200,
-      scrollable: page,
-    );
+    await toBottom(tester);
     await tester.tap(find.text(AppCopy.resetRejected));
     await tester.pumpAndSettle();
     expect(await app.storage.rejections.all(), isEmpty);

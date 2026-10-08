@@ -24,16 +24,44 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- Capture entry: opens a blank note with the keyboard up. Used by
-                 the app-icon shortcut now; widgets and the tile later. -->
+            <!-- Capture and shortcut entry points (app shortcuts, widgets, tile)
+                 name this activity directly with an action; see
+                 CaptureIntents.kt. No intent filter is needed for them. -->
+        </activity>
+        <!-- Home-screen widgets (UI spec §5): each opens a blank note. -->
+        <receiver
+            android:name=".QuickNoteWidget"
+            android:exported="false"
+            android:label="@string/widget_quick_note_name">
             <intent-filter>
-                <action android:name="com.example.vera_n.NEW_NOTE"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
-        </activity>
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_note_info" />
+        </receiver>
+        <receiver
+            android:name=".NewNoteWidget"
+            android:exported="false"
+            android:label="@string/widget_new_note_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_new_note_info" />
+        </receiver>
+        <!-- Quick Settings tile "New note". -->
+        <service
+            android:name=".NewNoteTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_new_note"
+            android:label="@string/tile_new_note"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
