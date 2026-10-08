@@ -9,6 +9,7 @@ import '../../../core/settings/app_prefs_controller.dart';
 import '../../../shared/widgets/setting_row.dart';
 import '../../../shared/widgets/undo_snack_bar.dart';
 import '../state/settings_controller.dart';
+import 'reminder_settings.dart';
 import 'settings_group.dart';
 
 /// SMART SUGGESTIONS, the only place AI appears (UI spec §11): one switch
@@ -48,6 +49,7 @@ class _SuggestionsSectionState extends ConsumerState<SuggestionsSection> {
                     )
                   : null,
             ),
+            const ReminderSettings(),
           ],
         ),
         SettingsGroup(

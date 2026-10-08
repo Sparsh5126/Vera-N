@@ -8,6 +8,7 @@ import 'package:vera_n/core/ai/search/meaning_search_provider.dart';
 import 'package:vera_n/core/models/app_prefs.dart';
 import 'package:vera_n/core/platform/attachment_capture.dart';
 import 'package:vera_n/core/platform/device_lock.dart';
+import 'package:vera_n/core/platform/reminder_notifications.dart';
 import 'package:vera_n/core/settings/app_prefs_controller.dart';
 import 'package:vera_n/core/storage/db/app_database.dart';
 import 'package:vera_n/core/storage/files/folder_access.dart';
@@ -17,6 +18,7 @@ import 'package:vera_n/core/storage/storage_services.dart';
 import 'fake_attachment_capture.dart';
 import 'fake_device_lock.dart';
 import 'fake_embedder.dart';
+import 'fake_reminder_notifications.dart';
 import 'memory_note_file_store.dart';
 
 /// The whole app on an in-memory database and fake files, for widget tests.
@@ -41,6 +43,9 @@ class AppHarness {
   /// The phone's lock (Locked folder) in widget tests.
   final lock = FakeDeviceLock();
 
+  /// Reminders' notifications in widget tests.
+  final notifications = FakeReminderNotifications();
+
   Future<void> pump(
     WidgetTester tester, {
     bool startWithOnboarding = false,
@@ -55,6 +60,7 @@ class AppHarness {
           embedderFactoryProvider.overrideWithValue(() => embedder),
           attachmentCaptureProvider.overrideWithValue(capture),
           deviceLockProvider.overrideWithValue(lock),
+          reminderNotificationsProvider.overrideWithValue(notifications),
         ],
         child: App(startWithOnboarding: startWithOnboarding),
       ),

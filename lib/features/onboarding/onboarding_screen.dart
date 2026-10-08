@@ -13,9 +13,10 @@ import 'widgets/onboarding_actions.dart';
 import 'widgets/onboarding_page.dart';
 
 /// Onboarding (UI spec §4) as one set of pages with dots: private by
-/// design, what it does, how it works, the notes folder (where one can be
-/// picked), and the name. Swipe or use the buttons; Skip on the first
-/// three goes straight to the folder.
+/// design, what it does, how it works, reminders, the notes folder (where
+/// one can be picked), and the name. Every page carries the privacy line.
+/// Swipe or use the buttons; Skip on the intro pages goes straight to the
+/// folder.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -32,6 +33,10 @@ class OnboardingScreen extends ConsumerStatefulWidget {
     OnboardingPage(
       title: AppCopy.onboardingHowTitle,
       body: AppCopy.onboardingHowBody,
+    ),
+    OnboardingPage(
+      title: AppCopy.onboardingRemindTitle,
+      body: AppCopy.onboardingRemindBody,
     ),
   ];
 
@@ -183,6 +188,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Widget _namePageContent() => OnboardingPage(
     title: AppCopy.onboardingNameTitle,
+    body: AppCopy.onboardingNameBody,
     child: TextField(
       controller: _name,
       focusNode: _nameFocus,

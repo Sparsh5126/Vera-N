@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/styles/app_styles.dart';
+import 'privacy_line.dart';
 
 /// One onboarding page: an optional wordmark, a title, a short paragraph,
-/// and optionally a control below (the name field).
+/// optionally a control below (the name field), and on every page the
+/// same privacy line, so it is never in doubt (decided 2026-10-08).
 class OnboardingPage extends StatelessWidget {
   const OnboardingPage({
     super.key,
@@ -46,6 +48,8 @@ class OnboardingPage extends StatelessWidget {
             ),
           ],
           if (child != null) ...[const SizedBox(height: AppSpace.l), child],
+          const SizedBox(height: AppSpace.xl),
+          const PrivacyLine(),
         ],
       ),
     );

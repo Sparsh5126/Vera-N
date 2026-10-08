@@ -2,12 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools">
     <!-- Voice notes only; asked for the first time the user records. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Reminders a note asks for ("remind me ..."): asked for the first
+         time a note has one. Exact alarms only if the user allows them in
+         Settings; otherwise a reminder may come a few minutes late. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <!-- Added by WorkManager but not needed (minimum permissions, CLAUDE.md
-         §9): the app sends no notifications, and from Android 7 on the
-         system's job scheduler holds the wake lock for background work. -->
-    <uses-permission
-        android:name="android.permission.POST_NOTIFICATIONS"
-        tools:node="remove" />
+         §9): from Android 7 on the system's job scheduler holds the wake
+         lock for background work. -->
     <uses-permission
         android:name="android.permission.WAKE_LOCK"
         tools:node="remove" />
@@ -79,6 +81,20 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Reminders: shows scheduled ones, and sets them again after a
+             restart or an update. -->
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

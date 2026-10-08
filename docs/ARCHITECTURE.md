@@ -36,7 +36,9 @@ lib/
 │   │   ├── launch_channel.dart    capture entry points and startup timing (Android bridge)
 │   │   ├── attachment_capture.dart camera, gallery, microphone behind one interface (tests use a fake)
 │   │   ├── voice_player.dart      plays a voice note
-│   │   └── device_lock.dart       the phone's lock (system prompt) for the Locked folder
+│   │   ├── device_lock.dart       the phone's lock (system prompt) for the Locked folder
+│   │   └── reminder_notifications.dart  the phone's notifications, for reminders only (tests use a fake)
+│   ├── reminders/                 "remind me" parsing (date, time, span) and keeping scheduled reminders matched to notes
 │   ├── security/
 │   │   └── locked_session.dart    whether the Locked folder is open (closes 30 s after leaving)
 │   ├── settings/

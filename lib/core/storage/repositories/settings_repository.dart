@@ -17,6 +17,7 @@ class SettingsRepository {
   static const _reviewHintSeen = 'reviewHintSeen';
   static const _learning = 'learning.';
   static const _unusedSince = 'attachments.unusedSince';
+  static const _notificationsAsked = 'reminders.notificationsAsked';
 
   /// Recent searches kept, newest first.
   static const recentSearchLimit = 8;
@@ -109,6 +110,7 @@ class SettingsRepository {
       chargingOnly: (v[_Prefs.chargingOnly] ?? '${d.chargingOnly}') == 'true',
       cleanAttachments:
           (v[_Prefs.cleanAttachments] ?? '${d.cleanAttachments}') == 'true',
+      reminders: (v[_Prefs.reminders] ?? '${d.reminders}') == 'true',
     );
   }
 
@@ -121,7 +123,14 @@ class SettingsRepository {
     await _set(_Prefs.suggestions, '${p.suggestions}');
     await _set(_Prefs.chargingOnly, '${p.chargingOnly}');
     await _set(_Prefs.cleanAttachments, '${p.cleanAttachments}');
+    await _set(_Prefs.reminders, '${p.reminders}');
   }
+
+  /// Whether the notification prompt was shown once already (reminders).
+  Future<bool> notificationsAsked() async =>
+      await _get(_notificationsAsked) == 'true';
+
+  Future<void> setNotificationsAsked() => _set(_notificationsAsked, 'true');
 
   /// When each attachment was first seen unused, by name, for the
   /// automatic clean-up (30 days unused).
@@ -173,7 +182,9 @@ abstract final class _Prefs {
   static const suggestions = 'suggestions';
   static const chargingOnly = 'chargingOnly';
   static const cleanAttachments = 'cleanAttachments';
+  static const reminders = 'reminders';
   static const keys = [
+    reminders,
     cleanAttachments,
     name,
     layout,

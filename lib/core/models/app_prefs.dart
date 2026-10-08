@@ -20,6 +20,7 @@ class AppPrefs {
     this.suggestions = true,
     this.chargingOnly = true,
     this.cleanAttachments = false,
+    this.reminders = true,
   });
 
   /// For the greeting; null when skipped.
@@ -40,6 +41,10 @@ class AppPrefs {
   /// user's (decided 2026-10-08).
   final bool cleanAttachments;
 
+  /// "Reminders from notes": a note line saying "remind me" with a future
+  /// date and time sets a reminder. Off cancels them all.
+  final bool reminders;
+
   AppPrefs copyWith({
     ValueGetter<String?>? name,
     NotesLayout? layout,
@@ -48,6 +53,7 @@ class AppPrefs {
     bool? suggestions,
     bool? chargingOnly,
     bool? cleanAttachments,
+    bool? reminders,
   }) {
     return AppPrefs(
       name: name == null ? this.name : name(),
@@ -57,6 +63,7 @@ class AppPrefs {
       suggestions: suggestions ?? this.suggestions,
       chargingOnly: chargingOnly ?? this.chargingOnly,
       cleanAttachments: cleanAttachments ?? this.cleanAttachments,
+      reminders: reminders ?? this.reminders,
     );
   }
 }

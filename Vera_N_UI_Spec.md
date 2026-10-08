@@ -86,6 +86,12 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 
 ---
 
+- **Built 2026-10-08 (user's request):**
+  - **Every page** ends with the same line, with a lock: "Private · Open source · On this phone · No account · No cloud".
+  - **A fourth intro page**, "Reminders, only when you ask.", explains that writing "remind me tomorrow at 9 am" in a note sets a reminder: only notes that ask, only for a time ahead, nothing else sends a notification, it all stays on the phone, and it can be turned off in Settings.
+  - **The other pages** also say on-device, no login and open source in their own words.
+  - **The name page** says the name stays on the phone.
+
 ## 5. Home
 
 ```text
@@ -273,6 +279,9 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
   - **Voice:** recording starts in a sheet with the time counting up, ended by Save or Cancel. The microphone is asked for the first time only; if refused, the sheet says "Voice notes need the microphone. You can allow it in Settings."
   - **Drawing:** a full screen with one ink, Undo last line, Clear and Save.
   - **Editing:** the cursor never rests on an attachment's line. Backspace at the start of the next line, or deleting into it, removes the attachment from the note; the file stays in `Attachments/`.
+- **Reminders (built 2026-10-08):**
+  - **Below the text** (never while typing), a "Reminders" section lists each "remind me" line: "Reminder: Tomorrow, 9:00 am", "Add a time, like 'at 9 am'", or "This time has passed". When notifications are off for the app, it adds "Notifications are off for this app", re-checked whenever the app comes back.
+  - **Settings, Smart Suggestions:** a "Reminders from notes" switch, and while it is on and exact timing isn't allowed, "On-time reminders · Allow", which opens Android's page.
   - **Cursor:** after a photo or drawing is added at the end, or a tap below a note that ends with one, the cursor lands on a fresh line right under it.
   - **Missing file:** an attachment whose file isn't there (still syncing) reads "This attachment isn't here yet."
   - **Elsewhere:** titles, card previews, search snippets and copies leave attachments out.

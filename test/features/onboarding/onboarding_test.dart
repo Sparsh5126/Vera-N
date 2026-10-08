@@ -22,15 +22,21 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('three intro screens, then the folder question', (tester) async {
+  testWidgets('four intro screens, then the folder question; every page '
+      'says it is private', (tester) async {
     await start(tester);
-    expect(find.text(AppCopy.onboardingPrivateTitle), findsOneWidget);
-    await tapText(tester, AppCopy.next);
-    expect(find.text(AppCopy.onboardingWhatTitle), findsOneWidget);
-    await tapText(tester, AppCopy.next);
-    expect(find.text(AppCopy.onboardingHowTitle), findsOneWidget);
-    await tapText(tester, AppCopy.next);
+    for (final title in [
+      AppCopy.onboardingPrivateTitle,
+      AppCopy.onboardingWhatTitle,
+      AppCopy.onboardingHowTitle,
+      AppCopy.onboardingRemindTitle,
+    ]) {
+      expect(find.text(title), findsOneWidget);
+      expect(find.text(AppCopy.privacyLine), findsWidgets);
+      await tapText(tester, AppCopy.next);
+    }
     expect(find.text(AppCopy.onboardingFolderTitle), findsOneWidget);
+    expect(find.text(AppCopy.privacyLine), findsWidgets);
     expect(await app.storage.settings.onboardingDone(), isFalse);
     await app.finish(tester);
   });
@@ -79,7 +85,7 @@ void main() {
     tester,
   ) async {
     await start(tester);
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 5; i++) {
       await tester.fling(find.byType(PageView), const Offset(-400, 0), 1000);
       await tester.pumpAndSettle();
     }

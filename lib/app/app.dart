@@ -9,7 +9,10 @@ import '../core/ai/suggestions/suggestion_providers.dart';
 import '../core/copy/app_copy.dart';
 import '../core/models/app_prefs.dart';
 import '../core/platform/frame_stats.dart';
+import '../core/navigation/routes.dart';
 import '../core/platform/launch_channel.dart';
+import '../core/platform/reminder_notifications.dart';
+import '../core/reminders/reminder_providers.dart';
 import '../core/settings/app_prefs_controller.dart';
 import '../core/storage/storage_providers.dart';
 import '../core/styles/app_styles.dart';
@@ -54,9 +57,25 @@ class _AppState extends ConsumerState<App> {
           );
         }
       },
-      onResume: storage.onResume,
+      onResume: () {
+        storage.onResume();
+        // Notifications may have been allowed meanwhile (prompt, settings).
+        ref.read(notificationsRecheckProvider.notifier).recheck();
+      },
     );
     LaunchChannel.listen(onOpen: _open, onWindowFocused: _showKeyboardIfTyping);
+    unawaited(_startReminders());
+  }
+
+  /// Reminders a note asked for: tapping one opens its note. The notes are
+  /// followed while "Reminders from notes" is on (see build).
+  Future<void> _startReminders() async {
+    await ref
+        .read(reminderNotificationsProvider)
+        .init((note) => unawaited(_router.push(Routes.note(note))));
+    if (mounted && ref.read(appPrefsProvider).reminders) {
+      ref.read(reminderSyncProvider).start();
+    }
   }
 
   /// On a cold start into a new note the editor is focused before Android
@@ -90,6 +109,10 @@ class _AppState extends ConsumerState<App> {
     ref.listen(pendingSuggestionsProvider, (_, next) {
       final waiting = (next.value ?? 0) > 0;
       unawaited(LaunchChannel.setReviewShortcut(waiting: waiting));
+    });
+    ref.listen(appPrefsProvider.select((p) => p.reminders), (_, on) {
+      final sync = ref.read(reminderSyncProvider);
+      on ? sync.start() : unawaited(sync.stop());
     });
     return MaterialApp.router(
       title: AppCopy.appName,

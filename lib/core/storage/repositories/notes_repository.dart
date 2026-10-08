@@ -21,6 +21,15 @@ import 'note_placement.dart';
 /// Create, read, update, tag, pin, move and trash notes.
 ///
 /// Every change lands in the database at once (the UI never waits on
+/// A note that may hold reminders: its id, text, folder, and when it last
+/// changed ("tomorrow" counts from then).
+typedef ReminderSource = ({
+  int ref,
+  String body,
+  String folder,
+  DateTime written,
+});
+
 /// files); [NoteWriter] writes the file shortly after.
 class NotesRepository {
   NotesRepository(
@@ -88,6 +97,28 @@ class NotesRepository {
       )
       ..orderBy([(n) => OrderingTerm.desc(n.modified)]);
     return (await query.get()).map(NoteRows.toSummary).toList();
+  }
+
+  /// Notes (not in the trash) whose text says "remind me", for reminders.
+  Stream<List<ReminderSource>> watchReminderSources() {
+    return _db
+        .customSelect(
+          'SELECT id, body, folder, modified FROM notes '
+          "WHERE trashed_at IS NULL AND lower(body) LIKE '%remind me%'",
+          readsFrom: {_db.notes},
+        )
+        .watch()
+        .map(
+          (rows) => [
+            for (final r in rows)
+              (
+                ref: r.read<int>('id'),
+                body: r.read<String>('body'),
+                folder: r.read<String>('folder'),
+                written: r.read<DateTime>('modified'),
+              ),
+          ],
+        );
   }
 
   /// Whether any note (not in the trash) is in the Locked folder, so Home

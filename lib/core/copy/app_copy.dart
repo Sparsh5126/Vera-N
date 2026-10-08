@@ -9,22 +9,36 @@ abstract final class AppCopy {
   // Onboarding (UI spec §4). Every claim must be true at launch.
   static const onboardingPrivateTitle = 'Notes that stay yours.';
   static const onboardingPrivateBody =
-      'Built for privacy. Your notes live on your phone. '
-      'No account, no cloud, no one else reading them.';
+      'Built for privacy. Your notes live on your phone. No account, no '
+      'login, no cloud, no one else reading them. The code is open source, '
+      'so anyone can check.';
   static const onboardingWhatTitle = 'Just write.';
   static const onboardingWhatBody =
       'Vera N quietly notices when your notes connect and suggests links and '
-      'tags. Nothing changes unless you say yes.';
+      'tags, right here on your phone. Nothing changes unless you say yes.';
   static const onboardingHowTitle = 'The thinking happens on your phone.';
   static const onboardingHowBody =
-      'If you have a laptop, it can help with deeper analysis over your own '
+      'Suggestions are worked out on this phone, never sent anywhere. If you '
+      'have a laptop, it can help with deeper analysis over your own '
       'devices. We have no servers that see your notes.';
+  static const onboardingRemindTitle = 'Reminders, only when you ask.';
+  static const onboardingRemindBody =
+      'Write "remind me tomorrow at 9 am" in any note and your phone reminds '
+      'you then. Only notes that ask, only for a time ahead, and nothing '
+      'else ever sends a notification. It all stays on this phone, and you '
+      'can turn it off in Settings.';
+  static const onboardingNameBody =
+      'Only for the greeting. It stays on this phone.';
+
+  /// On every onboarding page.
+  static const privacyLine =
+      'Private · Open source · On this phone · No account · No cloud';
   static const onboardingFolderTitle = 'Choose where your notes live.';
   static const onboardingFolderBody =
       'Pick a folder on your phone, or make a new one such as "Vera N" in '
       'Documents. Your notes are saved there '
       'as plain files you can open in other apps, and they stay even if you '
-      'remove Vera N.';
+      'remove Vera N. Nothing is uploaded.';
   static const chooseFolder = 'Choose folder';
   static const notNow = 'Not now';
   static const folderError = "Couldn't use that folder. Try another one.";
@@ -77,6 +91,16 @@ abstract final class AppCopy {
   static const emptyHome = 'Write your first thought.';
   static const loadError = "Couldn't open your notes.";
   static const today = 'Today';
+  static const tomorrow = 'Tomorrow';
+  static const weekdaysShort = [
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun',
+  ];
   static const monthsShort = [
     'Jan',
     'Feb',
@@ -295,6 +319,24 @@ abstract final class AppCopy {
     if (bytes < mb) return '${(bytes / 1024).ceil()} KB';
     return '${(bytes / mb).toStringAsFixed(1)} MB';
   }
+
+  // Reminders (decided 2026-10-08).
+  static const reminderTitle = 'Reminder';
+  static const remindersChannel = 'Reminders';
+  static const lockedReminder = 'A note in your Locked folder';
+  static const remindersSetting = 'Reminders from notes';
+  static const remindersSettingHint =
+      'When a note says “remind me” with a date and time';
+  static const onTimeReminders = 'On-time reminders';
+  static const onTimeAllowed = 'Allowed';
+  static const onTimeAllow = 'Allow';
+  static const onTimeHint =
+      'Without this, a reminder may come a few minutes late';
+  static const reminderNeedsTime = 'Add a time, like “at 9 am”';
+  static const reminderPast = 'This time has passed';
+  static const notificationsOff = 'Notifications are off for this app';
+  static const remindersHeading = 'Reminders';
+  static String reminderOn(String when) => 'Reminder: $when';
 
   // Locked folder (decided 2026-10-08).
   static const lockedFolder = 'Locked';

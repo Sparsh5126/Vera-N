@@ -9,6 +9,7 @@ import '../../../shared/widgets/suggestion_flow.dart';
 import '../state/note_providers.dart';
 import 'note_actions.dart';
 import 'note_details.dart';
+import 'note_reminders.dart';
 
 /// The note's details below its text, with their live data: folder, tags
 /// and tag suggestions, links, backlinks and link suggestions.
@@ -32,33 +33,40 @@ class NoteDetailsSection extends ConsumerWidget {
         ref.watch(suggestedLinksProvider(note.ref)).value ?? const [];
     final tagSuggestions =
         ref.watch(suggestedTagsProvider(note.ref)).value ?? const [];
-    return NoteDetails(
-      folder: note.folder,
-      onFolderTap: () => unawaited(actions.moveToFolder(context, note)),
-      tags: note.tags,
-      linked: ref.watch(linkedProvider(note.ref)).value ?? const [],
-      mentionedIn: ref.watch(mentionedInProvider(note.ref)).value ?? const [],
-      suggested: [for (final s in suggested) s.other],
-      onSuggestedTap: (other) {
-        final link = suggested.firstWhere((s) => s.other.ref == other);
-        unawaited(
-          suggestions.open(
-            context,
-            link.suggestion,
-            otherTitle: link.other.title,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        NoteReminders(body: note.body, written: note.modified),
+        NoteDetails(
+          folder: note.folder,
+          onFolderTap: () => unawaited(actions.moveToFolder(context, note)),
+          tags: note.tags,
+          linked: ref.watch(linkedProvider(note.ref)).value ?? const [],
+          mentionedIn:
+              ref.watch(mentionedInProvider(note.ref)).value ?? const [],
+          suggested: [for (final s in suggested) s.other],
+          onSuggestedTap: (other) {
+            final link = suggested.firstWhere((s) => s.other.ref == other);
+            unawaited(
+              suggestions.open(
+                context,
+                link.suggestion,
+                otherTitle: link.other.title,
+              ),
+            );
+          },
+          suggestedTags: [for (final s in tagSuggestions) s.tag],
+          onSuggestedTagTap: (tag) => unawaited(
+            suggestions.open(
+              context,
+              tagSuggestions.firstWhere((s) => s.tag == tag),
+            ),
           ),
-        );
-      },
-      suggestedTags: [for (final s in tagSuggestions) s.tag],
-      onSuggestedTagTap: (tag) => unawaited(
-        suggestions.open(
-          context,
-          tagSuggestions.firstWhere((s) => s.tag == tag),
+          onAddTag: () => unawaited(actions.addTag(context, note)),
+          onTagTap: (tag) => unawaited(actions.tagTapped(context, note, tag)),
+          onOpenNote: onOpenNote,
         ),
-      ),
-      onAddTag: () => unawaited(actions.addTag(context, note)),
-      onTagTap: (tag) => unawaited(actions.tagTapped(context, note, tag)),
-      onOpenNote: onOpenNote,
+      ],
     );
   }
 }

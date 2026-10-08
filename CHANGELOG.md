@@ -4,6 +4,41 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Added
+- **Reminders a note asks for** (product spec §10a; decided by the user 2026-10-08).
+  - **Only when asked:** a line saying "remind me" with a future date and time schedules a notification.
+    - It understands times ("at 9 am", "17:00", "noon", "tonight"), dates ("tomorrow", "Friday", "next Monday", "12 Oct", "12/10" day first) and spans ("in 2 hours").
+    - A date with no time, or a past time, sets nothing, and the note says why.
+    - Month and day words must be real names, so "market 5" or "sun cream" aren't dates.
+  - **Kept in sync:** `ReminderSync` follows the notes that contain "remind me" and schedules, moves or cancels to match. Trashed notes never remind.
+  - **Fixed during the phone test:** relative words counted from "now" at every sync, so "in 2 minutes" kept slipping a minute later. They now count from when the note last changed.
+  - **Privacy:**
+    - The lock screen shows only "Reminder".
+    - A Locked-folder note's words never reach the notification.
+    - Tapping a reminder opens its note.
+  - **Permissions:**
+    - `POST_NOTIFICATIONS` is back, asked once and only when a note first has a reminder.
+    - `SCHEDULE_EXACT_ALARM` is declared but needs the user's grant: Settings shows "On-time reminders · Allow" until it is allowed. Without it, Android may deliver a reminder a few minutes late.
+    - The plugin's boot receiver uses the existing `RECEIVE_BOOT_COMPLETED`.
+    - The "Notifications are off" hint re-checks after the prompt and whenever the app comes back.
+  - **Settings:** "Reminders from notes" in Smart Suggestions, on by default; off cancels all.
+  - **Note view:** a "Reminders" section below the text shows each line's state.
+  - **Checked on the phone (test app):**
+    - "remind me in 2 minutes" showed "Reminder: Today, 9:00 pm".
+    - Android's notification prompt appeared at that moment.
+    - The notification arrived titled "Reminder", with the line as its text, as an inexact alarm because exact timing wasn't granted.
+    - Afterwards the note read "This time has passed".
+  - **New packages:**
+    - `flutter_local_notifications`: needs core-library desugaring, now enabled in Gradle (`desugar_jdk_libs` 2.1.4).
+    - `timezone`: reminders are scheduled as UTC instants, so no time-zone lookup is needed.
+    - Release size wasn't re-measured this time (the build was stopped); these are small Java/Dart packages.
+  - Tests: 9 parser, 4 sync, 3 widget.
+- **Onboarding says it's private on every page** (user, 2026-10-08).
+  - The same line ends each page: "Private · Open source · On this phone · No account · No cloud".
+  - A new reminders page explains reminders before anyone meets them.
+  - The other pages' copy now mentions on-device, no login and open source.
+  - Tests check the line on every page.
+
 ### Changed
 - **Formatting buttons always shown while editing** (user, 2026-10-08): Bold, List, Checklist, Link and Attach sit together above the keyboard, not only while text is selected.
   - With nothing selected, Bold bolds the word at the cursor. A Devanagari word counts as one word, vowel signs included, and nothing happens between words.

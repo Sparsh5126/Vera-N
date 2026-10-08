@@ -174,11 +174,29 @@ Rules:
 
 - The app can bring back old notes that have become relevant again ("You might want to revisit this").
 - Appears as a **separate button on the homepage**. The user chooses whether to open it.
-- No push notifications, no interruptions.
+- No push notifications, no interruptions. (The only notifications the app ever sends are reminders a note asks for, §10a.)
 - Possibly one of the most valuable features of the app.
 - Built 2026-10-08 (decided by the user: old notes related to recent ones). During background analysis, a note changed in the last 7 days is compared with notes untouched for 30 days or more; its best strong match (the learned link bar) that is not already linked or offered becomes a `resurface` suggestion (old note, recent note). These never enter the Review batches, Home's dot, suggested-link chips or the Graph. Opening one removes it; "Not now" snoozes it for 30 days; it stays known meanwhile, so it is not offered again, and after that it can come back if the notes still match. Unopened offers expire after 30 days like other suggestions.
 
 ---
+
+## 10a. Reminders a note asks for (built 2026-10-08, decided by the user)
+
+- **Only when asked:** a line in a note containing "remind me" plus a date and a time still in the future sets a reminder. The app never sends a notification for anything else.
+- **Understood on the phone with plain rules, in English:**
+  - a time: "at 9 am", "9:30 pm", "17:00", "noon", "tonight";
+  - a date: "today", "tomorrow", "day after tomorrow", a weekday ("Friday", "next Monday"), "12 Oct", "Oct 12", "12/10" (day first);
+  - or a span: "in 10 minutes", "in 2 hours", "in 3 days".
+  - Relative words count from when the note last changed, so reading the note later never moves the reminder.
+  - A date with no time sets nothing, and the note says "Add a time, like 'at 9 am'". A past time sets nothing either.
+- **The notes are the source of truth:** editing the line moves the reminder, and removing it, trashing the note or the time passing cancels it. Reminders are scheduled with Android's alarms; they survive a restart, and the boot receiver sets them again.
+- **Notifications:**
+  - The title is "Reminder" and the text is the line as written. On a locked screen only "Reminder" shows.
+  - A note in the Locked folder shows "A note in your Locked folder", never its words.
+  - Tapping a reminder opens its note.
+- **Permissions:** notifications are asked for the first time a note has a reminder, never at install, and only once. Exact timing needs the user's permission on Android 14 (Settings → On-time reminders); without it a reminder may come a few minutes late.
+- **Settings:** "Reminders from notes" sits in Smart Suggestions with the other automatic features, on by default. Off cancels every reminder.
+- Nothing leaves the phone.
 
 ## 11. Tags, Folders, Topics
 
