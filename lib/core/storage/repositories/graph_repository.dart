@@ -48,7 +48,8 @@ class GraphRepository {
     final where = NoteFilterSql(filters, DateTime.now());
     final rows = await _db
         .customSelect(
-          'SELECT n.id, n.title, substr(n.body, 1, ?) AS body FROM notes n '
+          'SELECT n.id, n.title, n.folder, substr(n.body, 1, ?) AS body '
+          'FROM notes n '
           'WHERE ${where.sql} ORDER BY n.id',
           variables: [
             const Variable(NoteRows.previewLength),
@@ -63,6 +64,7 @@ class GraphRepository {
           ref: r.read<int>('id'),
           title: NoteMarkup.display(r.read<String>('title')),
           preview: NoteText.preview(r.read<String>('body')),
+          folder: r.read<String>('folder'),
         ),
     ];
   }

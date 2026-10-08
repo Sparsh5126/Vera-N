@@ -43,6 +43,10 @@ class _GraphCanvasState extends State<GraphCanvas> {
     _transform.addListener(
       () => _zoom.value = _transform.value.getMaxScaleOnAxis(),
     );
+    // Arriving with a note picked (the search jump from folder bubbles).
+    if (widget.selected != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _center());
+    }
   }
 
   @override

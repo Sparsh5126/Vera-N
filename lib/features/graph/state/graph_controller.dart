@@ -8,6 +8,7 @@ import '../../../core/models/search_filters.dart';
 import '../../../core/models/suggestion.dart';
 import '../../../core/settings/app_prefs_controller.dart';
 import '../../../core/storage/storage_providers.dart';
+import 'graph_bubbles.dart';
 import 'graph_layout.dart';
 import 'graph_view.dart';
 
@@ -22,6 +23,7 @@ class GraphPicture {
     required this.degrees,
     required this.positions,
     this.inFolder = false,
+    this.bubbles,
   });
 
   /// Every note the filters allow, shown or not (for the search jump).
@@ -37,7 +39,11 @@ class GraphPicture {
   /// A Folder filter is on: dots take the folder color (UI spec §10).
   final bool inFolder;
 
-  bool get isEmpty => nodes.isEmpty;
+  /// A very large library, shown as folder bubbles instead of dots;
+  /// [positions] then place the bubbles by index.
+  final GraphBubbles? bubbles;
+
+  bool get isEmpty => nodes.isEmpty && bubbles == null;
 }
 
 final _graphDataProvider = StreamProvider.autoDispose
@@ -65,6 +71,7 @@ final graphPictureProvider = FutureProvider.autoDispose<GraphPicture>((
         ]
       : const <Suggestion>[];
   final all = {for (final n in data.nodes) n.ref: n};
+  if (_grouped(view, all.length)) return _bubblesPicture(data, all);
   final linked = data.edges.toSet();
   final suggested = [
     for (final s in pending)
@@ -105,12 +112,7 @@ final graphPictureProvider = FutureProvider.autoDispose<GraphPicture>((
       if (placed.contains(e.a) && placed.contains(e.b)) e,
   ];
   final pairs = [for (final e in layoutEdges) (e.a, e.b)];
-  final key =
-      '${ids.join(',')}|${pairs.map((p) => '${p.$1}-${p.$2}').join(',')}';
-  final positions = _cache.remove(key) ?? await _layout(ids, pairs);
-  // Most recent last; only a few are kept.
-  _cache[key] = positions;
-  if (_cache.length > _cacheSize) _cache.remove(_cache.keys.first);
+  final positions = await _cached('', ids, pairs);
   return GraphPicture(
     all: all,
     nodes: {
@@ -128,6 +130,48 @@ final graphPictureProvider = FutureProvider.autoDispose<GraphPicture>((
     inFolder: view.filters.folder != null,
   );
 });
+
+/// The whole library, unfocused, past [GraphBubbles.above] notes. A Folder
+/// or Tag filter, or Focus, shows dots again.
+bool _grouped(GraphViewState view, int notes) =>
+    notes > GraphBubbles.above &&
+    view.filters.folder == null &&
+    view.filters.tag == null &&
+    view.focus == null;
+
+Future<GraphPicture> _bubblesPicture(
+  GraphData data,
+  Map<int, GraphNode> all,
+) async {
+  final bubbles = GraphBubbles.of(data.nodes, data.edges);
+  final ids = [for (var i = 0; i < bubbles.bubbles.length; i++) i];
+  final sizes = bubbles.bubbles.map((b) => b.count).join(',');
+  return GraphPicture(
+    all: all,
+    nodes: const {},
+    edges: const [],
+    suggested: const [],
+    degrees: const {},
+    positions: await _cached('bubbles $sizes', ids, bubbles.links),
+    bubbles: bubbles,
+  );
+}
+
+/// The layout for [ids] and [pairs], from the session cache when the same
+/// picture was laid out before.
+Future<GraphPositions> _cached(
+  String kind,
+  List<int> ids,
+  List<(int, int)> pairs,
+) async {
+  final key =
+      '$kind|${ids.join(',')}|${pairs.map((p) => '${p.$1}-${p.$2}').join(',')}';
+  final positions = _cache.remove(key) ?? await _layout(ids, pairs);
+  // Most recent last; only a few are kept.
+  _cache[key] = positions;
+  if (_cache.length > _cacheSize) _cache.remove(_cache.keys.first);
+  return positions;
+}
 
 /// [start] and every note up to [hops] confirmed links away.
 Set<int> _near(int start, int hops, List<GraphEdge> edges) {

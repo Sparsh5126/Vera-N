@@ -193,6 +193,11 @@ abstract final class AppCopy {
   static const focusOff = 'Show all';
   static String focusOn(String title) => 'Focus: $title';
   static String hops(int n) => n == 1 ? '1 step' : '$n steps';
+
+  /// A folder bubble's name; notes outside any folder share one.
+  static String folderName(String folder) => folder.isEmpty ? noFolder : folder;
+  static String folderBubble(String folder, int count) =>
+      '${folderName(folder)}, ${count == 1 ? '1 note' : '$count notes'}';
   static String suggestedLinkBetween(String a, String b) =>
       'Suggested link: $a and $b';
   static String graphDot(String title, int links) => switch (links) {

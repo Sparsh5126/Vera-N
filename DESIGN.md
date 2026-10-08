@@ -180,7 +180,7 @@ A near-neutral paper-and-ink palette with one restrained periwinkle reserved for
 ### Tertiary
 - **Bottle Green** (bottle-green / bottle-green-dark): confirms. The ✓ decision button and the Review card's drag-right mark.
 - **Vermilion** (vermilion / vermilion-dark): strikes. The ✕ decision button, the drag-left mark, "Delete forever" in Trash, and the Material error role.
-- **Folder Amber** (folder-amber / folder-amber-dark): the folder colour, chosen by the user (2026-10-08). Only the Graph's dots while a Folder filter is on (UI spec §10). Fills and marks only, never text (light amber is 3.3:1 against the stock, enough for a dot, not for type).
+- **Folder Amber** (folder-amber / folder-amber-dark): the folder colour, chosen by the user (2026-10-08). Only the Graph's dots while a Folder filter is on, and the outline and light wash (16%) of its folder bubbles in very large libraries (UI spec §10); the bubble's name stays ink. Fills and marks only, never text (light amber is 3.3:1 against the stock, enough for a dot, not for type).
 
 ### Neutral
 - **Stock** (stock / stock-dark): the screen ground, scaffold and canvas; also the native launch background.

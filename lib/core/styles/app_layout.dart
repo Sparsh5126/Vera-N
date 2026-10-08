@@ -107,6 +107,12 @@ abstract final class AppSize {
   /// Zoom from which note titles appear next to their dots.
   static const double graphTitleZoom = 1.4;
 
+  /// Folder bubbles (very large libraries): the smallest and largest
+  /// radius, and the room each bubble gets.
+  static const double graphBubbleMin = 28;
+  static const double graphBubbleMax = 64;
+  static const double graphBubbleSpacing = 168;
+
   /// Graph zoom limits.
   static const double graphMinZoom = 0.3;
   static const double graphMaxZoom = 4;
@@ -132,4 +138,7 @@ abstract final class AppOpacity {
   /// The ink veil behind sheets in light, so the near-white page stays
   /// pale instead of turning mid-grey (Material 3 scrim level).
   static const double scrim = 0.32;
+
+  /// The light amber wash inside a Graph folder bubble.
+  static const double bubbleFill = 0.16;
 }

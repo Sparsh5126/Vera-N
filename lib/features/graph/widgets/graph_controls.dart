@@ -51,7 +51,9 @@ class GraphControls extends StatelessWidget {
                   spacing: AppSpace.s,
                   children: [
                     FilterPill(
-                      label: folder ?? AppCopy.filterFolder,
+                      label: folder == null
+                          ? AppCopy.filterFolder
+                          : AppCopy.folderName(folder),
                       active: folder != null,
                       onTap: onFolder,
                     ),

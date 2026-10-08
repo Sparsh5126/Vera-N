@@ -17,6 +17,7 @@ import '../../shared/widgets/suggestion_flow.dart';
 import '../../shared/widgets/text_entry_sheet.dart';
 import 'state/graph_controller.dart';
 import 'state/graph_view.dart';
+import 'widgets/graph_bubble_view.dart';
 import 'widgets/graph_canvas.dart';
 import 'widgets/graph_controls.dart';
 import 'widgets/graph_preview_card.dart';
@@ -95,6 +96,12 @@ class _GraphScreenState extends ConsumerState<GraphScreen> {
         .where((e) => e.key.toLowerCase().contains(lower))
         .firstOrNull;
     if (match == null) return;
+    // Folder bubbles: open the note's folder first, then find it there.
+    if (picture.bubbles != null) {
+      final folder = picture.all[match.value]!.topFolder;
+      final filters = ref.read(graphViewProvider).filters;
+      _controls.setFilters(filters.withFolder(folder));
+    }
     _controls.jumpTo(
       match.value,
       hidden: !picture.nodes.containsKey(match.value),
@@ -139,6 +146,14 @@ class _GraphScreenState extends ConsumerState<GraphScreen> {
   }
 
   Widget _graph(GraphPicture picture, GraphViewState view) {
+    final bubbles = picture.bubbles;
+    if (bubbles != null) {
+      return GraphBubbleView(
+        bubbles: bubbles,
+        positions: picture.positions,
+        onFolder: (f) => _controls.setFilters(view.filters.withFolder(f)),
+      );
+    }
     final node = picture.nodes[view.selected];
     return Stack(
       children: [

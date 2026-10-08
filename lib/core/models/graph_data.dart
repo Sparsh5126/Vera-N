@@ -8,11 +8,18 @@ class GraphNode {
     required this.ref,
     required this.title,
     required this.preview,
+    this.folder = '',
   });
 
   final int ref;
   final String title;
   final String preview;
+
+  /// Its folder path, '' for the top level.
+  final String folder;
+
+  /// The top-level folder it sits in, '' for the top level itself.
+  String get topFolder => folder.split('/').first;
 }
 
 /// A confirmed link between two notes, either direction ([a] < [b]).

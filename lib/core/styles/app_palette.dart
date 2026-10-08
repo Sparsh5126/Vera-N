@@ -63,7 +63,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color border;
 
   /// Amber, the folder color: only the Graph's dots while a Folder filter
-  /// is on (UI spec §10; amber chosen by the user, 2026-10-08). Fills and
+  /// is on, and its folder bubbles (UI spec §10; amber chosen by the
+  /// user, 2026-10-08). Fills and
   /// marks only, never text (light amber is 3.3:1).
   final Color folder;
 
