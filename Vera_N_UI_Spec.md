@@ -216,12 +216,12 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 
 **Other card types** use the same swipe pattern: tag suggestion (note with proposed tag chip) and topic suggestion (the notes it would group). Built 2026-10-08: tag cards show this note, then the closest note that already has the tag ("This note" / "Has #music"), with "Notes like this one are tagged #music." Topic cards wait for topic discovery.
 
-**Finished:** a quiet "All caught up" screen. No streaks or rewards. A "Review 5 more" button appears only if more exist.
+**Finished:** a quiet "All caught up" screen. No streaks or rewards. A "Review more" button appears only if more exist; it loads the next batch of 5 (no number on the button, changed 2026-10-08 so it never feels urgent).
 
 **Built 2026-10-04:**
 - Accepting writes the link into the newer note's "Linked notes" footer, pointing at the older note.
 - The Home card shows no count ("New connections"), however many wait (changed 2026-10-08, user: a number creates urgency).
-- "Review 5 more" counts only suggestions the finished batch didn't show, so "Not sure" ones return in a later visit, not immediately.
+- "Review more" counts only suggestions the finished batch didn't show, so "Not sure" ones return in a later visit, not immediately.
 - "Why?" shows the matched passages in full; a fuller explanation needs the laptop layer.
 
 ---

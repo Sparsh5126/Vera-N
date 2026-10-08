@@ -95,9 +95,7 @@ void main() {
     await app.finish(tester);
   });
 
-  testWidgets('Not sure keeps it; Review 5 more offers the rest', (
-    tester,
-  ) async {
+  testWidgets('Not sure keeps it; Review more offers the rest', (tester) async {
     await suggest(count: 6);
     await openReview(tester);
     for (var i = 0; i < 5; i++) {
@@ -105,7 +103,7 @@ void main() {
     }
     expect(find.text('All caught up.'), findsOneWidget);
     expect(await app.storage.suggestions.pending(), hasLength(6));
-    await tapAndSettle(tester, find.text('Review 5 more'));
+    await tapAndSettle(tester, find.text(AppCopy.reviewMore));
     expect(find.text('Newer 5'), findsOneWidget);
     await app.finish(tester);
   });
