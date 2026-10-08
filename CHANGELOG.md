@@ -4,6 +4,17 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+- **Photo and drawing previews spilled over the lines above them** (found on the phone, 2026-10-08). A drawing showed on top of the note's title and reached into the status bar.
+  - **Cause:** Flutter's text field forces every line to the same height by default (`forceStrutHeight`), so a tall inline preview got no room and was centred on a one-line slot.
+  - **Fix:** the note editor turns that off (`strutStyle: StrutStyle.disabled`), so each line takes its content's height.
+  - A widget test now checks that a 200 px preview gets its own room below the title. Without the fix, the editor stays 88 px tall.
+- **Checked on the phone (2026-10-08, test app):**
+  - The app starts with the new fragment activity.
+  - The paperclip shows above the keyboard and its sheet lists the four choices.
+  - A drawing is drawn, saved as `.drawing.svg` and embedded.
+  - Not yet checked, because the phone disconnected: photo, voice, the Locked folder prompt, and the clean-up rows.
+
 ### Added
 - **Locked folder** (product spec §15, UI spec §5 and §7). Decided 2026-10-08 (user): an app lock (not encryption), opened with the phone's own lock, one folder.
   - **Locking:** ⋮ → Move to Locked folder moves the note into `Notes/Locked/`, keeping its folder inside like Archive, and leaves it with Undo. It needs a screen lock on the phone, so a note can't get stuck.

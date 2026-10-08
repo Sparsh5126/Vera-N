@@ -57,6 +57,10 @@ class NoteEditorView extends StatelessWidget {
               keyboardType: TextInputType.multiline,
               textCapitalization: TextCapitalization.sentences,
               maxLines: null,
+              // A text field forces every line to one height by default,
+              // which would let a photo or drawing spill over the lines
+              // above it; lines here take their content's height.
+              strutStyle: StrutStyle.disabled,
               decoration: const InputDecoration(border: InputBorder.none),
             ),
           ),
