@@ -5,6 +5,30 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Laptop, phase L0 (code; not yet run on Windows)** (docs/LAPTOP_PLAN.md).
+  - **Syncthing conflict copies** (`x.sync-conflict-<date>-<device>.md`) are no longer indexed as notes.
+    - A copy marks its note as in conflict, and the existing Compare / Keep this / Keep the other / Keep both use the copy as the other version, then delete it.
+    - The note stays in conflict while another copy remains.
+    - A copy whose note is gone is kept as a note, so no text is lost.
+    - Nothing new is stored: the copy on disk is the record. This works on the phone too, if Syncthing runs there.
+  - **The notes folder on a laptop** (`DesktopFolderAccess`): picked with the system folder dialog (`file_selector`) as a plain path. Notes are in its `Notes/` subfolder, as on the phone.
+  - **Folder watching** (`FolderWatcher`): while the app is open on a laptop, changes in the folder are picked up about a second after the burst settles (re-index and import other devices' rejections).
+    - Syncthing's `.stfolder`, `.stversions` and temporary files are ignored, and `.app/` is watched.
+    - No polling. Nothing on the phone, which rescans on resume.
+  - **Analysis on a laptop** (`DesktopAnalysis`): there is no WorkManager on Windows, so analysis runs inside the open app.
+    - It runs only on mains power (`battery_plus`; a computer without a battery counts as mains) and only after 3 minutes without a key press or click.
+    - It stops at the next key or click, and carries on in batches while still idle.
+    - The run itself is now one shared function (`runAnalysisOnce`) for the phone's background task and the laptop.
+  - **Reminders are phone-only** (user, 2026-10-09): the laptop never schedules them and shows neither the note's reminders section nor the Settings switch (`DeviceKind`).
+  - **New packages:**
+    - `file_selector` (official; folder dialog);
+    - `battery_plus` (power state; reads it only when about to analyse, so no battery cost);
+    - `fake_async` (test only).
+  - **Not yet run on Windows:** Visual Studio, with the "Desktop development with C++" workload, isn't installed, and Flutter needs it to build Windows apps.
+  - The Android build is unchanged in behaviour and still compiles.
+  - Tests: 6 Syncthing conflict, 5 laptop runner and watcher rules, 2 real-folder (watching on this machine, and the folder layout).
+
+### Added
 - **Laptop version plan** (`docs/LAPTOP_PLAN.md`), with the user's decisions of 2026-10-08:
   - Syncthing first; full notes app plus the AI booster; all four first AI jobs (written "Why?", new tag names, topics, duplicates); Windows first; local AI server only (LM Studio by default).
   - Six phases: L0 foundation, L1 desktop layout, L2 booster engine, L3 phone shows laptop results, L4 settings, L5 packaging.

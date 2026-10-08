@@ -33,7 +33,7 @@ Checked 2026-10-08, from each package's platform list:
 
 Each phase is one change: tests, phone check where it touches the phone, changelog, commit.
 
-### L0. The app runs on Windows (foundation)
+### L0. The app runs on Windows (foundation): code done 2026-10-09, not yet run on Windows (Visual Studio needed)
 - **Notes folder:** onboarding and Settings pick the Syncthing-shared `MyNotes/` folder with the system folder dialog (`file_selector`). Notes live in `Notes/`, attachments in `Attachments/`, as on the phone.
 - **Outside changes:** the app watches the folder while open (`Directory.watch`, debounced). Syncthing's edits reach the index within a second or two, with no polling.
 - **Syncthing conflict files:** `x.sync-conflict-<date>-<device>.md` must **not** become new notes. Each one is read as the other version of `x.md` and shown with the existing Compare / Keep this / Keep the other / Keep both, then removed once settled. Syncthing's own `.stfolder` and `.stversions` are ignored, as dot folders already are.
@@ -95,22 +95,15 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 - macOS and Linux builds.
 - Summaries and knowledge-health data (spec §5).
 
-## Open questions (to decide before the phase that needs them)
+## Decided 2026-10-09 (user)
 
-1. **What accepting a topic does** (L3). AI never moves notes between folders (CLAUDE.md §9). The options:
-   - (a) add the topic as a **tag** on its notes (my suggestion: reversible, and visible in Obsidian);
-   - (b) a separate "topics" view;
-   - (c) both.
-2. **What accepting a duplicate does** (L3). The options:
-   - (a) **link** the two notes and mark them "same idea";
-   - (b) also offer to move one to the trash, with Undo.
-   Never merge their text.
-3. **Reminders on the laptop** (L0). If both devices schedule a note's reminder, it rings twice. The options:
-   - (a) the phone only (my suggestion);
-   - (b) the laptop only while the phone is away;
-   - (c) both.
-4. **Laptop results sent to the phone** contain short AI-written text (topic names, "Why?" sentences) inside the user's own synced folder. That stays within "nothing leaves your devices", and the onboarding wording still holds. Confirm it fits.
-5. **Which local model** to recommend in LM Studio for Hindi plus English on a typical laptop (picked by testing in L2; at least two candidates compared on the user's own kind of notes).
+1. **Topics become tag suggestions.** A topic the laptop finds is offered as a suggested tag (dimmed, dashed outline) on each of its notes, accepted or rejected per note like links. No separate topics view.
+2. **Duplicates:** the Review card offers **Merge** or **Remove one**.
+   - **Merge** adds to the kept note only the lines it doesn't already have (lines in both appear once), then moves the other to the trash, all with Undo. Text is only added, never rewritten.
+   - **Remove one** moves the chosen note to the trash, with Undo.
+3. **Reminders are a phone-only feature.** The laptop never schedules them; its note view and Settings don't show them.
+4. **AI-written text** (topic names, "Why?" sentences) travelling in the user's own synced folder is fine.
+5. **Model:** the user has **Gemma 4** in LM Studio on an external SSD, to plug in when L2 starts testing.
 
 ## Risks
 

@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../db/app_database.dart';
 import '../db/note_rows.dart';
 import '../files/note_file_store.dart';
+import '../files/sync_conflict.dart';
 
 /// What one reconcile pass changed.
 class IndexReport {
@@ -31,7 +32,12 @@ class NoteIndexer {
 
   Future<IndexReport> reconcile() async {
     final report = IndexReport();
-    final entries = await _store.listNotes();
+    final listed = await _store.listNotes();
+    // Syncthing's conflict copies are other versions, not notes.
+    final entries = [
+      for (final e in listed)
+        if (!SyncConflict.isCopy(e.path)) e,
+    ];
     final rows = await (_db.select(
       _db.notes,
     )..where((n) => n.trashedAt.isNull())).get();
@@ -50,6 +56,14 @@ class NoteIndexer {
       }
       await _refresh(row, entry, report);
     }
+    // A conflict copy whose note is gone is kept as a note.
+    final copies = [
+      for (final e in listed)
+        if (SyncConflict.originalOf(e.path) case final original?) (e, original),
+    ];
+    for (final (copy, original) in copies) {
+      if (!seen.contains(NoteRows.pathKey(original))) added.add(copy);
+    }
 
     // Rows whose file is gone. Notes never written yet are not missing.
     final missing = rows
@@ -58,6 +72,7 @@ class NoteIndexer {
     for (final entry in added) {
       await _addOrMove(entry, missing, report);
     }
+    await _markSyncConflicts(copies, seen, report);
     // An empty folder where several notes were means the folder is
     // unavailable (unmounted, renamed, access lost), not that the user
     // deleted every note. Keep the index; the files will come back.
@@ -155,6 +170,32 @@ class NoteIndexer {
     final entry = row == null ? null : await _store.stat(row.path);
     if (row == null || entry == null) return null;
     return (await _read(entry, row.created)).body.value;
+  }
+
+  /// A note with a Syncthing conflict copy beside it is in conflict until
+  /// the user settles it.
+  Future<void> _markSyncConflicts(
+    List<(NoteFileEntry, String)> copies,
+    Set<String> seen,
+    IndexReport report,
+  ) async {
+    for (final (_, original) in copies) {
+      final key = NoteRows.pathKey(original);
+      if (!seen.contains(key)) continue;
+      final row = await (_db.select(
+        _db.notes,
+      )..where((n) => n.pathKey.equals(key))).getSingleOrNull();
+      if (row == null || row.conflict) continue;
+      await _update(row.id, const NotesCompanion(conflict: Value(true)));
+      report.conflicts++;
+    }
+  }
+
+  /// The body of the note file at [path], or null if there is none.
+  Future<String?> bodyAt(String path) async {
+    final entry = await _store.stat(path);
+    if (entry == null) return null;
+    return (await _read(entry)).body.value;
   }
 
   Future<NoteRow?> _row(int ref) =>

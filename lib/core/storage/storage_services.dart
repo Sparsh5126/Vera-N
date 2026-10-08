@@ -7,7 +7,9 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import 'db/app_database.dart';
+import 'files/desktop_folder_access.dart';
 import 'files/folder_access.dart';
+import 'files/folder_watcher.dart';
 import 'files/io_note_file_store.dart';
 import 'files/note_file_store.dart';
 import 'files/switching_note_file_store.dart';
@@ -60,7 +62,11 @@ class StorageServices {
     final services = StorageServices(
       AppDatabase.open(),
       IoNoteFileStore(holding),
-      folders: Platform.isAndroid ? const AndroidFolderAccess() : null,
+      folders: Platform.isAndroid
+          ? const AndroidFolderAccess()
+          : Platform.isWindows || Platform.isMacOS || Platform.isLinux
+          ? const DesktopFolderAccess()
+          : null,
     );
     await services.reconnectFolder();
     return services;
@@ -96,8 +102,40 @@ class StorageServices {
   late final NotesExporter exporter;
   late final ConflictResolver conflicts;
   Future<void>? _reconciling;
+  FolderWatcher? _watcher;
 
   bool get canChooseFolder => folders != null;
+
+  /// The storage analysis uses, on a laptop where it runs inside the app
+  /// (docs/LAPTOP_PLAN.md, L0). Closing it closes nothing: the app keeps
+  /// the database open.
+  AnalysisStorage get forAnalysis => (
+    analysis: analysis,
+    suggestions: suggestions,
+    settings: settings,
+    close: () async {},
+  );
+
+  /// On a laptop, follows the picked folder while the app is open: what
+  /// Syncthing brings in (notes, other devices' rejections) is picked up
+  /// within a second or two. Nothing on the phone, which rescans on resume.
+  Future<void> watchFolder() async {
+    await _watcher?.stop();
+    _watcher = null;
+    final folder = await settings.notesFolder();
+    if (folder == null || folders is! DesktopFolderAccess) return;
+    _watcher = FolderWatcher(folder, () => unawaited(_pickUpChanges()))
+      ..start();
+  }
+
+  Future<void> _pickUpChanges() async {
+    try {
+      await reconcile();
+      await rejections.importFiles();
+    } on Object catch (e) {
+      debugPrint('VeraN folder change: $e');
+    }
+  }
 
   /// Lets the user pick the notes folder and moves the notes there.
   /// Returns false if they backed out of the picker.
@@ -111,6 +149,7 @@ class StorageServices {
     store.switchTo(target);
     await settings.setNotesFolder(folder);
     await reconcile();
+    await watchFolder();
     // The chosen folder may hold rejections from an earlier install.
     await rejections.importFiles();
     return true;

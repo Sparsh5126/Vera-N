@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/copy/app_copy.dart';
+import '../../../core/platform/device_kind.dart';
 import '../../../core/platform/reminder_notifications.dart';
 import '../../../core/reminders/reminder_providers.dart';
 import '../../../core/settings/app_prefs_controller.dart';
@@ -18,6 +19,8 @@ class ReminderSettings extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Reminders are a phone-only feature (docs/LAPTOP_PLAN.md).
+    if (!DeviceKind.isPhone) return const SizedBox.shrink();
     final on = ref.watch(appPrefsProvider.select((p) => p.reminders));
     final exact = ref.watch(exactRemindersProvider).value ?? true;
     return Column(

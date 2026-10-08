@@ -1,15 +1,19 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/ai/scheduler/analysis_scheduler.dart';
+import '../core/ai/scheduler/desktop_analysis.dart';
 import '../core/ai/suggestions/suggestion_providers.dart';
 import '../core/copy/app_copy.dart';
 import '../core/models/app_prefs.dart';
 import '../core/platform/frame_stats.dart';
 import '../core/navigation/routes.dart';
+import '../core/platform/device_kind.dart';
 import '../core/platform/launch_channel.dart';
 import '../core/platform/reminder_notifications.dart';
 import '../core/reminders/reminder_providers.dart';
@@ -64,7 +68,33 @@ class _AppState extends ConsumerState<App> {
       },
     );
     LaunchChannel.listen(onOpen: _open, onWindowFocused: _showKeyboardIfTyping);
-    unawaited(_startReminders());
+    // Reminders are a phone-only feature (docs/LAPTOP_PLAN.md).
+    if (DeviceKind.isPhone) unawaited(_startReminders());
+    if (DeviceKind.isDesktop) _startDesktop();
+  }
+
+  DesktopAnalysis? _analysis;
+
+  /// On a laptop: follow the notes folder while open, and analyse while
+  /// the user is away from the keyboard (and on mains power).
+  void _startDesktop() {
+    final storage = ref.read(storageProvider);
+    unawaited(storage.watchFolder());
+    final analysis = DesktopAnalysis(
+      storage.forAnalysis,
+      enabled: () => ref.read(appPrefsProvider).suggestions,
+    );
+    _analysis = analysis;
+    GestureBinding.instance.pointerRouter.addGlobalRoute(_onPointer);
+    HardwareKeyboard.instance.addHandler(_onKey);
+    analysis.activity();
+  }
+
+  void _onPointer(PointerEvent _) => _analysis?.activity();
+
+  bool _onKey(KeyEvent _) {
+    _analysis?.activity();
+    return false;
   }
 
   /// Reminders a note asked for: tapping one opens its note. The notes are
@@ -98,6 +128,11 @@ class _AppState extends ConsumerState<App> {
 
   @override
   void dispose() {
+    if (_analysis != null) {
+      GestureBinding.instance.pointerRouter.removeGlobalRoute(_onPointer);
+      HardwareKeyboard.instance.removeHandler(_onKey);
+      _analysis?.dispose();
+    }
     _lifecycle.dispose();
     _router.dispose();
     super.dispose();
@@ -111,6 +146,7 @@ class _AppState extends ConsumerState<App> {
       unawaited(LaunchChannel.setReviewShortcut(waiting: waiting));
     });
     ref.listen(appPrefsProvider.select((p) => p.reminders), (_, on) {
+      if (!DeviceKind.isPhone) return;
       final sync = ref.read(reminderSyncProvider);
       on ? sync.start() : unawaited(sync.stop());
     });

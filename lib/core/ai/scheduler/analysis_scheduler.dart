@@ -3,9 +3,7 @@ import 'package:workmanager/workmanager.dart';
 
 import '../../storage/storage_services.dart';
 import '../ai_settings.dart';
-import '../embedder/onnx_embedder.dart';
-import '../suggestions/suggestion_learning.dart';
-import 'analysis_run.dart';
+import 'analysis_job.dart';
 
 /// Schedules on-device analysis with Android's WorkManager, only while the
 /// phone is charging or idle (CLAUDE.md §8): no polling, no wake locks.
@@ -81,22 +79,7 @@ void analysisDispatcher() {
     (task, _) async {
       final storage = StorageServices.openForAnalysis();
       try {
-        final links = await storage.settings.learning('link');
-        final tags = await storage.settings.learning('tag');
-        final done = await AnalysisRun(
-          analysis: storage.analysis,
-          suggestions: storage.suggestions,
-          embedder: OnnxEmbedder(),
-          stopRequested: () => stop,
-          linkThreshold: SuggestionLearning.thresholdFor(
-            links,
-            SuggestionLearning.baseFor('link'),
-          ),
-          tagThreshold: SuggestionLearning.thresholdFor(
-            tags,
-            SuggestionLearning.baseFor('tag'),
-          ),
-        ).run();
+        final done = await runAnalysisOnce(storage, stopRequested: () => stop);
         // Large libraries: carry on in a later run while charging.
         if (!done && !stop) await _continueLater();
         debugPrint('VeraN analysis: run finished, all done: $done');
