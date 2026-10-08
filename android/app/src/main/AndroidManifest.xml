@@ -1,6 +1,16 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Voice notes only; asked for the first time the user records. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Added by WorkManager but not needed (minimum permissions, CLAUDE.md
+         §9): the app sends no notifications, and from Android 7 on the
+         system's job scheduler holds the wake lock for background work. -->
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.WAKE_LOCK"
+        tools:node="remove" />
     <application
         android:label="Vera N"
         android:name="${applicationName}"

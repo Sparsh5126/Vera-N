@@ -5,6 +5,9 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Changed
+- **Removed two permissions WorkManager added** (user, 2026-10-08): `POST_NOTIFICATIONS` (the app sends none) and `WAKE_LOCK`. The minimum Android is 7 (API 24), where WorkManager runs on the system job scheduler, which holds the wake lock itself; the app schedules no expedited or foreground work. Removed in the manifest with `tools:node="remove"`.
+  - Release permissions are now `RECORD_AUDIO` (voice notes, asked on first use), plus `RECEIVE_BOOT_COMPLETED`, `FOREGROUND_SERVICE(_SHORT_SERVICE)` and `ACCESS_NETWORK_STATE` from WorkManager.
+  - **To check on the phone:** a background analysis run still completes.
 - **Drawings are vector (SVG)** (user, 2026-10-08: "vector, so it never blurs"). A drawing is now one file, `<id>.drawing.svg`, with each line a path.
   - It stays sharp at any size and opens in any app, printed in light ink on a light plate.
   - The app reads its own SVG back to keep drawing, so the separate strokes file and the PNG are gone.
