@@ -81,15 +81,20 @@ void analysisDispatcher() {
     (task, _) async {
       final storage = StorageServices.openForAnalysis();
       try {
-        final learned = await storage.settings.learning('link');
+        final links = await storage.settings.learning('link');
+        final tags = await storage.settings.learning('tag');
         final done = await AnalysisRun(
           analysis: storage.analysis,
           suggestions: storage.suggestions,
           embedder: OnnxEmbedder(),
           stopRequested: () => stop,
           linkThreshold: SuggestionLearning.thresholdFor(
-            learned,
+            links,
             SuggestionLearning.baseFor('link'),
+          ),
+          tagThreshold: SuggestionLearning.thresholdFor(
+            tags,
+            SuggestionLearning.baseFor('tag'),
           ),
         ).run();
         // Large libraries: carry on in a later run while charging.

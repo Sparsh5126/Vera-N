@@ -28,6 +28,10 @@ class Rejection {
 
   String get pairKey => pairKeyOf(noteA, noteB);
 
+  /// The "note" side of a rejected tag: `#` and the tag in lowercase, so
+  /// a tag rejection is the pair (note id, `#tag`) in the same file.
+  static String tagSide(String tag) => '#${tag.toLowerCase()}';
+
   static String pairKeyOf(String a, String b) =>
       a.compareTo(b) < 0 ? '$a|$b' : '$b|$a';
 

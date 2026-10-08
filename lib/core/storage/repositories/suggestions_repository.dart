@@ -20,7 +20,8 @@ class SuggestionsRepository {
   Future<void> add(List<SuggestionDraft> drafts, DateTime now, Duration ttl) {
     return _db.batch((b) {
       for (final d in drafts) {
-        final (a, z) = d.noteA < d.noteB
+        // A link is a pair, stored lower id first; a tag belongs to noteA.
+        final (a, z) = d.kind == Suggestion.tagKind || d.noteA < d.noteB
             ? (d.noteA, d.noteB)
             : (d.noteB, d.noteA);
         final swapped = a != d.noteA;
@@ -30,6 +31,7 @@ class SuggestionsRepository {
             kind: d.kind,
             noteA: a,
             noteB: z,
+            tag: Value(d.tag),
             score: d.score,
             chunkA: swapped ? d.chunkB : d.chunkA,
             chunkB: swapped ? d.chunkA : d.chunkB,
@@ -106,6 +108,7 @@ class SuggestionsRepository {
             kind: s.kind,
             noteA: s.noteA,
             noteB: s.noteB,
+            tag: Value(s.tag),
             score: s.score,
             chunkA: s.chunkA,
             chunkB: s.chunkB,
@@ -147,5 +150,6 @@ class SuggestionsRepository {
     notSure: r.status == notSure,
     createdAt: r.createdAt,
     expiresAt: r.expiresAt,
+    tag: r.tag,
   );
 }

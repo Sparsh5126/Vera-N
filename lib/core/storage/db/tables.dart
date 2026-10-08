@@ -142,12 +142,18 @@ class Chunks extends Table {
 class Suggestions extends Table {
   IntColumn get id => integer().autoIncrement()();
 
-  /// `link` for now; later `tag`, `topic`, `resurface`.
+  /// `link` or `tag`; later `resurface`.
   TextColumn get kind => text()();
   IntColumn get noteA =>
       integer().references(Notes, #id, onDelete: KeyAction.cascade)();
+
+  /// For a link, the other note. For a tag, the closest note that already
+  /// has the tag: the reason it is suggested.
   IntColumn get noteB =>
       integer().references(Notes, #id, onDelete: KeyAction.cascade)();
+
+  /// The suggested tag (without `#`); empty for links (schema 6).
+  TextColumn get tag => text().withDefault(const Constant(''))();
   RealColumn get score => real()();
 
   /// The best-matching chunk of each note, for "why related".
@@ -161,7 +167,7 @@ class Suggestions extends Table {
 
   @override
   List<Set<Column<Object>>> get uniqueKeys => [
-    {kind, noteA, noteB},
+    {kind, noteA, noteB, tag},
   ];
 }
 

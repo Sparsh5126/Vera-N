@@ -31,6 +31,11 @@ abstract final class AiSettings {
   /// At most this many new suggestions per changed note, strongest first.
   static const suggestionsPerNote = 3;
 
+  /// Tag suggestions: the closest notes looked at, and at most this many
+  /// tags suggested per changed note.
+  static const tagNeighbours = 10;
+  static const tagsPerNote = 2;
+
   /// Unreviewed suggestions disappear after this (product spec §7).
   static const suggestionLifetime = Duration(days: 30);
 

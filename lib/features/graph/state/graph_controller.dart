@@ -59,7 +59,10 @@ final graphPictureProvider = FutureProvider.autoDispose<GraphPicture>((
   final view = ref.watch(graphViewProvider);
   final data = await ref.watch(_graphDataProvider(view.filters).future);
   final pending = ref.watch(suggestionsOnProvider)
-      ? await ref.watch(_pendingProvider.future)
+      ? [
+          for (final s in await ref.watch(_pendingProvider.future))
+            if (!s.isTag) s,
+        ]
       : const <Suggestion>[];
   final all = {for (final n in data.nodes) n.ref: n};
   final linked = data.edges.toSet();

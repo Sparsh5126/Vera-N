@@ -20,6 +20,8 @@ class SuggestionViews {
     if (a == null || b == null) return null;
     final first = await _side(a, s.chunkA);
     final second = await _side(b, s.chunkB);
+    // A tag: the note to tag first, then the note that already has it.
+    if (s.isTag) return SuggestionView(s, first, second);
     return a.created.isAfter(b.created)
         ? SuggestionView(s, first, second)
         : SuggestionView(s, second, first);

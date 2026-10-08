@@ -164,13 +164,14 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       passage: note.passage,
       onOpen: () => context.push(Routes.note(note.ref)),
     );
+    final words = suggestionWording(view);
     return Center(
       child: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
         child: SuggestionCard(
-          newer: side(AppCopy.reviewNewLabel, view.newer),
-          older: side(AppCopy.reviewOlderLabel, view.older),
-          reason: AppCopy.suggestionReason(view.older.title),
+          newer: side(words.first, view.newer),
+          older: side(words.second, view.older),
+          reason: words.reason,
         ),
       ),
     );

@@ -2669,6 +2669,16 @@ class $SuggestionsTable extends Suggestions
       'REFERENCES notes (id) ON DELETE CASCADE',
     ),
   );
+  static const VerificationMeta _tagMeta = const VerificationMeta('tag');
+  @override
+  late final GeneratedColumn<String> tag = GeneratedColumn<String>(
+    'tag',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   static const VerificationMeta _scoreMeta = const VerificationMeta('score');
   @override
   late final GeneratedColumn<double> score = GeneratedColumn<double>(
@@ -2733,6 +2743,7 @@ class $SuggestionsTable extends Suggestions
     kind,
     noteA,
     noteB,
+    tag,
     score,
     chunkA,
     chunkB,
@@ -2778,6 +2789,12 @@ class $SuggestionsTable extends Suggestions
       );
     } else if (isInserting) {
       context.missing(_noteBMeta);
+    }
+    if (data.containsKey('tag')) {
+      context.handle(
+        _tagMeta,
+        tag.isAcceptableOrUnknown(data['tag']!, _tagMeta),
+      );
     }
     if (data.containsKey('score')) {
       context.handle(
@@ -2834,7 +2851,7 @@ class $SuggestionsTable extends Suggestions
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-    {kind, noteA, noteB},
+    {kind, noteA, noteB, tag},
   ];
   @override
   SuggestionRow map(Map<String, dynamic> data, {String? tablePrefix}) {
@@ -2855,6 +2872,10 @@ class $SuggestionsTable extends Suggestions
       noteB: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}note_b'],
+      )!,
+      tag: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tag'],
       )!,
       score: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
@@ -2892,10 +2913,16 @@ class $SuggestionsTable extends Suggestions
 class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
   final int id;
 
-  /// `link` for now; later `tag`, `topic`, `resurface`.
+  /// `link` or `tag`; later `resurface`.
   final String kind;
   final int noteA;
+
+  /// For a link, the other note. For a tag, the closest note that already
+  /// has the tag: the reason it is suggested.
   final int noteB;
+
+  /// The suggested tag (without `#`); empty for links (schema 6).
+  final String tag;
   final double score;
 
   /// The best-matching chunk of each note, for "why related".
@@ -2911,6 +2938,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     required this.kind,
     required this.noteA,
     required this.noteB,
+    required this.tag,
     required this.score,
     required this.chunkA,
     required this.chunkB,
@@ -2925,6 +2953,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     map['kind'] = Variable<String>(kind);
     map['note_a'] = Variable<int>(noteA);
     map['note_b'] = Variable<int>(noteB);
+    map['tag'] = Variable<String>(tag);
     map['score'] = Variable<double>(score);
     map['chunk_a'] = Variable<int>(chunkA);
     map['chunk_b'] = Variable<int>(chunkB);
@@ -2940,6 +2969,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       kind: Value(kind),
       noteA: Value(noteA),
       noteB: Value(noteB),
+      tag: Value(tag),
       score: Value(score),
       chunkA: Value(chunkA),
       chunkB: Value(chunkB),
@@ -2959,6 +2989,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       kind: serializer.fromJson<String>(json['kind']),
       noteA: serializer.fromJson<int>(json['noteA']),
       noteB: serializer.fromJson<int>(json['noteB']),
+      tag: serializer.fromJson<String>(json['tag']),
       score: serializer.fromJson<double>(json['score']),
       chunkA: serializer.fromJson<int>(json['chunkA']),
       chunkB: serializer.fromJson<int>(json['chunkB']),
@@ -2975,6 +3006,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       'kind': serializer.toJson<String>(kind),
       'noteA': serializer.toJson<int>(noteA),
       'noteB': serializer.toJson<int>(noteB),
+      'tag': serializer.toJson<String>(tag),
       'score': serializer.toJson<double>(score),
       'chunkA': serializer.toJson<int>(chunkA),
       'chunkB': serializer.toJson<int>(chunkB),
@@ -2989,6 +3021,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     String? kind,
     int? noteA,
     int? noteB,
+    String? tag,
     double? score,
     int? chunkA,
     int? chunkB,
@@ -3000,6 +3033,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     kind: kind ?? this.kind,
     noteA: noteA ?? this.noteA,
     noteB: noteB ?? this.noteB,
+    tag: tag ?? this.tag,
     score: score ?? this.score,
     chunkA: chunkA ?? this.chunkA,
     chunkB: chunkB ?? this.chunkB,
@@ -3013,6 +3047,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       kind: data.kind.present ? data.kind.value : this.kind,
       noteA: data.noteA.present ? data.noteA.value : this.noteA,
       noteB: data.noteB.present ? data.noteB.value : this.noteB,
+      tag: data.tag.present ? data.tag.value : this.tag,
       score: data.score.present ? data.score.value : this.score,
       chunkA: data.chunkA.present ? data.chunkA.value : this.chunkA,
       chunkB: data.chunkB.present ? data.chunkB.value : this.chunkB,
@@ -3029,6 +3064,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
           ..write('kind: $kind, ')
           ..write('noteA: $noteA, ')
           ..write('noteB: $noteB, ')
+          ..write('tag: $tag, ')
           ..write('score: $score, ')
           ..write('chunkA: $chunkA, ')
           ..write('chunkB: $chunkB, ')
@@ -3045,6 +3081,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     kind,
     noteA,
     noteB,
+    tag,
     score,
     chunkA,
     chunkB,
@@ -3060,6 +3097,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
           other.kind == this.kind &&
           other.noteA == this.noteA &&
           other.noteB == this.noteB &&
+          other.tag == this.tag &&
           other.score == this.score &&
           other.chunkA == this.chunkA &&
           other.chunkB == this.chunkB &&
@@ -3073,6 +3111,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
   final Value<String> kind;
   final Value<int> noteA;
   final Value<int> noteB;
+  final Value<String> tag;
   final Value<double> score;
   final Value<int> chunkA;
   final Value<int> chunkB;
@@ -3084,6 +3123,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     this.kind = const Value.absent(),
     this.noteA = const Value.absent(),
     this.noteB = const Value.absent(),
+    this.tag = const Value.absent(),
     this.score = const Value.absent(),
     this.chunkA = const Value.absent(),
     this.chunkB = const Value.absent(),
@@ -3096,6 +3136,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     required String kind,
     required int noteA,
     required int noteB,
+    this.tag = const Value.absent(),
     required double score,
     required int chunkA,
     required int chunkB,
@@ -3116,6 +3157,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     Expression<String>? kind,
     Expression<int>? noteA,
     Expression<int>? noteB,
+    Expression<String>? tag,
     Expression<double>? score,
     Expression<int>? chunkA,
     Expression<int>? chunkB,
@@ -3128,6 +3170,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
       if (kind != null) 'kind': kind,
       if (noteA != null) 'note_a': noteA,
       if (noteB != null) 'note_b': noteB,
+      if (tag != null) 'tag': tag,
       if (score != null) 'score': score,
       if (chunkA != null) 'chunk_a': chunkA,
       if (chunkB != null) 'chunk_b': chunkB,
@@ -3142,6 +3185,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     Value<String>? kind,
     Value<int>? noteA,
     Value<int>? noteB,
+    Value<String>? tag,
     Value<double>? score,
     Value<int>? chunkA,
     Value<int>? chunkB,
@@ -3154,6 +3198,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
       kind: kind ?? this.kind,
       noteA: noteA ?? this.noteA,
       noteB: noteB ?? this.noteB,
+      tag: tag ?? this.tag,
       score: score ?? this.score,
       chunkA: chunkA ?? this.chunkA,
       chunkB: chunkB ?? this.chunkB,
@@ -3177,6 +3222,9 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     }
     if (noteB.present) {
       map['note_b'] = Variable<int>(noteB.value);
+    }
+    if (tag.present) {
+      map['tag'] = Variable<String>(tag.value);
     }
     if (score.present) {
       map['score'] = Variable<double>(score.value);
@@ -3206,6 +3254,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
           ..write('kind: $kind, ')
           ..write('noteA: $noteA, ')
           ..write('noteB: $noteB, ')
+          ..write('tag: $tag, ')
           ..write('score: $score, ')
           ..write('chunkA: $chunkA, ')
           ..write('chunkB: $chunkB, ')
@@ -6103,6 +6152,7 @@ typedef $$SuggestionsTableCreateCompanionBuilder =
       required String kind,
       required int noteA,
       required int noteB,
+      Value<String> tag,
       required double score,
       required int chunkA,
       required int chunkB,
@@ -6116,6 +6166,7 @@ typedef $$SuggestionsTableUpdateCompanionBuilder =
       Value<String> kind,
       Value<int> noteA,
       Value<int> noteB,
+      Value<String> tag,
       Value<double> score,
       Value<int> chunkA,
       Value<int> chunkB,
@@ -6179,6 +6230,11 @@ class $$SuggestionsTableFilterComposer
 
   ColumnFilters<String> get kind => $composableBuilder(
     column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tag => $composableBuilder(
+    column: $table.tag,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6278,6 +6334,11 @@ class $$SuggestionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get tag => $composableBuilder(
+    column: $table.tag,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get score => $composableBuilder(
     column: $table.score,
     builder: (column) => ColumnOrderings(column),
@@ -6369,6 +6430,9 @@ class $$SuggestionsTableAnnotationComposer
 
   GeneratedColumn<String> get kind =>
       $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get tag =>
+      $composableBuilder(column: $table.tag, builder: (column) => column);
 
   GeneratedColumn<double> get score =>
       $composableBuilder(column: $table.score, builder: (column) => column);
@@ -6467,6 +6531,7 @@ class $$SuggestionsTableTableManager
                 Value<String> kind = const Value.absent(),
                 Value<int> noteA = const Value.absent(),
                 Value<int> noteB = const Value.absent(),
+                Value<String> tag = const Value.absent(),
                 Value<double> score = const Value.absent(),
                 Value<int> chunkA = const Value.absent(),
                 Value<int> chunkB = const Value.absent(),
@@ -6478,6 +6543,7 @@ class $$SuggestionsTableTableManager
                 kind: kind,
                 noteA: noteA,
                 noteB: noteB,
+                tag: tag,
                 score: score,
                 chunkA: chunkA,
                 chunkB: chunkB,
@@ -6491,6 +6557,7 @@ class $$SuggestionsTableTableManager
                 required String kind,
                 required int noteA,
                 required int noteB,
+                Value<String> tag = const Value.absent(),
                 required double score,
                 required int chunkA,
                 required int chunkB,
@@ -6502,6 +6569,7 @@ class $$SuggestionsTableTableManager
                 kind: kind,
                 noteA: noteA,
                 noteB: noteB,
+                tag: tag,
                 score: score,
                 chunkA: chunkA,
                 chunkB: chunkB,

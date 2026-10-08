@@ -91,6 +91,11 @@ abstract final class AppCopy {
   // Review and suggestion card (UI spec §6, §8).
   static String suggestionReason(String title) =>
       'Looks related to your note on $title.';
+  static String tagReason(String tag) =>
+      'Notes like this one are tagged ${tagLabel(tag)}.';
+  static const tagThisNote = 'This note';
+  static String tagHasIt(String tag) => 'Has ${tagLabel(tag)}';
+  static String suggestedTag(String tag) => 'Suggested tag: ${tagLabel(tag)}';
   static const accept = 'Accept';
   static const reject = 'Reject';
   static const notSure = 'Not sure';

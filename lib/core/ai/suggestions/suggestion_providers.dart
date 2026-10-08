@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/linked_note.dart';
 import '../../models/suggested_link.dart';
+import '../../models/suggestion.dart';
 import '../../settings/app_prefs_controller.dart';
 import '../../storage/storage_providers.dart';
 import 'suggestion_actions.dart';
@@ -37,7 +38,7 @@ final suggestedLinksProvider = StreamProvider.autoDispose
       final storage = ref.watch(storageProvider);
       return storage.suggestions.watchFor(note).asyncMap((list) async {
         final links = <SuggestedLink>[];
-        for (final s in list) {
+        for (final s in list.where((s) => !s.isTag)) {
           final other = await storage.notes.getNote(s.otherThan(note));
           if (other == null) continue;
           links.add(
@@ -46,4 +47,21 @@ final suggestedLinksProvider = StreamProvider.autoDispose
         }
         return links;
       });
+    });
+
+/// Tag suggestions waiting for one note, for the dimmed chips in its Tags
+/// row (UI spec §7).
+final suggestedTagsProvider = StreamProvider.autoDispose
+    .family<List<Suggestion>, int>((ref, note) {
+      if (!ref.watch(suggestionsOnProvider)) return Stream.value(const []);
+      return ref
+          .watch(storageProvider)
+          .suggestions
+          .watchFor(note)
+          .map(
+            (list) => [
+              for (final s in list)
+                if (s.isTag && s.noteA == note) s,
+            ],
+          );
     });

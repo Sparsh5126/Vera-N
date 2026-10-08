@@ -296,6 +296,8 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       builder: (context, ref, _) {
         final suggested =
             ref.watch(suggestedLinksProvider(note.ref)).value ?? const [];
+        final tagSuggestions =
+            ref.watch(suggestedTagsProvider(note.ref)).value ?? const [];
         return NoteDetails(
           folder: note.folder,
           onFolderTap: () => unawaited(_actions.moveToFolder(context, note)),
@@ -314,6 +316,13 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
               ),
             );
           },
+          suggestedTags: [for (final s in tagSuggestions) s.tag],
+          onSuggestedTagTap: (tag) => unawaited(
+            _suggestions.open(
+              context,
+              tagSuggestions.firstWhere((s) => s.tag == tag),
+            ),
+          ),
           onAddTag: () => unawaited(_actions.addTag(context, note)),
           onTagTap: (tag) => unawaited(_actions.tagTapped(context, note, tag)),
           onOpenNote: _openNote,

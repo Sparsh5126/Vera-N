@@ -279,3 +279,8 @@ Raised by the storage stage — **built as proposed, easy to change; please conf
 - The suffix (4 lowercase hex characters from a secure random source, 65,536 values) avoids collisions when two devices create notes in the same second while offline. If a name still exists on the device, a new suffix is drawn.
 - For notes created in the app, the header `id` equals the file name without `.md` (adopted imported notes differ; see Note identity).
 - If inline links are chosen later, they are written as `[[20261003-153228-a7f3|Time Loop]]` so they keep working in Obsidian.
+
+
+## Tag suggestions (2026-10-08)
+
+Stored in `suggestions` with `kind = 'tag'`, `noteA` = the note to tag, `noteB` = the closest note that already has the tag (the reason), `tag` = the tag (schema 6). Rejected tags reuse the rejections table and file as the pair (note id, `#tag`). Only existing tags are suggested on the phone (`TagSuggester`).

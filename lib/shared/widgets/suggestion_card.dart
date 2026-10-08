@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/copy/app_copy.dart';
+import '../../core/models/suggestion_view.dart';
 import '../../core/styles/app_styles.dart';
 import 'highlighted_text.dart';
 
@@ -19,6 +20,28 @@ class SuggestionSide {
   final String title;
   final String passage;
   final VoidCallback onOpen;
+}
+
+/// The words around a suggestion card: each side's label and the reason.
+/// A link names the other note ([otherTitle], or the older note); a tag
+/// says which tag and that notes like this one have it.
+({String first, String second, String reason}) suggestionWording(
+  SuggestionView view, {
+  String? otherTitle,
+}) {
+  final s = view.suggestion;
+  if (s.isTag) {
+    return (
+      first: AppCopy.tagThisNote,
+      second: AppCopy.tagHasIt(s.tag),
+      reason: AppCopy.tagReason(s.tag),
+    );
+  }
+  return (
+    first: AppCopy.reviewNewLabel,
+    second: AppCopy.reviewOlderLabel,
+    reason: AppCopy.suggestionReason(otherTitle ?? view.older.title),
+  );
 }
 
 /// The suggestion card (UI spec §8): both notes with the matching passage

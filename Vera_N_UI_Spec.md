@@ -213,7 +213,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 
 **First-time hint:** a one-time overlay showing the four gestures, never shown again.
 
-**Other card types** use the same swipe pattern: tag suggestion (note with proposed tag chip) and topic suggestion (the notes it would group).
+**Other card types** use the same swipe pattern: tag suggestion (note with proposed tag chip) and topic suggestion (the notes it would group). Built 2026-10-08: tag cards show this note, then the closest note that already has the tag ("This note" / "Has #music"), with "Notes like this one are tagged #music." Topic cards wait for topic discovery.
 
 **Finished:** a quiet "All caught up" screen. No streaks or rewards. A "Review 5 more" button appears only if more exist.
 

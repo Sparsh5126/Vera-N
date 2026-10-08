@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../../models/note.dart';
 import '../../models/rejection.dart';
 import '../../models/suggestion.dart';
@@ -36,6 +38,7 @@ class SuggestionActions {
   /// Links the two notes: the newer note gets a link to the older one in
   /// its "Linked notes" footer (only added to, never rewritten).
   Future<Undo> accept(Suggestion s) async {
+    if (s.isTag) return _acceptTag(s);
     final pair = await _notes(s);
     if (pair == null) return _removeOnly(s);
     final (newer, older) = pair.$1.created.isAfter(pair.$2.created)
@@ -59,6 +62,7 @@ class SuggestionActions {
 
   /// Remembers the pair so it isn't suggested again (product spec §8).
   Future<Undo> reject(Suggestion s) async {
+    if (s.isTag) return _rejectTag(s);
     final pair = await _notes(s);
     if (pair == null) return _removeOnly(s);
     final idA = await notes.ensureId(s.noteA);
@@ -96,6 +100,56 @@ class SuggestionActions {
       kind,
       SuggestionLearning.undoLast(await settings.learning(kind)),
     );
+  }
+
+  /// A tag suggestion accepted: the tag joins the note's tags (an
+  /// addition, approved; product spec §11). Undo removes it again unless
+  /// the tags changed since.
+  Future<Undo> _acceptTag(Suggestion s) async {
+    final note = await notes.getNote(s.noteA);
+    if (note == null) return _removeOnly(s);
+    final before = note.tags;
+    final after = [...before, s.tag];
+    await notes.setTags(s.noteA, after);
+    await suggestions.remove(s.id);
+    final unlearn = await _learn(s.kind, accepted: true);
+    return () async {
+      await unlearn();
+      final now = await notes.getNote(s.noteA);
+      if (now != null && listEquals(now.tags, after)) {
+        await notes.setTags(s.noteA, before);
+      }
+      await suggestions.putBack(s);
+    };
+  }
+
+  /// A tag suggestion rejected: remembered as the pair (note id, `#tag`)
+  /// in the same rejections file, so it isn't suggested again.
+  Future<Undo> _rejectTag(Suggestion s) async {
+    final note = await notes.getNote(s.noteA);
+    final id = note == null ? null : await notes.ensureId(s.noteA);
+    if (note == null || id == null) return _removeOnly(s);
+    final deviceId = await settings.deviceId();
+    final tagSide = Rejection.tagSide(s.tag);
+    final noteFirst = id.compareTo(tagSide) < 0;
+    final noteHash = NoteText.contentHash(note.body);
+    final tagHash = s.tag.toLowerCase();
+    final rejection = Rejection(
+      noteA: noteFirst ? id : tagSide,
+      hashA: noteFirst ? noteHash : tagHash,
+      noteB: noteFirst ? tagSide : id,
+      hashB: noteFirst ? tagHash : noteHash,
+      rejectedAt: _clock(),
+      deviceId: deviceId,
+    );
+    await rejections.add(rejection);
+    await suggestions.remove(s.id);
+    final unlearn = await _learn(s.kind, accepted: false);
+    return () async {
+      await unlearn();
+      await rejections.remove(rejection.pairKey, deviceId);
+      await suggestions.putBack(s);
+    };
   }
 
   /// Keeps it dimmed; it comes back in a later batch until it expires.

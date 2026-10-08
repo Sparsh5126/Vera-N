@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/copy/app_copy.dart';
 import '../../core/models/suggestion_view.dart';
 import '../../core/styles/app_styles.dart';
 import 'decision_buttons.dart';
@@ -16,7 +15,7 @@ abstract final class SuggestionSheet {
   static Future<SheetChoice?> show(
     BuildContext context,
     SuggestionView view, {
-    required String otherTitle,
+    String? otherTitle,
     required ValueChanged<int> onOpenNote,
     required String Function(DateTime) dateLabel,
   }) {
@@ -29,6 +28,7 @@ abstract final class SuggestionSheet {
         onOpenNote(note.ref);
       },
     );
+    final words = suggestionWording(view, otherTitle: otherTitle);
     return showModalBottomSheet<SheetChoice>(
       context: context,
       useRootNavigator: true,
@@ -45,9 +45,9 @@ abstract final class SuggestionSheet {
             mainAxisSize: MainAxisSize.min,
             children: [
               SuggestionCard(
-                newer: side(AppCopy.reviewNewLabel, view.newer),
-                older: side(AppCopy.reviewOlderLabel, view.older),
-                reason: AppCopy.suggestionReason(otherTitle),
+                newer: side(words.first, view.newer),
+                older: side(words.second, view.older),
+                reason: words.reason,
               ),
               const SizedBox(height: AppSpace.m),
               DecisionButtons(

@@ -155,6 +155,44 @@ class AnalysisRepository {
     ];
   }
 
+  /// The tags of each of [refs] (notes without tags are left out).
+  Future<Map<int, Set<String>>> tagsOf(Iterable<int> refs) async {
+    final ids = refs.toList();
+    if (ids.isEmpty) return const {};
+    final rows = await (_db.select(
+      _db.noteTags,
+    )..where((t) => t.note.isIn(ids))).get();
+    final out = <int, Set<String>>{};
+    for (final r in rows) {
+      (out[r.note] ??= {}).add(r.tag);
+    }
+    return out;
+  }
+
+  /// Tags the user rejected for note [ref], lowercase, without `#`. A tag
+  /// rejection is a pair of the note's id and `#tag` (see [Rejection]).
+  Future<Set<String>> rejectedTags(int ref) async {
+    final rows = await _db
+        .customSelect(
+          "SELECT CASE WHEN r.note_a = n.note_id THEN r.note_b "
+          'ELSE r.note_a END AS tag FROM notes n JOIN rejections r '
+          "ON (r.note_a = n.note_id AND r.note_b LIKE '#%') "
+          "OR (r.note_b = n.note_id AND r.note_a LIKE '#%') WHERE n.id = ?",
+          variables: [Variable(ref)],
+          readsFrom: {_db.notes, _db.rejections},
+        )
+        .get();
+    return {for (final r in rows) r.read<String>('tag').substring(1)};
+  }
+
+  /// Tags already waiting as suggestions for note [ref], lowercase.
+  Future<Set<String>> pendingTags(int ref) async {
+    final rows = await (_db.select(
+      _db.suggestions,
+    )..where((s) => s.kind.equals('tag') & s.noteA.equals(ref))).get();
+    return {for (final r in rows) r.tag.toLowerCase()};
+  }
+
   /// Notes [ref] is already linked with, in either direction: these are
   /// never suggested.
   Future<Set<int>> linkedWith(int ref) async {

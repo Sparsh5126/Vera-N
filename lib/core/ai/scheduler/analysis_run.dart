@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 
 import '../../models/chunk_vector.dart';
 import '../../models/note_to_analyze.dart';
+import '../../models/suggestion.dart';
 import '../../models/suggestion_draft.dart';
 import '../../storage/repositories/analysis_repository.dart';
 import '../../storage/repositories/suggestions_repository.dart';
@@ -12,6 +13,7 @@ import '../ai_settings.dart';
 import '../chunking/note_chunker.dart';
 import '../embedder/embedder.dart';
 import '../matching/note_matcher.dart';
+import '../matching/tag_suggester.dart';
 import '../matching/vectors.dart';
 import '../matching/word_signature.dart';
 
@@ -31,12 +33,16 @@ class AnalysisRun {
     Stopwatch? stopwatch,
     bool Function()? stopRequested,
     this.linkThreshold = AiSettings.strongMatch,
+    this.tagThreshold = AiSettings.strongMatch,
   }) : _stopRequested = stopRequested ?? _never,
        _clock = clock ?? DateTime.now,
        _stopwatch = stopwatch ?? Stopwatch();
 
   /// The link bar, as learned from accept rates (product spec §8).
   final double linkThreshold;
+
+  /// The bar for a tag's neighbours, learned separately (kind `tag`).
+  final double tagThreshold;
   final AnalysisRepository analysis;
   final SuggestionsRepository suggestions;
   final Embedder embedder;
@@ -115,31 +121,80 @@ class AnalysisRun {
     final drafts = <SuggestionDraft>[];
     for (final ref in changed) {
       final own = all.where((c) => c.note == ref).toList();
-      final matches = NoteMatcher.strongMatches(
-        own,
-        all,
-        threshold: linkThreshold,
-        limit: AiSettings.suggestionsPerNote,
-        exclude: {
-          ref,
-          ...await analysis.linkedWith(ref),
-          ...await _stillRejected(ref),
-        },
-      );
-      for (final m in matches) {
-        drafts.add(
-          SuggestionDraft(
-            kind: 'link',
-            noteA: ref,
-            noteB: m.note,
-            score: m.score,
-            chunkA: m.ownChunk,
-            chunkB: m.otherChunk,
-          ),
-        );
-      }
+      drafts
+        ..addAll(await _linkDrafts(ref, own, all))
+        ..addAll(await _tagDrafts(ref, own, all));
     }
     await suggestions.add(drafts, _clock(), AiSettings.suggestionLifetime);
+  }
+
+  Future<List<SuggestionDraft>> _linkDrafts(
+    int ref,
+    List<ChunkVector> own,
+    List<ChunkVector> all,
+  ) async {
+    final matches = NoteMatcher.strongMatches(
+      own,
+      all,
+      threshold: linkThreshold,
+      limit: AiSettings.suggestionsPerNote,
+      exclude: {
+        ref,
+        ...await analysis.linkedWith(ref),
+        ...await _stillRejected(ref),
+      },
+    );
+    return [
+      for (final m in matches)
+        SuggestionDraft(
+          kind: Suggestion.linkKind,
+          noteA: ref,
+          noteB: m.note,
+          score: m.score,
+          chunkA: m.ownChunk,
+          chunkB: m.otherChunk,
+        ),
+    ];
+  }
+
+  /// Tags that notes very close to [ref] share and it lacks (product spec
+  /// §11; see [TagSuggester]).
+  Future<List<SuggestionDraft>> _tagDrafts(
+    int ref,
+    List<ChunkVector> own,
+    List<ChunkVector> all,
+  ) async {
+    final neighbours = NoteMatcher.strongMatches(
+      own,
+      all,
+      threshold: tagThreshold,
+      limit: AiSettings.tagNeighbours,
+      exclude: {ref},
+    );
+    if (neighbours.length < TagSuggester.minNeighbours) return const [];
+    final tags = await analysis.tagsOf([ref, ...neighbours.map((n) => n.note)]);
+    final candidates = TagSuggester.forNote(
+      neighbours: neighbours,
+      tagsOf: tags,
+      own: tags[ref] ?? const {},
+      rejected: {
+        ...await analysis.rejectedTags(ref),
+        ...await analysis.pendingTags(ref),
+      },
+      limit: AiSettings.tagsPerNote,
+    );
+    return [
+      for (final c in candidates)
+        SuggestionDraft(
+          kind: Suggestion.tagKind,
+          noteA: ref,
+          noteB: c.evidence.note,
+          tag: c.tag,
+          score: c.score,
+          chunkA: c.evidence.ownChunk,
+          chunkB: c.evidence.otherChunk,
+        ),
+    ];
   }
 
   /// Notes rejected with [ref] where neither note changed a lot since

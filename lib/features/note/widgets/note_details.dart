@@ -20,6 +20,8 @@ class NoteDetails extends StatelessWidget {
     required this.mentionedIn,
     this.suggested = const [],
     this.onSuggestedTap,
+    this.suggestedTags = const [],
+    this.onSuggestedTagTap,
     required this.onFolderTap,
     required this.onAddTag,
     required this.onTagTap,
@@ -35,6 +37,11 @@ class NoteDetails extends StatelessWidget {
   /// Notes the app suggests linking; tapping one opens the suggestion.
   final List<LinkedNote> suggested;
   final ValueChanged<int>? onSuggestedTap;
+
+  /// Tags the app suggests (dimmed, in the Tags row after the confirmed
+  /// ones; UI spec §7). Tapping one opens the suggestion.
+  final List<String> suggestedTags;
+  final ValueChanged<String>? onSuggestedTagTap;
 
   /// Opens the move-to-folder sheet.
   final VoidCallback onFolderTap;
@@ -102,7 +109,8 @@ class NoteDetails extends StatelessWidget {
       icon: const Icon(Icons.add, size: AppSize.iconSmall),
       label: const Text(AppCopy.addTag),
     );
-    if (folder.isEmpty && tags.isEmpty) {
+    final anyTags = tags.isNotEmpty || suggestedTags.isNotEmpty;
+    if (folder.isEmpty && !anyTags) {
       return [
         _section(null, _wrap([addToFolder, addTag])),
       ];
@@ -121,10 +129,17 @@ class NoteDetails extends StatelessWidget {
               ]),
       ),
       _section(
-        tags.isEmpty ? null : AppCopy.tags,
+        anyTags ? AppCopy.tags : null,
         _wrap([
           for (final tag in tags)
             NoteChip(label: AppCopy.tagLabel(tag), onTap: () => onTagTap(tag)),
+          for (final tag in suggestedTags)
+            NoteChip(
+              label: AppCopy.tagLabel(tag),
+              dimmed: true,
+              semanticLabel: AppCopy.suggestedTag(tag),
+              onTap: () => onSuggestedTagTap?.call(tag),
+            ),
           addTag,
         ]),
       ),

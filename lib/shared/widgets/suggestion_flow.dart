@@ -60,7 +60,7 @@ class SuggestionFlow {
     final choice = await SuggestionSheet.show(
       context,
       view,
-      otherTitle: otherTitle ?? view.older.title,
+      otherTitle: otherTitle,
       onOpenNote: onOpenNote,
       dateLabel: dateLabel,
     );

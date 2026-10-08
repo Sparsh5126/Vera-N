@@ -39,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -66,6 +66,13 @@ class AppDatabase extends _$AppDatabase {
         await m.createIndex(suggestionsExpires);
       }
       if (from < 5) await m.createTable(rejections);
+      if (from < 6) {
+        // Tag suggestions: a tag column, and the unique key now includes
+        // it (the table is rebuilt; pending suggestions are kept).
+        await m.alterTable(
+          TableMigration(suggestions, newColumns: [suggestions.tag]),
+        );
+      }
     },
     beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),
   );
