@@ -8,9 +8,13 @@ import io.flutter.plugin.common.MethodChannel
 
 /**
  * The `vera_n/launch` channel: capture entry points (app shortcut now;
- * widget and Quick Settings tile later) and startup timing.
+ * widget and Quick Settings tile later), startup timing, and the app
+ * version for Settings.
  */
-class LaunchBridge(private val channel: MethodChannel) : MethodChannel.MethodCallHandler {
+class LaunchBridge(
+    private val channel: MethodChannel,
+    private val versionName: () -> String?,
+) : MethodChannel.MethodCallHandler {
     companion object {
         const val CHANNEL = "vera_n/launch"
         const val ACTION_NEW_NOTE = "com.example.vera_n.NEW_NOTE"
@@ -24,6 +28,7 @@ class LaunchBridge(private val channel: MethodChannel) : MethodChannel.MethodCal
             // Milliseconds since this process started, for the startup log.
             "sinceProcessStart" ->
                 result.success(SystemClock.uptimeMillis() - Process.getStartUptimeMillis())
+            "versionName" -> result.success(versionName())
             else -> result.notImplemented()
         }
     }

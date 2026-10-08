@@ -11,6 +11,8 @@ class TextEntrySheet extends StatefulWidget {
     required this.hint,
     required this.suggestions,
     this.labelFor,
+    this.initial = '',
+    this.allowEmpty = false,
   });
 
   /// Shows the sheet above the nav bar; null if dismissed.
@@ -19,6 +21,8 @@ class TextEntrySheet extends StatefulWidget {
     required String hint,
     List<String> suggestions = const [],
     String Function(String)? labelFor,
+    String initial = '',
+    bool allowEmpty = false,
   }) {
     return showModalBottomSheet<String>(
       context: context,
@@ -29,6 +33,8 @@ class TextEntrySheet extends StatefulWidget {
         hint: hint,
         suggestions: suggestions,
         labelFor: labelFor,
+        initial: initial,
+        allowEmpty: allowEmpty,
       ),
     );
   }
@@ -39,12 +45,18 @@ class TextEntrySheet extends StatefulWidget {
   /// How a suggestion is shown (e.g. with a `#`).
   final String Function(String)? labelFor;
 
+  /// Text already in the field (e.g. the current name).
+  final String initial;
+
+  /// Whether an empty entry may be saved (it clears the value).
+  final bool allowEmpty;
+
   @override
   State<TextEntrySheet> createState() => _TextEntrySheetState();
 }
 
 class _TextEntrySheetState extends State<TextEntrySheet> {
-  final _text = TextEditingController();
+  late final _text = TextEditingController(text: widget.initial);
 
   @override
   void dispose() {
@@ -53,7 +65,9 @@ class _TextEntrySheetState extends State<TextEntrySheet> {
   }
 
   void _done(String value) {
-    if (value.trim().isNotEmpty) Navigator.of(context).pop(value.trim());
+    if (value.trim().isNotEmpty || widget.allowEmpty) {
+      Navigator.of(context).pop(value.trim());
+    }
   }
 
   @override

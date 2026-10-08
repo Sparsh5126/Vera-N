@@ -25,5 +25,7 @@ From the user's note `20261004-145445-ae09` (2026-10-04): "all these aren't urge
   - Without the checkbox/bullet glyph widgets: 22 ms, so glyphs are not the cause.
   - Not yet measured: without the hidden-symbol style (0.01 font size runs) and without bold font variations. These are the next two suspects (many tiny style runs break up text shaping).
   - Already fixed: the quadratic span build (CHANGELOG).
-- **Release build size.** Profile APKs varied between 75 and 98 MB between builds; measure a release build and log it.
+- ~~**Release build size.**~~ Measured 2026-10-04 (CHANGELOG): the release arm64 APK is 71.3 MB with the model, 21.4 MB without. Per-device APKs or an app bundle are needed: a single all-CPU APK is about 160 MB.
 - **Application id** is still `com.example.vera_n`; it needs the user's own id before any store release.
+- ~~**Device check of background analysis.**~~ Passed 2026-10-08 on the measurement build: after leaving the app while charging, the log shows `VeraN analysis: requested`, and the run started 60 s later and finished (`run finished, all done: true`). Work queued by the earlier build also ran at the next launch. Why the 2026-10-04 check saw no job is unknown (it has not come back since the logging was added). Not yet checked: that a library with matching notes produces suggestions on the phone.
+- **Slow first launch seen once (2026-10-04):** "15415 ms to typing cursor" on the first launch after installing the new build (schema 4 migration plus the new plugins). Check whether it repeats on a second launch; the target is about 1 s.

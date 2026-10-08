@@ -8,6 +8,7 @@ class SafNoteFileStore implements NoteFileStore {
   SafNoteFileStore(this.tree, {this.channel = const NotesFolderChannel()});
 
   static const notesDir = 'Notes';
+  static const appDir = '.app';
 
   /// URI of the picked folder.
   final String tree;
@@ -61,6 +62,27 @@ class SafNoteFileStore implements NoteFileStore {
   @override
   Future<void> delete(String path) =>
       channel.call<void>('delete', tree, path: _full(path));
+
+  @override
+  Future<String?> readAppFile(String name) async {
+    final path = '$appDir/${checkAppFileName(name)}';
+    final found = await channel.call<Map<Object?, Object?>>(
+      'stat',
+      tree,
+      path: path,
+    );
+    if (found == null) return null;
+    return channel.call<String>('read', tree, path: path);
+  }
+
+  @override
+  Future<void> writeAppFile(String name, String content) =>
+      channel.call<Map<Object?, Object?>>(
+        'write',
+        tree,
+        path: '$appDir/${checkAppFileName(name)}',
+        extra: {'content': content},
+      );
 
   String _full(String path) => '$notesDir/${checkNotePath(path).join('/')}';
 

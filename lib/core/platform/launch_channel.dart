@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 /// Dart side of the Android `vera_n/launch` bridge (`LaunchBridge.kt`):
-/// capture entry points and startup timing.
+/// capture entry points, startup timing and the app version.
 abstract final class LaunchChannel {
   static const _channel = MethodChannel('vera_n/launch');
   static var _typingReadyLogged = false;
@@ -35,6 +35,15 @@ abstract final class LaunchChannel {
       if (ms != null) debugPrint('VeraN startup: $ms ms to typing cursor');
     } on MissingPluginException {
       // Not on Android (tests, desktop): nothing to measure.
+    }
+  }
+
+  /// The installed version (e.g. "0.1.0"), or null off Android.
+  static Future<String?> version() async {
+    try {
+      return await _channel.invokeMethod<String>('versionName');
+    } on MissingPluginException {
+      return null;
     }
   }
 }

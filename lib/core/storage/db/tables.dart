@@ -95,3 +95,95 @@ class Links extends Table {
   @override
   Set<Column<Object>> get primaryKey => {source, targetKey};
 }
+
+/// Per note: what the last analysis read, so a note is embedded again only
+/// when its text or the model changed (product spec §4). Rebuildable.
+@DataClassName('NoteAnalysisRow')
+class NoteAnalysis extends Table {
+  IntColumn get note =>
+      integer().references(Notes, #id, onDelete: KeyAction.cascade)();
+  TextColumn get contentHash => text()();
+
+  /// Embedding model name and version the chunks were made with.
+  TextColumn get model => text()();
+  DateTimeColumn get analyzedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {note};
+}
+
+/// Chunk embeddings: a note's text split into pieces the model can read,
+/// each with an int8 vector (384 bytes). Rebuildable from the notes.
+@DataClassName('ChunkRow')
+class Chunks extends Table {
+  IntColumn get note =>
+      integer().references(Notes, #id, onDelete: KeyAction.cascade)();
+  IntColumn get idx => integer()();
+
+  /// Where the chunk sits in the note's text, for "why related" later.
+  IntColumn get start => integer()();
+  IntColumn get end => integer()();
+
+  /// Hash of the chunk's text: unchanged chunks keep their vector.
+  TextColumn get hash => text()();
+  TextColumn get model => text()();
+  BlobColumn get vector => blob()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {note, idx};
+}
+
+/// AI suggestions waiting for review (product spec §7). Never written to
+/// files; rebuildable. [noteA] < [noteB], one row per pair and kind.
+@DataClassName('SuggestionRow')
+@TableIndex(name: 'suggestions_note_a', columns: {#noteA})
+@TableIndex(name: 'suggestions_note_b', columns: {#noteB})
+@TableIndex(name: 'suggestions_expires', columns: {#expiresAt})
+class Suggestions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  /// `link` for now; later `tag`, `topic`, `resurface`.
+  TextColumn get kind => text()();
+  IntColumn get noteA =>
+      integer().references(Notes, #id, onDelete: KeyAction.cascade)();
+  IntColumn get noteB =>
+      integer().references(Notes, #id, onDelete: KeyAction.cascade)();
+  RealColumn get score => real()();
+
+  /// The best-matching chunk of each note, for "why related".
+  IntColumn get chunkA => integer()();
+  IntColumn get chunkB => integer()();
+
+  /// `fresh` (not yet reviewed) or `notSure` (comes back in a later batch).
+  TextColumn get status => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get expiresAt => dateTime()();
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {kind, noteA, noteB},
+  ];
+}
+
+/// Rejected suggestions (product spec §8), so a pair doesn't come back.
+/// Also appended to `MyNotes/.app/rejections-<deviceid>.jsonl` (ids and
+/// hashes only), so they survive uninstall and reach other devices.
+@DataClassName('RejectionRow')
+class Rejections extends Table {
+  /// `idA|idB`, the two note ids in sorted order.
+  TextColumn get pairKey => text()();
+  TextColumn get noteA => text()();
+  TextColumn get hashA => text()();
+  TextColumn get noteB => text()();
+  TextColumn get hashB => text()();
+
+  /// Word fingerprints (see `WordSignature`) when rejected, kept only in
+  /// this private database: a pair returns only after a big change.
+  BlobColumn get signatureA => blob().nullable()();
+  BlobColumn get signatureB => blob().nullable()();
+  DateTimeColumn get rejectedAt => dateTime()();
+  TextColumn get deviceId => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {pairKey};
+}

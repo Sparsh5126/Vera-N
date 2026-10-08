@@ -34,6 +34,8 @@ lib/
 │   │   └── motion.dart            reduce-motion aware helpers (durations come from app_styles)
 │   ├── platform/
 │   │   └── launch_channel.dart    capture entry points and startup timing (Android bridge)
+│   ├── settings/
+│   │   └── app_prefs_controller.dart  the user's Settings choices (AppPrefs), read once at start
 │   ├── navigation/
 │   │   └── routes.dart            route names/paths (features navigate by name, never import each other)
 │   ├── models/                    plain immutable data: Note, Chunk, Suggestion, Rejection, Relationship, Topic
@@ -189,7 +191,7 @@ Each package is logged in `CHANGELOG.md` with size and battery impact when it is
 
 From the specs — **blocking the stages noted, not the architecture**:
 
-1. **Accepted-link storage**: inline footer block vs sidecar. Blocks: Review/accept logic.
+1. ~~Accepted-link storage~~: **decided 2026-10-04**: inline, in one append-only "Linked notes" footer block at the end of the note, written only when the user accepts (product spec §5). Built in the Review stage.
 2. ~~On-device embedding model~~: **decided 2026-10-04**: paraphrase-multilingual-MiniLM-L12-v2 int8, trimmed to English + Hindi (`tool/model_trim/`), ONNX Runtime (`flutter_onnxruntime`), bundled. See section 8.
 3. ~~Similarity thresholds~~: **decided 2026-10-04**: a "strong" match is cosine ≥ **0.60** at launch. On the benchmark's Hindi / English / Hinglish pairs, unrelated notes topped out at 0.50 and related pairs averaged 0.71. It is to be tuned later from accept rates (product spec §8).
 
@@ -226,6 +228,27 @@ Raised by the storage stage — **built as proposed, easy to change; please conf
 - Loaded only for a batch, then released: it adds ~140 MB of memory while loaded and takes 0.5–0.8 s to load on a Snapdragon 778G.
 - Files: `assets/models/minilm-l12-en-hi/` (Git LFS), with the Apache-2.0 license and a notice of the trim.
 - Evidence: `tool/embedding_bench/README.md` and `tool/model_trim/README.md`.
+
+**On-device analysis** (built 2026-10-04)
+- `core/ai/`: `embedder/` (the `Embedder` interface; `OnnxEmbedder`; `ModelFiles`, which copies the model out of the app once under a versioned name), `chunking/NoteChunker` (sentences and lines, ≤ 126 tokens per chunk, Devanagari `।` included), `matching/` (`Vectors`: int8 quantize and cosine; `NoteMatcher`: a pair of notes scores as its best chunk pair), `scheduler/` (`AnalysisRun`, `AnalysisScheduler`), and `ai_settings.dart` (every tunable value).
+- Schema 4 adds three tables, all rebuildable:
+  - `note_analysis`: the content hash and model each note was last analyzed with. A note is embedded again only when either changes.
+  - `chunks`: character range, chunk text hash, model, and a 384-byte int8 vector. Unchanged chunks keep their vector.
+  - `suggestions`: kind, the note pair (lower id first, unique per kind), score, best chunk of each note, status (`fresh` / `notSure`), created, expires (30 days).
+- **When it runs:** leaving the app requests two WorkManager one-off jobs: one needs charging, the other needs device idle with battery not low. Each waits 1 minute and repeated requests merge. Whichever runs first does the work; the other finds nothing changed and returns without loading the model. If the system stops the work (for example the charger is unplugged), the run finishes its current note and stops. A library too big for one run continues in a later charging run.
+- **Database sharing:** the database is opened with `shareAcrossIsolates`, so the background job and the open app use one connection and the UI sees new suggestions.
+- **Defaults** (in `ai_settings.dart`, easy to change):
+  - notes under 4 words aren't matched;
+  - at most 3 new suggestions per changed note;
+  - 200 notes per run, 8-minute budget;
+  - a pair already suggested keeps its first expiry date;
+  - pairs already linked are never suggested.
+
+**Suggestion lifecycle** (built 2026-10-04)
+- `core/ai/suggestions/SuggestionActions`: accept, reject, not sure, each returning an undo. It is used by both the Review screen and the note's suggestion sheet.
+- **Accept** appends a link to the older note in the newer note's "## Linked notes" footer (`NoteFooter`).
+- **Reject** writes a `rejections` row (schema 5) and a line in `.app/rejections-<deviceid>.jsonl`.
+- **Reconsidering a rejected pair:** a word fingerprint of each note (`WordSignature`, MinHash, kept in the database only) decides whether a note changed a lot: under 2/3 of its words still the same.
 
 **Database location and `.app/`** (decided 2026-10-03)
 - The database lives in app-private storage; it is an index and rebuilds from `Notes/` and `.app/`.

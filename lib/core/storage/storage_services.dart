@@ -13,8 +13,18 @@ import 'files/switching_note_file_store.dart';
 import 'indexer/note_indexer.dart';
 import 'indexer/note_writer.dart';
 import 'indexer/notes_relocator.dart';
+import 'repositories/analysis_repository.dart';
 import 'repositories/notes_repository.dart';
+import 'repositories/rejections_repository.dart';
 import 'repositories/settings_repository.dart';
+import 'repositories/suggestions_repository.dart';
+
+/// What background analysis uses; see [StorageServices.openForAnalysis].
+typedef AnalysisStorage = ({
+  AnalysisRepository analysis,
+  SuggestionsRepository suggestions,
+  Future<void> Function() close,
+});
 
 /// The storage objects the app shares, wired together once at start.
 ///
@@ -24,10 +34,13 @@ class StorageServices {
   StorageServices(this.db, NoteFileStore holding, {this.folders})
     : _holding = holding,
       store = SwitchingNoteFileStore(holding),
-      settings = SettingsRepository(db) {
+      settings = SettingsRepository(db),
+      suggestions = SuggestionsRepository(db),
+      analysis = AnalysisRepository(db) {
     writer = NoteWriter(db, store);
     indexer = NoteIndexer(db, store);
     notes = NotesRepository(db, store, writer);
+    rejections = RejectionsRepository(db, store);
   }
 
   /// Opens storage on the device and reconnects to the picked folder.
@@ -43,9 +56,22 @@ class StorageServices {
     return services;
   }
 
+  /// Storage for the background analysis task: the database only (it
+  /// reads note text from there, never from the folder). Close it after.
+  static AnalysisStorage openForAnalysis() {
+    final db = AppDatabase.open();
+    return (
+      analysis: AnalysisRepository(db),
+      suggestions: SuggestionsRepository(db),
+      close: db.close,
+    );
+  }
+
   final AppDatabase db;
   final SwitchingNoteFileStore store;
   final SettingsRepository settings;
+  final SuggestionsRepository suggestions;
+  final AnalysisRepository analysis;
 
   /// Null where picking a folder isn't supported yet (desktop).
   final FolderAccess? folders;
@@ -53,6 +79,7 @@ class StorageServices {
   late final NoteWriter writer;
   late final NoteIndexer indexer;
   late final NotesRepository notes;
+  late final RejectionsRepository rejections;
   Future<void>? _reconciling;
 
   bool get canChooseFolder => folders != null;

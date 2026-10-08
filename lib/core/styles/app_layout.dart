@@ -41,12 +41,18 @@ abstract final class AppSize {
   /// Minimum tap target on every interactive element.
   static const double minTapTarget = 48;
   static const Size tapTarget = Size(minTapTarget, minTapTarget);
+
+  /// The main choice buttons on the Review screen: larger, in thumb reach.
+  static const double xlTapTarget = 64;
   static const double icon = 24;
   static const double iconSmall = 20;
 
   /// Note card in the Home grid and pinned row, before text scaling.
   static const double noteCardHeight = 168;
   static const double pinnedCardWidth = 168;
+
+  /// Note card in the Home list layout, before text scaling.
+  static const double noteRowHeight = 112;
 
   /// Space a checkbox or bullet takes at the start of a list line in the
   /// editor. The checkbox is tappable across this width and the line's

@@ -14,6 +14,7 @@ class NoteCard extends StatelessWidget {
     required this.pinned,
     required this.onTap,
     this.onLongPress,
+    this.suggested = false,
   });
 
   final String title;
@@ -21,6 +22,9 @@ class NoteCard extends StatelessWidget {
   final String dateLabel;
   final bool pinned;
   final VoidCallback onTap;
+
+  /// Suggestions involving this note are waiting: a small dimmed dot.
+  final bool suggested;
 
   /// Opens the card's options (Pin, Delete).
   final VoidCallback? onLongPress;
@@ -41,6 +45,7 @@ class NoteCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(child: Text(dateLabel, style: styles.small)),
+                  if (suggested) _dot(context),
                   if (pinned)
                     Icon(
                       Icons.push_pin_outlined,
@@ -67,4 +72,20 @@ class NoteCard extends StatelessWidget {
       ),
     );
   }
+
+  /// Dimmed like every AI suggestion; read out, never counted.
+  Widget _dot(BuildContext context) => Semantics(
+    label: AppCopy.hasSuggestions,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpace.xs),
+      child: Container(
+        width: AppSpace.s,
+        height: AppSpace.s,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: context.colors.accent.withValues(alpha: AppOpacity.dimmed),
+        ),
+      ),
+    ),
+  );
 }

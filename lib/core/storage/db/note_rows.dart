@@ -121,6 +121,7 @@ abstract final class NoteRows {
       pinned: r.read<bool>('pinned'),
       modified: r.read<DateTime>('modified'),
       folder: r.read<String>('folder'),
+      suggested: r.data['suggested'] == 1,
     );
   }
 

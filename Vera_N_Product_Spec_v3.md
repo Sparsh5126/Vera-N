@@ -108,7 +108,7 @@ Sync and AI are independent systems. Notes and sync work even if no AI is availa
 
 Key point: an approved link is a decision the user made, not something the AI can rebuild. The `.app/` folder is meant to be disposable, so approved links should not live only there.
 
-**Current recommendation:** inline, in one dedicated footer block at the end of the note (for example a "Linked notes" list), written only after the user accepts and only ever appended to. A single append-only block keeps sync merges simple and respects the additive-only rule. Suggestions and rejections stay in `.app/`.
+**Decided 2026-10-04:** inline, in one dedicated footer block at the end of the note (for example a "Linked notes" list), written only after the user accepts and only ever appended to. A single append-only block keeps sync merges simple and respects the additive-only rule. Suggestions and rejections stay in `.app/`.
 
 ---
 
@@ -150,7 +150,7 @@ Rules:
 - Every rejected pair is stored so it does not reappear.
 - Store a **content hash of both notes** with the rejection.
 - Rejections are kept in `MyNotes/.app/rejections-<deviceid>.jsonl` (see section 3), so they survive uninstall and reach every device. Each device appends only to its own file and reads all of them.
-- Rejections are not necessarily permanent: if either note changes substantially, the pair may be reconsidered, but only if the new match is strong.
+- Rejections are not necessarily permanent: if either note changes substantially (about a third or more of its words, decided 2026-10-04), the pair may be reconsidered, but only if the new match is strong.
 - Learning is simple: track the accept rate per suggestion type (link, tag, topic). If a type is rejected often, raise its threshold. No model training at first.
 
 ---
@@ -283,10 +283,10 @@ The phone detects a strong match and shows a dimmed suggestion. In the review ba
 ## 21. Open Decisions
 
 - Logo and app icon final artwork (direction: dark rounded square, serif V, one amber dot).
-- Where accepted links are stored (see section 5).
+- ~~Where accepted links are stored.~~ Decided 2026-10-04: inline, in one append-only "Linked notes" footer block at the end of the note (section 5).
 - ~~Which on-device embedding model to start with.~~ Decided 2026-10-04: paraphrase-multilingual-MiniLM-L12-v2 (int8), trimmed to English + Hindi and bundled; benchmarked on a mid-range phone (Snapdragon 778G). Details in docs/ARCHITECTURE.md §8.
 - ~~Similarity thresholds for "strong" at launch.~~ Decided 2026-10-04: cosine ≥ 0.60, tuned later from accept rates (section 8).
-- How "substantial change" is measured when reconsidering rejected pairs.
+- ~~How "substantial change" is measured when reconsidering rejected pairs.~~ Decided 2026-10-04: about a third or more of either note's words changed since the rejection (estimated from a word fingerprint kept in the private database, no note text), and the match is still strong.
 - Capture-screen details (launch-to-typing target). Markdown format and header fields are decided in docs/ARCHITECTURE.md §8: `id`, `created`, `tags`, `pinned`.
 
 ---

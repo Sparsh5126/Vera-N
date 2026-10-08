@@ -58,4 +58,15 @@ class MemoryNoteFileStore implements NoteFileStore {
   Future<void> delete(String path) async {
     files.remove(path);
   }
+
+  /// Files in `.app/`, by name.
+  final appFiles = <String, String>{};
+
+  @override
+  Future<String?> readAppFile(String name) async => appFiles[name];
+
+  @override
+  Future<void> writeAppFile(String name, String content) async {
+    appFiles[name] = content;
+  }
 }

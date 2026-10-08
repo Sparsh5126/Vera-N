@@ -32,4 +32,11 @@ class SwitchingNoteFileStore implements NoteFileStore {
 
   @override
   Future<void> delete(String path) => _current.delete(path);
+
+  @override
+  Future<String?> readAppFile(String name) => _current.readAppFile(name);
+
+  @override
+  Future<void> writeAppFile(String name, String content) =>
+      _current.writeAppFile(name, content);
 }

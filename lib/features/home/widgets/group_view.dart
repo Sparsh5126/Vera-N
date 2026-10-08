@@ -8,7 +8,7 @@ import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/filter_pill.dart';
 import '../state/home_view.dart';
 import 'card_callbacks.dart';
-import 'notes_grid.dart';
+import 'note_cards.dart';
 
 /// Home's Folders or Tags view: a pill per folder or tag; tapping one
 /// shows its notes below (a folder includes its subfolders), tapping it
@@ -81,6 +81,6 @@ class GroupView extends ConsumerWidget {
         ? SearchFilters(tag: picked)
         : SearchFilters(folder: picked);
     final notes = ref.watch(groupNotesProvider(filters)).value ?? const [];
-    return NotesGrid(notes: notes, now: now, cards: cards);
+    return NoteCards(notes: notes, now: now, cards: cards);
   }
 }

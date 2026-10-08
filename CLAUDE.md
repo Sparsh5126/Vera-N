@@ -6,7 +6,7 @@ Instructions for building **Vera N**, a local-first, privacy-first notes app (Fl
 
 - `Vera_N_Product_Spec_v3.md`: behavior, AI pipeline, data, privacy.
 - `Vera_N_UI_Spec.md`: every screen, gesture, copy line, and widget.
-- If code and specs disagree, the specs win. If a spec is unclear or has an open decision that blocks you, **ask; don't guess**. Open decisions right now: where accepted links are stored (inline vs sidecar), which on-device embedding model, similarity thresholds.
+- If code and specs disagree, the specs win. If a spec is unclear or has an open decision that blocks you, **ask; don't guess**. The earlier open decisions (link storage, embedding model, similarity threshold) were decided on 2026-10-04; see `docs/ARCHITECTURE.md` §7–8.
 - If you change behavior on purpose, update the spec in the same change and log it in the changelog.
 
 ## 2. Before writing any code

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import '../../models/app_prefs.dart';
 import '../db/app_database.dart';
 
 /// Per-device settings, kept in app-private storage (never synced).
@@ -12,6 +13,7 @@ class SettingsRepository {
   static const _deviceId = 'deviceId';
   static const _onboardingDone = 'onboardingDone';
   static const _recentSearches = 'recentSearches';
+  static const _reviewHintSeen = 'reviewHintSeen';
 
   /// Recent searches kept, newest first.
   static const recentSearchLimit = 8;
@@ -64,6 +66,40 @@ class SettingsRepository {
     return id;
   }
 
+  /// The Review screen's one-time gesture hint was shown (UI spec §6).
+  Future<bool> reviewHintSeen() async => await _get(_reviewHintSeen) == 'true';
+
+  Future<void> setReviewHintSeen() => _set(_reviewHintSeen, 'true');
+
+  /// The choices from Settings, with defaults for those never changed.
+  Future<AppPrefs> prefs() async {
+    final rows = await (_db.select(
+      _db.settings,
+    )..where((s) => s.key.isIn(_Prefs.keys))).get();
+    final v = {for (final r in rows) r.key: r.value};
+    T pick<T extends Enum>(List<T> values, String key, T fallback) =>
+        values.asNameMap()[v[key]] ?? fallback;
+    const d = AppPrefs();
+    return AppPrefs(
+      name: v[_Prefs.name],
+      layout: pick(NotesLayout.values, _Prefs.layout, d.layout),
+      startPage: pick(StartPage.values, _Prefs.startPage, d.startPage),
+      theme: pick(ThemeChoice.values, _Prefs.theme, d.theme),
+      suggestions: (v[_Prefs.suggestions] ?? '${d.suggestions}') == 'true',
+      chargingOnly: (v[_Prefs.chargingOnly] ?? '${d.chargingOnly}') == 'true',
+    );
+  }
+
+  Future<void> savePrefs(AppPrefs p) async {
+    final name = p.name?.trim();
+    await _set(_Prefs.name, name == null || name.isEmpty ? null : name);
+    await _set(_Prefs.layout, p.layout.name);
+    await _set(_Prefs.startPage, p.startPage.name);
+    await _set(_Prefs.theme, p.theme.name);
+    await _set(_Prefs.suggestions, '${p.suggestions}');
+    await _set(_Prefs.chargingOnly, '${p.chargingOnly}');
+  }
+
   Future<String?> _get(String key) async {
     final row = await (_db.select(
       _db.settings,
@@ -82,4 +118,22 @@ class SettingsRepository {
           SettingsCompanion.insert(key: key, value: value),
         );
   }
+}
+
+/// Settings keys of [AppPrefs].
+abstract final class _Prefs {
+  static const name = 'name';
+  static const layout = 'layout';
+  static const startPage = 'startPage';
+  static const theme = 'theme';
+  static const suggestions = 'suggestions';
+  static const chargingOnly = 'chargingOnly';
+  static const keys = [
+    name,
+    layout,
+    startPage,
+    theme,
+    suggestions,
+    chargingOnly,
+  ];
 }

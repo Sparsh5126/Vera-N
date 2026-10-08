@@ -17,7 +17,9 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, NotesFolderBridge.CHANNEL).setMethodCallHandler(folderBridge)
 
         val launchChannel = MethodChannel(messenger, LaunchBridge.CHANNEL)
-        val launchBridge = LaunchBridge(launchChannel)
+        val launchBridge = LaunchBridge(launchChannel) {
+            packageManager.getPackageInfo(packageName, 0).versionName
+        }
         launch = launchBridge
         launchChannel.setMethodCallHandler(launchBridge)
     }

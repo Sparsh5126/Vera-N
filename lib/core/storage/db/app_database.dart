@@ -8,7 +8,18 @@ import 'tables.dart';
 part 'app_database.g.dart';
 
 /// The index database, in app-private storage (ARCHITECTURE.md §8).
-@DriftDatabase(tables: [Notes, NoteTags, Settings, Links])
+@DriftDatabase(
+  tables: [
+    Notes,
+    NoteTags,
+    Settings,
+    Links,
+    NoteAnalysis,
+    Chunks,
+    Suggestions,
+    Rejections,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
@@ -19,13 +30,16 @@ class AppDatabase extends _$AppDatabase {
         name: 'vera_n',
         native: const DriftNativeOptions(
           databaseDirectory: getApplicationSupportDirectory,
+          // The background analysis (another isolate) shares the same
+          // connection, so the UI's queries see its changes.
+          shareAcrossIsolates: true,
         ),
       ),
     );
   }
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -43,6 +57,15 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(links);
         await NoteRows.backfillLinks(this);
       }
+      if (from < 4) {
+        await m.createTable(noteAnalysis);
+        await m.createTable(chunks);
+        await m.createTable(suggestions);
+        await m.createIndex(suggestionsNoteA);
+        await m.createIndex(suggestionsNoteB);
+        await m.createIndex(suggestionsExpires);
+      }
+      if (from < 5) await m.createTable(rejections);
     },
     beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),
   );

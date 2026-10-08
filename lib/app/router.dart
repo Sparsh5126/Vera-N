@@ -7,15 +7,24 @@ import '../core/styles/app_styles.dart';
 import '../features/home/home_screen.dart';
 import '../features/note/note_screen.dart';
 import '../features/onboarding/onboarding_folder_screen.dart';
+import '../features/review/review_screen.dart';
 import '../features/search/search_screen.dart';
+import '../features/settings/settings_screen.dart';
 import 'app_shell.dart';
 
 /// The route table. URL-style paths so widgets, the Quick Settings tile
 /// and app shortcuts can deep-link later (e.g. straight to a new note).
-GoRouter buildRouter({bool startWithOnboarding = false}) {
+/// [startWithNewNote] is the "Open app to: New note" setting; back from
+/// that note goes Home.
+GoRouter buildRouter({
+  bool startWithOnboarding = false,
+  bool startWithNewNote = false,
+}) {
   return GoRouter(
     initialLocation: startWithOnboarding
         ? Routes.onboardingFolder
+        : startWithNewNote
+        ? Routes.newNote
         : Routes.home,
     routes: [
       GoRoute(
@@ -28,9 +37,11 @@ GoRouter buildRouter({bool startWithOnboarding = false}) {
         routes: [
           _tab(Routes.home, const HomeScreen()),
           _tab(Routes.search, const SearchScreen()),
+          _tab(Routes.settings, const SettingsScreen()),
         ],
       ),
       GoRoute(path: Routes.newNote, builder: (_, _) => const NoteScreen()),
+      GoRoute(path: Routes.review, builder: (_, _) => const ReviewScreen()),
       GoRoute(
         path: Routes.notePattern,
         builder: (_, state) => NoteScreen(

@@ -12,6 +12,8 @@ class IoNoteFileStore implements NoteFileStore {
 
   final Directory root;
 
+  static const appDir = '.app';
+
   @override
   Future<List<NoteFileEntry>> listNotes() async {
     if (!await root.exists()) return const [];
@@ -72,6 +74,25 @@ class IoNoteFileStore implements NoteFileStore {
 
   @override
   Future<void> delete(String path) => _file(path).delete();
+
+  /// `.app/` sits next to the notes folder, inside `MyNotes/`.
+  @override
+  Future<String?> readAppFile(String name) async {
+    final file = _appFile(name);
+    return await file.exists() ? file.readAsString() : null;
+  }
+
+  @override
+  Future<void> writeAppFile(String name, String content) async {
+    final file = _appFile(name);
+    await file.parent.create(recursive: true);
+    final temp = File('${file.path}.tmp');
+    await temp.writeAsString(content, flush: true);
+    await temp.rename(file.path);
+  }
+
+  File _appFile(String name) =>
+      File(p.join(root.parent.path, appDir, checkAppFileName(name)));
 
   /// Resolves [path] inside [root], refusing anything that escapes it.
   File _file(String path) {

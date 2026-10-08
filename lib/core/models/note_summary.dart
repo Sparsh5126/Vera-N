@@ -10,6 +10,7 @@ class NoteSummary {
     required this.pinned,
     required this.modified,
     required this.folder,
+    this.suggested = false,
   });
 
   final int ref;
@@ -20,4 +21,8 @@ class NoteSummary {
   final bool pinned;
   final DateTime modified;
   final String folder;
+
+  /// AI suggestions involving this note are waiting: its card shows a
+  /// small dimmed dot, never a number (UI spec §5).
+  final bool suggested;
 }

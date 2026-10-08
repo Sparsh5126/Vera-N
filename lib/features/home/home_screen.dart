@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/copy/app_copy.dart';
 import '../../core/navigation/routes.dart';
+import '../../core/settings/app_prefs_controller.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../core/styles/app_styles.dart';
 import '../../core/utils/greeting.dart';
@@ -14,6 +15,7 @@ import '../../shared/widgets/pill_tabs.dart';
 import 'state/home_view.dart';
 import 'widgets/bottom_fade.dart';
 import 'widgets/card_callbacks.dart';
+import 'widgets/connections_card.dart';
 import 'widgets/group_view.dart';
 import 'widgets/home_header.dart';
 import 'widgets/home_note_menu.dart';
@@ -53,8 +55,14 @@ class HomeScreen extends ConsumerWidget {
             CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
-                  child: HomeHeader(greeting: Greeting.of(now)),
+                  child: HomeHeader(
+                    greeting: Greeting.of(
+                      now,
+                      name: ref.watch(appPrefsProvider.select((p) => p.name)),
+                    ),
+                  ),
                 ),
+                const SliverToBoxAdapter(child: ConnectionsCard()),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: AppSpace.m),

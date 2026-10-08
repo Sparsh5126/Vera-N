@@ -8,9 +8,9 @@ import '../../../shared/widgets/section_label.dart';
 import '../../../shared/widgets/text_link.dart';
 
 /// What sits below the note's text when not typing (UI spec §7): Folder,
-/// Tags, Linked, and Mentioned in. Empty sections are hidden; a note with
-/// no folder or tags shows small "Add to folder" / "Add tag" buttons
-/// instead. Suggested links come with the AI stage.
+/// Tags, Linked, Suggested links (dimmed chips) and Mentioned in. Empty
+/// sections are hidden; a note with no folder or tags shows small "Add to
+/// folder" / "Add tag" buttons instead.
 class NoteDetails extends StatelessWidget {
   const NoteDetails({
     super.key,
@@ -18,6 +18,8 @@ class NoteDetails extends StatelessWidget {
     required this.tags,
     required this.linked,
     required this.mentionedIn,
+    this.suggested = const [],
+    this.onSuggestedTap,
     required this.onFolderTap,
     required this.onAddTag,
     required this.onTagTap,
@@ -29,6 +31,10 @@ class NoteDetails extends StatelessWidget {
   final List<String> tags;
   final List<LinkedNote> linked;
   final List<LinkedNote> mentionedIn;
+
+  /// Notes the app suggests linking; tapping one opens the suggestion.
+  final List<LinkedNote> suggested;
+  final ValueChanged<int>? onSuggestedTap;
 
   /// Opens the move-to-folder sheet.
   final VoidCallback onFolderTap;
@@ -51,6 +57,19 @@ class NoteDetails extends StatelessWidget {
               _wrap([
                 for (final n in linked)
                   TextLink(label: n.title, onTap: () => onOpenNote(n.ref)),
+              ]),
+            ),
+          if (suggested.isNotEmpty)
+            _section(
+              AppCopy.suggestedLinks,
+              _wrap([
+                for (final n in suggested)
+                  NoteChip(
+                    label: n.title,
+                    dimmed: true,
+                    semanticLabel: AppCopy.suggestedLink(n.title),
+                    onTap: () => onSuggestedTap?.call(n.ref),
+                  ),
               ]),
             ),
           if (mentionedIn.isNotEmpty)

@@ -43,6 +43,9 @@ dependencies:
   characters: ^1.4.1
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.2
+  flutter_onnxruntime: 1.8.5
+  dart_sentencepiece_tokenizer: 1.4.1
+  workmanager: ^0.10.10
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +65,12 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # The on-device embedding model (ARCHITECTURE.md §8), Git LFS.
+  assets:
+    - assets/models/minilm-l12-en-hi/model_int8.onnx
+    - assets/models/minilm-l12-en-hi/tokenizer.json
+    - assets/models/minilm-l12-en-hi/LICENSE
 
   # Bundled, never fetched: the app must not go online (CLAUDE.md §9).
   fonts:

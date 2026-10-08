@@ -62,10 +62,13 @@ class NotesRepository {
     return _db
         .customSelect(
           'SELECT n.id, n.title, n.pinned, n.modified, n.folder, '
-          'substr(n.body, 1, ${NoteRows.previewLength}) AS body FROM notes n '
+          'substr(n.body, 1, ${NoteRows.previewLength}) AS body, '
+          'EXISTS (SELECT 1 FROM suggestions s '
+          'WHERE s.note_a = n.id OR s.note_b = n.id) AS suggested '
+          'FROM notes n '
           'WHERE ${where.sql} ORDER BY n.modified DESC, n.id DESC',
           variables: where.variables,
-          readsFrom: {_db.notes, _db.noteTags},
+          readsFrom: {_db.notes, _db.noteTags, _db.suggestions},
         )
         .watch()
         .map((rows) => rows.map(NoteRows.summaryFrom).toList());
@@ -145,6 +148,15 @@ class NotesRepository {
   Future<void> setTags(int ref, List<String> tags) async {
     await _changeHeader(ref, (h) => h.copyWith(tags: tags));
     await NoteRows.replaceTags(_db, ref, tags);
+  }
+
+  /// The note's stable id. A headerless note gets its `id` header now:
+  /// a rejection or link must keep pointing at it (ARCHITECTURE.md §8).
+  Future<String?> ensureId(int ref) async {
+    final row = await _row(ref).getSingleOrNull();
+    if (row == null || row.noteId != null) return row?.noteId;
+    await _changeHeader(ref, (h) => h);
+    return (await _row(ref).getSingleOrNull())?.noteId;
   }
 
   /// Moves the note's file into `.trash/`; the file is kept for undo.

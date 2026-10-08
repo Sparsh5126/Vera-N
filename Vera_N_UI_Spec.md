@@ -214,6 +214,12 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 
 **Finished:** a quiet "All caught up" screen. No streaks or rewards. A "Review 5 more" button appears only if more exist.
 
+**Built 2026-10-04:**
+- Accepting writes the link into the newer note's "Linked notes" footer, pointing at the older note.
+- The Home card counts at most one batch ("5 new connections" even when more wait).
+- "Review 5 more" counts only suggestions the finished batch didn't show, so "Not sure" ones return in a later visit, not immediately.
+- "Why?" shows the matched passages in full; a fuller explanation needs the laptop layer.
+
 ---
 
 ## 7. Note View
@@ -263,7 +269,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 - **Move to folder (built 2026-10-03; from 2026-10-04 reached through the Folder row, no longer the ⋮ menu):** a sheet with "No folder", the existing folders, and "New folder" (typed; `/` makes subfolders). The file keeps its name; an Undo snackbar follows. Disabled until a new note has text.
 - **Tags:** one row. Solid chips are confirmed tags (user-made or approved). Dimmed chips (no fill, dashed outline at about 55% opacity, readable secondary-text label) are AI-suggested tags waiting for approval. Tapping a dimmed tag opens the suggestion sheet (accept, reject, or close for not sure). The user can also add a tag by hand.
 - **Linked:** text links (2026-10-04, backlog #1 and #9; were chips): the linked note's current title in normal text with the amber link underline, tappable across 48 points; tapping opens the note. Links to notes that don't exist aren't shown. Tags and folders stay chips, so things that organise a note look different from notes it points to.
-- **Suggested links:** dimmed chips for AI link suggestions. Tapping opens the suggestion sheet.
+- **Suggested links:** dimmed chips for AI link suggestions. Tapping opens the suggestion sheet. Built 2026-10-04: the sheet's reason names the other note; if accepting adds the link to the open note, the editor saves first and then shows the new text.
 - **Mentioned in:** backlinks, shown as text links like Linked, one per line.
 
 ---
@@ -385,6 +391,7 @@ Version
 - Advanced is collapsed by default.
 - Trash keeps deleted notes for 30 days.
 - Export produces a Markdown zip.
+- **Built 2026-10-08:** YOU, APP, Notes folder, SMART SUGGESTIONS, ADVANCED and ABOUT (Privacy, Version, and a Licenses row for open-source and model licenses). Rebuild and Reset offer Undo instead of asking first. Quick capture, sync Status, Laptop connection, Trash and Export join with their features. "Suggest connections" off also hides suggestions that were already waiting, until it is turned back on.
 
 ---
 
@@ -419,6 +426,6 @@ Version
 - Logo and app icon final artwork, and the final look of the "N" in the logo (colors and typography are settled; see the main spec).
 - Final onboarding copy (the privacy claims must be exactly true at launch, including how sync works).
 - ~~Exact behavior of the Folders and Tags switch on Home~~: decided 2026-10-04, see section 5.
-- Where accepted links are stored (inline `[[link]]` vs sidecar file); see the main spec.
+- ~~Where accepted links are stored~~: decided 2026-10-04, inline in a "Linked notes" footer (main spec §5).
 - Whether the later "Recent notes" widget is worth it, given privacy of titles on the home screen.
 - Whether a cold Flutter start meets the one-second capture target, or a minimal capture entry point is needed.

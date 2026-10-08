@@ -1,19 +1,26 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/ai/scheduler/analysis_scheduler.dart';
 import '../core/copy/app_copy.dart';
+import '../core/models/app_prefs.dart';
 import '../core/navigation/routes.dart';
 import '../core/platform/frame_stats.dart';
 import '../core/platform/launch_channel.dart';
+import '../core/settings/app_prefs_controller.dart';
 import '../core/storage/storage_providers.dart';
 import '../core/styles/app_styles.dart';
 import 'router.dart';
 
-/// Root widget. Follows the system theme until the Theme setting exists.
+/// Root widget. Theme and start page come from Settings.
 ///
 /// Going to the background writes unsaved text to files; coming back picks
-/// up changes made outside the app.
+/// up changes made outside the app. Leaving also asks for analysis, which
+/// runs later, only while charging (or idle, if allowed in Settings), and
+/// only while suggestions are on.
 class App extends ConsumerStatefulWidget {
   const App({super.key, this.startWithOnboarding = false});
 
@@ -27,6 +34,7 @@ class App extends ConsumerStatefulWidget {
 class _AppState extends ConsumerState<App> {
   late final GoRouter _router = buildRouter(
     startWithOnboarding: widget.startWithOnboarding,
+    startWithNewNote: ref.read(appPrefsProvider).startPage == StartPage.newNote,
   );
   late final AppLifecycleListener _lifecycle;
 
@@ -38,6 +46,12 @@ class _AppState extends ConsumerState<App> {
       onPause: () {
         FrameStats.report();
         storage.onPause();
+        final prefs = ref.read(appPrefsProvider);
+        if (prefs.suggestions) {
+          unawaited(
+            AnalysisScheduler.request(chargingOnly: prefs.chargingOnly),
+          );
+        }
       },
       onResume: storage.onResume,
     );
@@ -69,7 +83,11 @@ class _AppState extends ConsumerState<App> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: switch (ref.watch(appPrefsProvider.select((p) => p.theme))) {
+        ThemeChoice.system => ThemeMode.system,
+        ThemeChoice.dark => ThemeMode.dark,
+        ThemeChoice.light => ThemeMode.light,
+      },
       routerConfig: _router,
     );
   }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/ai/suggestions/suggestion_providers.dart';
 import '../../core/copy/app_copy.dart';
 import '../../core/models/note.dart';
 import '../../core/navigation/routes.dart';
@@ -20,6 +21,7 @@ import 'widgets/note_actions.dart';
 import 'widgets/note_details.dart';
 import 'widgets/note_editor_view.dart';
 import 'widgets/note_format_actions.dart';
+import 'widgets/note_suggestion_flow.dart';
 import 'widgets/note_top_bar.dart';
 import 'widgets/titled_text_controller.dart';
 
@@ -39,6 +41,12 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   late final NoteEditorController _editor;
   late final NoteActions _actions;
   late final AppLifecycleListener _lifecycle;
+  late final NoteSuggestionFlow _suggestions = NoteSuggestionFlow(
+    ref: ref,
+    beforeChange: _editor.save,
+    afterChange: _reloadText,
+    onOpenNote: _openNote,
+  );
   final _focus = FocusNode();
   TitledTextController? _text;
 
@@ -136,6 +144,21 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   }
 
   void _openNote(int noteRef) => context.push(Routes.note(noteRef));
+
+  /// After a change made outside the editor (an accepted link added to
+  /// this note), shows the saved text.
+  Future<void> _reloadText() async {
+    final noteRef = _editor.noteRef.value;
+    final text = _text;
+    if (noteRef == null || text == null) return;
+    final note = await ref.read(notesRepositoryProvider).getNote(noteRef);
+    if (note == null || !mounted || note.body == text.text) return;
+    _lastText = note.body;
+    text.value = TextEditingValue(
+      text: note.body,
+      selection: TextSelection.collapsed(offset: note.body.length),
+    );
+  }
 
   /// Tapping inside a link's title opens the linked note.
   void _onEditorTap() {
@@ -239,16 +262,28 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
   Widget _details(Note note) {
     return Consumer(
-      builder: (context, ref, _) => NoteDetails(
-        folder: note.folder,
-        onFolderTap: () => unawaited(_actions.moveToFolder(context, note)),
-        tags: note.tags,
-        linked: ref.watch(linkedProvider(note.ref)).value ?? const [],
-        mentionedIn: ref.watch(mentionedInProvider(note.ref)).value ?? const [],
-        onAddTag: () => unawaited(_actions.addTag(context, note)),
-        onTagTap: (tag) => unawaited(_actions.tagTapped(context, note, tag)),
-        onOpenNote: _openNote,
-      ),
+      builder: (context, ref, _) {
+        final suggested =
+            ref.watch(suggestedLinksProvider(note.ref)).value ?? const [];
+        return NoteDetails(
+          folder: note.folder,
+          onFolderTap: () => unawaited(_actions.moveToFolder(context, note)),
+          tags: note.tags,
+          linked: ref.watch(linkedProvider(note.ref)).value ?? const [],
+          mentionedIn:
+              ref.watch(mentionedInProvider(note.ref)).value ?? const [],
+          suggested: [for (final s in suggested) s.other],
+          onSuggestedTap: (other) => unawaited(
+            _suggestions.open(
+              context,
+              suggested.firstWhere((s) => s.other.ref == other),
+            ),
+          ),
+          onAddTag: () => unawaited(_actions.addTag(context, note)),
+          onTagTap: (tag) => unawaited(_actions.tagTapped(context, note, tag)),
+          onOpenNote: _openNote,
+        );
+      },
     );
   }
 }

@@ -87,6 +87,14 @@ abstract final class AppCopy {
   static const allCaughtUp = 'All caught up.';
   static String reviewMore(int batchSize) => 'Review $batchSize more';
   static const close = 'Close';
+  static const reviewHintTitle = 'Swipe to decide';
+  static const reviewHintRight = 'Right: link them';
+  static const reviewHintLeft = 'Left: not related';
+  static const reviewHintUp = 'Up: not sure yet';
+  static const reviewHintDown = 'Down: undo';
+  static const gotIt = 'Got it';
+  static String reviewProgress(int done, int total) =>
+      'Suggestion ${done + 1} of $total';
 
   // Note view (UI spec §7).
   static const back = 'Back';
@@ -98,6 +106,9 @@ abstract final class AppCopy {
   static const saved = 'Saved';
   static const tags = 'Tags';
   static const suggestedLinks = 'Suggested links';
+  static const hasSuggestions = 'Has suggestions';
+  static String suggestedLink(String title) => 'Suggested link: $title';
+  static const notLinked = 'Not linked';
   static const mentionedIn = 'Mentioned in';
   static const linkPickerHint = 'Link to a note…';
   static const bullet = '•';
@@ -194,6 +205,14 @@ abstract final class AppCopy {
   static const privacy = 'Privacy';
   static const privacyValue = 'Everything stays on your devices.';
   static const version = 'Version';
+  static const nameHint = 'Your name';
+  static const startHome = 'Home';
+  static const startNewNote = 'New note';
+  static const suggestionsRebuilt = 'Suggestions will be rebuilt soon.';
+  static const rejectedReset = 'Rejected suggestions can come back.';
+  static const showAdvanced = 'Show advanced';
+  static const hideAdvanced = 'Hide advanced';
+  static const licenses = 'Licenses';
 
   // Capture shortcuts outside the app (UI spec §5).
   static const widgetQuickNoteHint = 'Write a thought…';

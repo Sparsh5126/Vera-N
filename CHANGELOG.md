@@ -5,6 +5,52 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Settings screen** (UI spec §11), the fourth tab after Home and Search (Graph joins later).
+  - **YOU:** Name, used in the Home greeting ("Good evening, Asha"); clearing it goes back to just "Good evening".
+  - **APP:** Layout (Grid | List), Open app to (Home | New note), and Theme (System | Dark | Light), as pills. A change shows at once. Choices are kept on this device in the settings table and read once at start, so the first frame already has the right theme and layout. The list layout uses the same note card, full width (new token `AppSize.noteRowHeight`).
+  - **SYNC:** Notes folder shows the folder's name, or "On this phone only" with the hint to choose one; tapping opens the folder picker and moves the notes there. Hidden on desktop.
+  - **SMART SUGGESTIONS:** "Suggest connections" turns AI off completely: waiting analysis is cancelled, nothing new is scheduled, and no suggestion shows anywhere (Home card, card dots, note chips). Turning it back on shows any that were waiting. "Analyze only when charging" is on by default (as drawn in the spec): analysis is requested only with the charging constraint. Turning it off adds the idle-and-battery-not-low request as before.
+  - **ADVANCED** (collapsed): "Rebuild suggestions" clears waiting suggestions and marks every note for matching again on the next run. Stored vectors are reused by chunk hash, so this costs little battery. "Reset rejected suggestions" forgets every rejection and empties this device's rejections file. Both offer Undo instead of a question.
+  - **ABOUT:** the privacy line, the version (read from Android through the existing `vera_n/launch` channel, so no new package), and Licenses, which include the suggestion model's.
+  - Not yet shown, because those features don't exist yet: Quick capture, sync Status, Laptop connection, Trash and Export. They join with their features.
+  - Fixed on the phone: the APP choices were centered instead of left-aligned, and each choice was read out twice by screen readers.
+  - New shared widgets `SettingRow` and `SettingChoice`; `TextEntrySheet` can start with text and allow an empty entry.
+  - 4 tests (prefs saved and read back; Dark applies and is saved; suggestions off hides them on Home; reset with Undo).
+
+- **Suggestions in the note view and on Home cards** (UI spec §5, §7–8).
+  - **Note view:** a "Suggested links" section of dimmed chips (dashed outline), read out as "Suggested link: …". Tapping one opens the suggestion card in a bottom sheet with ✕ / ✓; closing the sheet counts as not sure and the chip stays. Accept and reject are the same actions as in Review, followed by "Linked" or "Not linked" with Undo.
+  - **Accepting inside the open note:** if the link is written into this note, the editor first saves what was typed, then shows the new text, so the next autosave can't drop the link.
+  - **Home cards:** a small dimmed dot (no number) on the card of every note with suggestions waiting, read out as "Has suggestions". The Home query gets this from one indexed `EXISTS` check (new index `suggestions_note_a`).
+  - **Shared widget:** the ✕ / Not sure / ✓ row is now `shared/widgets/decision_buttons.dart`, used by Review and the sheet.
+  - 4 widget tests.
+- **Review screen and the Home "new connections" card** (UI spec §5–6, §8).
+  - **Home card:** "N new connections" sits under the greeting. It counts at most one batch (5), so it never becomes a growing number, and it is hidden when nothing is waiting.
+  - **Review:** one suggestion at a time, on the shared `SuggestionCard`: newer note first, the matched passage highlighted, the reason ("Looks related to your note on …"), and "Why?" to read the passages in full. Tapping a note opens it. Progress shows as dots, with the position read out to screen readers.
+  - **Gestures:** swipe right to accept, left to reject, up for not sure, down to undo. The card tilts while dragged, shows a faint ✓ or ✕, and settles on a spring; with reduced motion it moves without animating. ✕ / Not sure / ✓ buttons (64-point targets) and Undo are always visible.
+  - **Feedback:** accepting shows "Linked" with Undo. Haptics go through the new `core/feedback/haptics.dart`: light on accept, soft on not sure and undo, none on reject.
+  - **One-time hint** showing the four gestures; whether it was seen is kept in settings.
+  - **End of batch:** a quiet "All caught up."; "Review 5 more" appears only when suggestions this batch didn't show are waiting.
+  - Nothing loads with a spinner: it is all on the device.
+  - 7 widget tests.
+- **Suggestion lifecycle** (product spec §7–8, UI spec §8): accept, reject, not sure, each with undo, and review batches of 5. The same `SuggestionActions` will serve the Review screen and the note's suggestion sheet (next changes).
+  - **Accept:** the newer note of the pair gets a link to the older one in a "## Linked notes" footer at its end. The footer is only ever added to (`NoteFooter`). Undo removes it only if the note wasn't edited since, so it never takes the user's words.
+  - **Reject:** stored in the database and appended to `MyNotes/.app/rejections-<deviceid>.jsonl`, which holds note ids and content hashes only, never note text (a test checks this). A headerless note gets its `id` header at that point, as for pin and tag.
+  - **Not sure:** stays dimmed; comes back after fresh ones in later batches until it expires.
+  - **Batches:** fresh suggestions first, then not-sure ones, oldest first; pairs with a note in the trash are hidden.
+  - Decided 2026-10-04: **a rejected pair comes back only after a big change**, when about a third or more of a note's words differ, and only if it is still a strong match. The app measures this without keeping note text: a 128-byte word fingerprint (MinHash) of each note is saved with the rejection, in the private database only. Rejections arriving from other devices' files have no fingerprint, so those pairs stay rejected.
+  - Notes can now read and write `.app/` files (`NoteFileStore.readAppFile` / `writeAppFile`). Reading other devices' rejection files comes with sync.
+  - Schema 5 adds the `rejections` table, with migration.
+  - 16 new tests.
+- **On-device analysis: embeddings and link suggestions** (product spec §4, §7; build order step 5). Leaving the app requests analysis. It runs later, through Android's WorkManager, only while charging or idle. It embeds only notes whose text changed, and only their changed chunks; the model is loaded only when there is work, then released. Each changed note is matched against the others, and pairs at cosine ≥ 0.60 become suggestions that expire after 30 days. Nothing shows in the UI yet: the dimmed suggestions and the Review screen come next. Details: ARCHITECTURE.md §8 "On-device analysis". 23 new tests (chunking, including Hindi; int8 vectors; matching; the full run with a stand-in model: only changed chunks re-embedded, model not loaded when nothing changed, linked pairs skipped, expiry, model change, stopping).
+- **Schema 4:** `note_analysis`, `chunks`, `suggestions` tables, with migration and a test from versions 1–3.
+- **New dependencies:**
+  - `flutter_onnxruntime` 1.8.5 (ONNX Runtime native libraries, about 15 MB per CPU type);
+  - `dart_sentencepiece_tokenizer` 1.4.1 (pure Dart, small);
+  - `workmanager` 0.10.10 (wraps AndroidX WorkManager, under 1 MB).
+  
+  Battery: no work while the phone is in use and on battery; no polling, wake locks or foreground service.
+- **Model in the app:** the model is now listed in the `pubspec.yaml` assets, with its license shown on the app's licenses page. **Measured size (release, arm64 APK): 21.4 → 71.3 MB.** On the phone, the model is also copied out once (about 45 MB) for ONNX Runtime. That is within the user's 150 MB limit.
+- Decided 2026-10-04: **accepted links are stored inline**, in one append-only "Linked notes" footer at the end of the note (product spec §5, §21; ARCHITECTURE.md §7). Built in the Review stage.
 - **Typing performance tools** (`tool/perf/`). `typing_scenario.sh` types into the measurement build over adb (kinds plain, rich, long) and prints frame stats. `bin/timeline.dart` records the engine timeline over the VM service and summarises it per thread. New dev-only dependency in `tool/perf` only: `vm_service`. No change to the app's own dependencies.
 - **Trimmed embedding model committed** at `assets/models/minilm-l12-en-hi/`, with Git LFS (`.gitattributes` tracks `assets/models/**`). Included: the Apache-2.0 license and a README with source, SHA-256 checksums and the notice of changes. Not yet listed in `pubspec.yaml` assets; it joins the app in the embeddings stage, so builds don't grow before the model is used.
 - Decided 2026-10-04: **similarity threshold 0.60** for a "strong" match at launch (ARCHITECTURE.md §7, product spec §21).
@@ -131,6 +177,9 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - 14 new tests, 97 in total: folder choose, reconnect, access lost, name clash, migration from version 1, the onboarding screen, the empty-folder guard, restore of a missing file, and colons in note names.
 
 ### Changed
+- **Suggestions checked end to end on the phone** (2026-10-08, measurement build with its own fresh data, not the user's folder): 5 short notes (two about piano, two about pasta, one about a bike). One run while charging made exactly 2 suggestions, the piano pair and the pasta pair, with none for the bike note. Home showed "2 new connections" and the dots; Review showed both, and Accept linked the first.
+- **Background analysis checked on the phone** (2026-10-08, measurement build): requested on leaving the app, started 60 s later while charging, finished successfully. See BACKLOG.
+- **Background analysis now runs only while charging by default** (was: charging, or idle with battery not low). This follows the Settings default "Analyze only when charging: On"; the idle request is cancelled when the setting is on.
 - **Linked and Mentioned in are text links**, no longer chips (backlog #1 and #9). The note's title in normal text with the amber link underline, as in the editor, tappable across 48 points (`TextLink`). Tags and folders stay chips, so what organises a note looks different from the notes it points to. UI spec §7 updated. 1 test.
 - Typing performance: **Saving waits for a 1-second pause** in typing instead of 300 ms. Leaving the note or the app still saves at once.
 - **A save is one database transaction** (row, revision and links together) instead of about five statements, so Home and the note view hear about it once.
@@ -145,6 +194,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - **Move to folder in the note's ⋮ menu** (backlog #5): it's reached through the Folder row below the text. The unused `AppCopy.moveToFolder` string is gone too.
 
 ### Fixed
+- Kotlin plugin builds failed on Windows (Kotlin's incremental caches can't span the C: pub cache and the D: project). `kotlin.incremental=false` in `android/gradle.properties`, as in the bench tool.
 - **Typing in long notes: editor formatting work no longer grows with note length squared** (backlog: typing lag). Each keystroke rebuilt the formatted text by checking every Markdown piece against every text piece. It is now one pass that tracks only the pieces covering the current position. Desktop timing per keystroke: 200 lines 2.3 → 0.8 ms, 1000 lines 43 → 1.3 ms. On the phone at ~150 lines it changed little (UI frame median 23.5 → 23.0 ms, 3 runs each), because the main cost there is elsewhere (see BACKLOG.md).
 - **Enter right next to a blank line could fail to continue a list.** The edit position came from comparing the old and new text, which is ambiguous between two line breaks. It now comes from the cursor, for checklists and bullets as well as numbers.
 - Note cards in the grid always showed as unpinned. This was harmless while the grid held only unpinned notes, but folder and tag views include pinned ones; `NotesGrid` now uses each note's own pinned flag.

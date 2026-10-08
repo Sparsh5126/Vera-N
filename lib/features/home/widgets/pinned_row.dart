@@ -15,11 +15,15 @@ class PinnedRow extends StatelessWidget {
     required this.notes,
     required this.now,
     required this.cards,
+    required this.showSuggested,
   });
 
   final List<NoteSummary> notes;
   final DateTime now;
   final CardCallbacks cards;
+
+  /// Whether the faded "has suggestions" dot may show.
+  final bool showSuggested;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +59,7 @@ class PinnedRow extends StatelessWidget {
     preview: note.preview,
     dateLabel: DateLabel.of(note.modified, now),
     pinned: true,
+    suggested: showSuggested && note.suggested,
     onTap: () => cards.open(note.ref),
     onLongPress: () => cards.menu(note),
   );

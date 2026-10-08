@@ -40,6 +40,24 @@ abstract interface class NoteFileStore {
   Future<void> move(String from, String to);
 
   Future<void> delete(String path);
+
+  /// `MyNotes/.app/[name]`: the little app data that must survive
+  /// uninstall and reach other devices (ARCHITECTURE.md §8), such as the
+  /// rejections file. Null if it doesn't exist.
+  Future<String?> readAppFile(String name);
+
+  Future<void> writeAppFile(String name, String content);
+}
+
+/// Checks that [name] is a plain file name for `.app/`.
+String checkAppFileName(String name) {
+  if (name.isEmpty ||
+      name.contains('/') ||
+      name.contains(r'') ||
+      name.startsWith('.')) {
+    throw ArgumentError.value(name, 'name', 'not a safe app file name');
+  }
+  return name;
 }
 
 /// Checks that [path] stays inside the notes folder and returns its

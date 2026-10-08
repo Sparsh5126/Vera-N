@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/app/app.dart';
+import 'package:vera_n/core/models/app_prefs.dart';
+import 'package:vera_n/core/settings/app_prefs_controller.dart';
 import 'package:vera_n/core/storage/db/app_database.dart';
 import 'package:vera_n/core/storage/files/folder_access.dart';
 import 'package:vera_n/core/storage/storage_providers.dart';
@@ -27,10 +29,14 @@ class AppHarness {
   Future<void> pump(
     WidgetTester tester, {
     bool startWithOnboarding = false,
+    AppPrefs prefs = const AppPrefs(),
   }) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [storageProvider.overrideWithValue(storage)],
+        overrides: [
+          storageProvider.overrideWithValue(storage),
+          initialPrefsProvider.overrideWithValue(prefs),
+        ],
         child: App(startWithOnboarding: startWithOnboarding),
       ),
     );

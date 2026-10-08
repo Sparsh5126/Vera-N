@@ -1,0 +1,37 @@
+/// Tunable values for on-device analysis, in one place (product spec §4,
+/// §7; ARCHITECTURE.md §7–8). Thresholds are tuned later from accept rates.
+abstract final class AiSettings {
+  /// A "strong" match: cosine similarity of two chunks (decided 2026-10-04).
+  static const strongMatch = 0.60;
+
+  /// Tokens per chunk: the model reads 128, two of which are `<s>`, `</s>`.
+  static const chunkTokens = 126;
+
+  /// Notes shorter than this many words aren't matched: too little meaning
+  /// to judge, and they produce chance matches.
+  static const minWords = 4;
+
+  /// A rejected pair may come back only when a note's words changed a lot:
+  /// less than this share of them still the same (decided 2026-10-04).
+  static const sameNoteWords = 2 / 3;
+
+  /// Review batches hold this many suggestions (UI spec §6).
+  static const batchSize = 5;
+
+  /// At most this many new suggestions per changed note, strongest first.
+  static const suggestionsPerNote = 3;
+
+  /// Unreviewed suggestions disappear after this (product spec §7).
+  static const suggestionLifetime = Duration(days: 30);
+
+  /// Notes analyzed per run; the rest wait for the next run.
+  static const notesPerRun = 200;
+
+  /// Wait after the app is left before analysis may start, so a quick
+  /// return to the note doesn't run it mid-thought.
+  static const startDelay = Duration(minutes: 1);
+
+  /// A run stops starting new notes after this, well inside the 10 minutes
+  /// Android gives background work.
+  static const runBudget = Duration(minutes: 8);
+}
