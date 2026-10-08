@@ -323,7 +323,7 @@ One reusable card, two containers:
 - Keyboard opens as soon as the tab is tapped.
 - Before typing: recent searches, each removable.
 - **Matches:** keyword results, highlighted, instant.
-- **Similar in meaning:** on-device meaning-based results, filled in a moment later so keyword results never wait.
+- **Similar in meaning:** on-device meaning-based results, filled in a moment later so keyword results never wait. Built 2026-10-08: up to 5 notes, closest passage shown, keyword matches not repeated, filters apply; shown only while suggestions are on (it is AI). With no keyword match, meaning results take the place of "No notes found".
 - Filters: thin pills for Folder, Tag, Date (decided 2026-10-03):
   - Each holds one value, picked from a bottom sheet whose first row clears it ("Any folder", "Any tag", "Any time"). A set pill turns into a solid ink plate and shows its value; tapping it again reopens the sheet.
   - Folder includes its subfolders. Tag is one confirmed tag. Date is Today, Last 7 days, Last 30 days, or This year, by when the note was last changed (the date on its card).

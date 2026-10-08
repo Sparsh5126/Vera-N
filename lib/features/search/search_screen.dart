@@ -19,7 +19,8 @@ import 'widgets/search_field.dart';
 import 'widgets/search_filter_bar.dart';
 import 'widgets/search_result_card.dart';
 
-/// Search (UI spec §9). Keyword matches appear instantly as you type.
+/// Search (UI spec §9). Keyword matches appear instantly as you type;
+/// notes similar in meaning follow a moment later.
 /// Results are always one column, and only the user's own notes.
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -149,8 +150,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     }
     // Results are a moment away (local): keep the space quiet, no spinner.
     if (hits == null) return const SizedBox.shrink();
-    if (hits.isEmpty) return const EmptyState(message: AppCopy.emptySearch);
+    final similar = state.similar;
+    if (hits.isEmpty && similar.isEmpty) {
+      return const EmptyState(message: AppCopy.emptySearch);
+    }
     final now = DateTime.now();
+    // Matches first; "Similar in meaning" fills in a moment later.
+    final rows = <Object>[
+      if (hits.isNotEmpty) AppCopy.matches,
+      ...hits,
+      if (similar.isNotEmpty) AppCopy.similarInMeaning,
+      ...similar,
+    ];
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(
         AppSpace.m,
@@ -158,11 +169,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         AppSpace.m,
         AppSize.navBarClearance,
       ),
-      itemCount: hits.length + 1,
+      itemCount: rows.length,
       separatorBuilder: (_, _) => const SizedBox(height: AppSpace.s),
       itemBuilder: (context, i) {
-        if (i == 0) return const SectionLabel(AppCopy.matches);
-        final hit = hits[i - 1];
+        final row = rows[i];
+        if (row is String) return SectionLabel(row);
+        final hit = row as SearchHit;
         return SearchResultCard(
           hit: hit,
           dateLabel: DateLabel.of(hit.modified, now),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/app/app.dart';
+import 'package:vera_n/core/ai/search/meaning_search_provider.dart';
 import 'package:vera_n/core/models/app_prefs.dart';
 import 'package:vera_n/core/settings/app_prefs_controller.dart';
 import 'package:vera_n/core/storage/db/app_database.dart';
@@ -11,6 +12,7 @@ import 'package:vera_n/core/storage/files/folder_access.dart';
 import 'package:vera_n/core/storage/storage_providers.dart';
 import 'package:vera_n/core/storage/storage_services.dart';
 
+import 'fake_embedder.dart';
 import 'memory_note_file_store.dart';
 
 /// The whole app on an in-memory database and fake files, for widget tests.
@@ -26,6 +28,9 @@ class AppHarness {
 
   late final StorageServices storage;
 
+  /// The model Search's meaning search uses in widget tests.
+  final embedder = FakeEmbedder();
+
   Future<void> pump(
     WidgetTester tester, {
     bool startWithOnboarding = false,
@@ -36,6 +41,8 @@ class AppHarness {
         overrides: [
           storageProvider.overrideWithValue(storage),
           initialPrefsProvider.overrideWithValue(prefs),
+          // Meaning search uses the fake model, never the real one.
+          embedderFactoryProvider.overrideWithValue(() => embedder),
         ],
         child: App(startWithOnboarding: startWithOnboarding),
       ),

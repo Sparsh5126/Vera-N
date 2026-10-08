@@ -4,6 +4,16 @@ abstract final class AiSettings {
   /// A "strong" match: cosine similarity of two chunks (decided 2026-10-04).
   static const strongMatch = 0.60;
 
+  /// "Similar in meaning" in Search: a short query against a passage
+  /// scores lower than two passages do, so the bar is lower than
+  /// [strongMatch]; [similarResults] caps the list. Tuned from use.
+  static const similarSearch = 0.40;
+  static const similarResults = 5;
+
+  /// Pause after the last keystroke before Search asks the model, so
+  /// keyword results never wait and typing never stutters.
+  static const similarDelay = Duration(milliseconds: 400);
+
   /// Tokens per chunk: the model reads 128, two of which are `<s>`, `</s>`.
   static const chunkTokens = 126;
 
