@@ -91,6 +91,17 @@ class IoNoteFileStore implements NoteFileStore {
     await temp.rename(file.path);
   }
 
+  @override
+  Future<List<String>> listAppFiles() async {
+    final dir = Directory(p.join(root.parent.path, appDir));
+    if (!await dir.exists()) return const [];
+    return [
+      await for (final entry in dir.list())
+        if (entry is File && !entry.path.endsWith('.tmp'))
+          p.basename(entry.path),
+    ];
+  }
+
   File _appFile(String name) =>
       File(p.join(root.parent.path, appDir, checkAppFileName(name)));
 

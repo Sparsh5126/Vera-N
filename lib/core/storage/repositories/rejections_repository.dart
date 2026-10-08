@@ -17,6 +17,58 @@ class RejectionsRepository {
 
   static String fileName(String deviceId) => 'rejections-$deviceId.jsonl';
 
+  static final _file = RegExp(r'^rejections-[A-Za-z0-9]+\.jsonl$');
+
+  /// Reads every device's rejections file in `.app/` into the database,
+  /// so rejections survive uninstall (this device's file) and reach this
+  /// device (others' files, once sync exists). Pairs already known keep
+  /// their row, including the word fingerprints only the database holds.
+  /// Damaged lines are skipped. Returns how many pairs were new.
+  Future<int> importFiles() async {
+    final before = await _count();
+    for (final name in await _store.listAppFiles()) {
+      if (!_file.hasMatch(name)) continue;
+      final text = await _store.readAppFile(name) ?? '';
+      for (final line in const LineSplitter().convert(text)) {
+        final r = _parse(line);
+        if (r == null) continue;
+        await _db
+            .into(_db.rejections)
+            .insert(
+              RejectionsCompanion.insert(
+                pairKey: r.pairKey,
+                noteA: r.noteA,
+                hashA: r.hashA,
+                noteB: r.noteB,
+                hashB: r.hashB,
+                rejectedAt: r.rejectedAt,
+                deviceId: r.deviceId,
+              ),
+              mode: InsertMode.insertOrIgnore,
+            );
+      }
+    }
+    return await _count() - before;
+  }
+
+  Future<int> _count() async {
+    final count = _db.rejections.pairKey.count();
+    final row = await (_db.selectOnly(
+      _db.rejections,
+    )..addColumns([count])).getSingle();
+    return row.read(count) ?? 0;
+  }
+
+  static Rejection? _parse(String line) {
+    if (line.trim().isEmpty) return null;
+    try {
+      final json = jsonDecode(line);
+      return json is Map<String, Object?> ? Rejection.fromFileJson(json) : null;
+    } on FormatException {
+      return null;
+    }
+  }
+
   Future<void> add(Rejection r) async {
     await _db
         .into(_db.rejections)

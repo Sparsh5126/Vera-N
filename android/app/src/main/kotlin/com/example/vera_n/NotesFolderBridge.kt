@@ -50,6 +50,7 @@ class NotesFolderBridge(private val activity: Activity) : MethodChannel.MethodCa
             "hasAccess" -> docs.hasAccess()
             "displayName" -> docs.displayName()
             "list" -> docs.listMarkdown(path)
+            "names" -> docs.names(path)
             "stat" -> docs.stat(path)
             "read" -> docs.read(path)
             "write" -> docs.write(path, call.argument<String>("content") ?: "")

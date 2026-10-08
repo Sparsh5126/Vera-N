@@ -38,6 +38,7 @@ class NoteCards extends ConsumerWidget {
         dateLabel: DateLabel.of(note.modified, now),
         pinned: note.pinned,
         suggested: showSuggested && note.suggested,
+        conflict: note.conflict,
         onTap: () => cards.open(note.ref),
         onLongPress: () => cards.menu(note),
       );

@@ -39,4 +39,7 @@ class SwitchingNoteFileStore implements NoteFileStore {
   @override
   Future<void> writeAppFile(String name, String content) =>
       _current.writeAppFile(name, content);
+
+  @override
+  Future<List<String>> listAppFiles() => _current.listAppFiles();
 }

@@ -18,6 +18,8 @@ import 'state/link_typing.dart';
 import 'state/markup_editing.dart';
 import 'state/note_editor_controller.dart';
 import 'state/note_providers.dart';
+import 'widgets/conflict_flow.dart';
+import 'widgets/conflict_notice.dart';
 import 'widgets/format_bar.dart';
 import 'widgets/note_actions.dart';
 import 'widgets/note_details.dart';
@@ -42,6 +44,11 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   late final NoteEditorController _editor;
   late final NoteActions _actions;
   late final AppLifecycleListener _lifecycle;
+  late final _conflicts = ConflictFlow(
+    resolver: ref.read(storageProvider).conflicts,
+    beforeChange: _editor.save,
+    afterChange: _reloadText,
+  );
   late final _suggestions = SuggestionFlow(
     load: ref.read(suggestionViewsProvider).load,
     accept: ref.read(suggestionActionsProvider).accept,
@@ -198,6 +205,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
         child: Column(
           children: [
             _watchNote(_topBar),
+            _watchNote(_conflict),
             Expanded(
               child: text == null ? const SizedBox.shrink() : _body(text),
             ),
@@ -233,6 +241,18 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
           ? null
           : () => unawaited(_actions.copy(context, _text?.text ?? note.body)),
       onDelete: () => unawaited(_delete()),
+    );
+  }
+
+  /// Both versions are kept until the user picks (product spec §14).
+  Widget _conflict(Note? note) {
+    if (note == null || !note.conflict) return const SizedBox.shrink();
+    final ref = note.ref;
+    return ConflictNotice(
+      onCompare: () => unawaited(_conflicts.compare(context, ref)),
+      onKeepThis: () => unawaited(_conflicts.keepThis(context, ref)),
+      onKeepOther: () => unawaited(_conflicts.keepOther(context, ref)),
+      onKeepBoth: () => unawaited(_conflicts.keepBoth(context, ref)),
     );
   }
 

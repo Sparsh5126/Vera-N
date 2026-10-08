@@ -60,6 +60,7 @@ class PinnedRow extends StatelessWidget {
     dateLabel: DateLabel.of(note.modified, now),
     pinned: true,
     suggested: showSuggested && note.suggested,
+    conflict: note.conflict,
     onTap: () => cards.open(note.ref),
     onLongPress: () => cards.menu(note),
   );

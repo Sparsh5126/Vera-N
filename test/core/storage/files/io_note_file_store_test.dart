@@ -71,4 +71,25 @@ void main() {
       expect(() => store.read(bad), throwsArgumentError, reason: bad);
     }
   });
+
+  test('lists the app files next to the notes folder', () async {
+    // `.app/` sits beside `Notes/`, so give this test its own MyNotes/.
+    final myNotes = await Directory.systemTemp.createTemp('vera_n_app_');
+    addTearDown(() => myNotes.delete(recursive: true));
+    final notes = IoNoteFileStore(Directory('${myNotes.path}/Notes'));
+    expect(await notes.listAppFiles(), isEmpty);
+    await notes.writeAppFile('rejections-a1.jsonl', 'x');
+    await notes.writeAppFile('rejections-b2.jsonl', 'y');
+    expect((await notes.listAppFiles())..sort(), [
+      'rejections-a1.jsonl',
+      'rejections-b2.jsonl',
+    ]);
+  });
+
+  test('app file names: plain names pass, paths and hidden names do not', () {
+    expect(checkAppFileName('rejections-a1.jsonl'), 'rejections-a1.jsonl');
+    for (final bad in ['', 'a/b', r'a\b', '.hidden']) {
+      expect(() => checkAppFileName(bad), throwsArgumentError, reason: bad);
+    }
+  });
 }

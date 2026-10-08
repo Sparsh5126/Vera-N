@@ -37,6 +37,18 @@ abstract final class AppCopy {
   static const done = 'Done';
   static String onboardingPage(int page, int total) => 'Page $page of $total';
 
+  // A note changed both here and outside the app (product spec §14).
+  static const conflictNotice = 'This note was also changed outside Vera N.';
+  static const compareVersions = 'Compare';
+  static const keepThisVersion = 'Keep this version';
+  static const keepOtherVersion = 'Keep the other version';
+  static const keepBothVersions = 'Keep both';
+  static const otherVersion = 'The other version';
+  static const keptThisVersion = 'Kept this version';
+  static const keptOtherVersion = 'Kept the other version';
+  static const keptBothVersions = 'Saved the other version as a new note';
+  static const changedInTwoPlaces = 'Changed in two places';
+
   // Navigation (UI spec §3).
   static const navHome = 'Home';
   static const navSearch = 'Search';

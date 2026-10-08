@@ -63,10 +63,14 @@ class MemoryNoteFileStore implements NoteFileStore {
   final appFiles = <String, String>{};
 
   @override
-  Future<String?> readAppFile(String name) async => appFiles[name];
+  Future<String?> readAppFile(String name) async =>
+      appFiles[checkAppFileName(name)];
 
   @override
   Future<void> writeAppFile(String name, String content) async {
-    appFiles[name] = content;
+    appFiles[checkAppFileName(name)] = content;
   }
+
+  @override
+  Future<List<String>> listAppFiles() async => appFiles.keys.toList();
 }

@@ -15,6 +15,7 @@ class NoteCard extends StatelessWidget {
     required this.onTap,
     this.onLongPress,
     this.suggested = false,
+    this.conflict = false,
   });
 
   final String title;
@@ -25,6 +26,9 @@ class NoteCard extends StatelessWidget {
 
   /// Suggestions involving this note are waiting: a small dimmed dot.
   final bool suggested;
+
+  /// Changed in two places: a small mark until the user picks a version.
+  final bool conflict;
 
   /// Opens the card's options (Pin, Delete).
   final VoidCallback? onLongPress;
@@ -46,6 +50,13 @@ class NoteCard extends StatelessWidget {
                 children: [
                   Expanded(child: Text(dateLabel, style: styles.small)),
                   if (suggested) _dot(context),
+                  if (conflict)
+                    Icon(
+                      Icons.sync_problem,
+                      size: AppSize.iconSmall,
+                      color: context.colors.textSecondary,
+                      semanticLabel: AppCopy.changedInTwoPlaces,
+                    ),
                   if (pinned)
                     Icon(
                       Icons.push_pin_outlined,

@@ -43,6 +43,12 @@ class SafDocuments(private val resolver: ContentResolver, private val tree: Uri)
         return out
     }
 
+    /** Names of the plain files directly in [dir] (empty if it doesn't exist). */
+    fun names(dir: String): List<String> {
+        val dirId = findDir(segments(dir)) ?: return emptyList()
+        return children(dirId).filter { !it.isDir }.map { it.name }
+    }
+
     fun stat(path: String): Map<String, Any>? = find(path)?.let(::entry)
 
     fun read(path: String): String {

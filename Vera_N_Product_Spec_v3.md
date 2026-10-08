@@ -208,6 +208,7 @@ Tracked internally as a foundation for future features, not as a dashboard the u
 - Use **Tailscale** (or similar) for syncing away from home Wi-Fi, so there is still no cloud copy.
 - Later option: built-in device pairing via QR code and local-network discovery.
 - Sync never silently overwrites notes. On conflict, show both versions with Compare / Keep Phone / Keep Desktop / Merge.
+  - Built on the phone 2026-10-08 for any outside change (another app or a synced copy): Compare, Keep this version, Keep the other version, and Keep both (the other version becomes its own note, the phone's merge). A true line-by-line merge is not built.
 - Keep note version history so recovery is possible.
 - Optional encrypted relay in the long term.
 

@@ -15,6 +15,7 @@ import 'indexer/note_indexer.dart';
 import 'indexer/note_writer.dart';
 import 'indexer/notes_relocator.dart';
 import 'repositories/analysis_repository.dart';
+import 'repositories/conflict_resolver.dart';
 import 'repositories/notes_exporter.dart';
 import 'repositories/notes_repository.dart';
 import 'repositories/rejections_repository.dart';
@@ -46,6 +47,7 @@ class StorageServices {
     rejections = RejectionsRepository(db, store);
     trash = TrashRepository(db, store);
     exporter = NotesExporter(db, writer);
+    conflicts = ConflictResolver(db, store, writer, indexer, notes);
   }
 
   /// Opens storage on the device and reconnects to the picked folder.
@@ -87,6 +89,7 @@ class StorageServices {
   late final RejectionsRepository rejections;
   late final TrashRepository trash;
   late final NotesExporter exporter;
+  late final ConflictResolver conflicts;
   Future<void>? _reconciling;
 
   bool get canChooseFolder => folders != null;
@@ -103,6 +106,8 @@ class StorageServices {
     store.switchTo(target);
     await settings.setNotesFolder(folder);
     await reconcile();
+    // The chosen folder may hold rejections from an earlier install.
+    await rejections.importFiles();
     return true;
   }
 
@@ -119,9 +124,16 @@ class StorageServices {
     );
   }
 
-  /// Removes notes kept in the trash past 30 days. Run after start, never
-  /// delaying it; a failure only means they wait for the next start.
+  /// After start, never delaying it: reads every device's rejections file
+  /// into the database (so rejections survive reinstalling), and removes
+  /// notes kept in the trash past 30 days. A failure only means it waits
+  /// for the next start.
   Future<void> cleanUp() async {
+    try {
+      await rejections.importFiles();
+    } on Object catch (e) {
+      debugPrint('VeraN rejections import failed: $e');
+    }
     try {
       await trash.purge(DateTime.now());
     } on Object catch (e) {

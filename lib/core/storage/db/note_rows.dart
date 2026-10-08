@@ -122,6 +122,7 @@ abstract final class NoteRows {
       modified: r.read<DateTime>('modified'),
       folder: r.read<String>('folder'),
       suggested: r.data['suggested'] == 1,
+      conflict: r.data['conflict'] == 1,
     );
   }
 

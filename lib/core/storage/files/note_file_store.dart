@@ -47,13 +47,17 @@ abstract interface class NoteFileStore {
   Future<String?> readAppFile(String name);
 
   Future<void> writeAppFile(String name, String content);
+
+  /// Names of the files in `MyNotes/.app/` (empty if there is none), for
+  /// example every device's rejections file.
+  Future<List<String>> listAppFiles();
 }
 
 /// Checks that [name] is a plain file name for `.app/`.
 String checkAppFileName(String name) {
   if (name.isEmpty ||
       name.contains('/') ||
-      name.contains(r'') ||
+      name.contains(r'\') ||
       name.startsWith('.')) {
     throw ArgumentError.value(name, 'name', 'not a safe app file name');
   }

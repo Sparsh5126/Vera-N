@@ -138,6 +138,28 @@ class NoteIndexer {
     report.moved++;
   }
 
+  /// Replaces note [ref] with its file's current text, clearing a
+  /// conflict ("keep the other version"). False if the file is gone.
+  Future<bool> reload(int ref) async {
+    final row = await _row(ref);
+    final entry = row == null ? null : await _store.stat(row.path);
+    if (row == null || entry == null) return false;
+    await _apply(ref, entry, row.created);
+    return true;
+  }
+
+  /// The text of note [ref]'s file, without its header: in a conflict,
+  /// the version changed outside the app. Null if the file is gone.
+  Future<String?> fileBody(int ref) async {
+    final row = await _row(ref);
+    final entry = row == null ? null : await _store.stat(row.path);
+    if (row == null || entry == null) return null;
+    return (await _read(entry, row.created)).body.value;
+  }
+
+  Future<NoteRow?> _row(int ref) =>
+      (_db.select(_db.notes)..where((n) => n.id.equals(ref))).getSingleOrNull();
+
   Future<void> _apply(int ref, NoteFileEntry entry, DateTime created) async {
     final values = await _read(entry, created);
     await _update(ref, values);

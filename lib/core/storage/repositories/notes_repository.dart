@@ -61,7 +61,7 @@ class NotesRepository {
     // re-reading the list after each save stays cheap.
     return _db
         .customSelect(
-          'SELECT n.id, n.title, n.pinned, n.modified, n.folder, '
+          'SELECT n.id, n.title, n.pinned, n.modified, n.folder, n.conflict, '
           'substr(n.body, 1, ${NoteRows.previewLength}) AS body, '
           'EXISTS (SELECT 1 FROM suggestions s '
           'WHERE s.note_a = n.id OR s.note_b = n.id) AS suggested '
