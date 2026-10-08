@@ -134,7 +134,12 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   Widget _body(ReviewState state, SuggestionView? current) {
     // Everything is on the device: nothing to show while it loads.
     if (state.loading) return const SizedBox.shrink();
-    if (current == null) return const ReviewDone();
+    if (current == null) {
+      final review = ref.read(reviewProvider.notifier);
+      return ReviewDone(
+        onMore: state.moreWaiting ? () => unawaited(review.nextBatch()) : null,
+      );
+    }
     return Stack(
       alignment: Alignment.center,
       children: [

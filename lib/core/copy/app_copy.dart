@@ -109,6 +109,7 @@ abstract final class AppCopy {
   static const reviewNewLabel = 'NEW';
   static const reviewOlderLabel = 'OLDER';
   static const allCaughtUp = 'All caught up.';
+  static String reviewMore(int batchSize) => 'Review $batchSize more';
   static const close = 'Close';
   static const reviewHintTitle = 'Swipe to decide';
   static const reviewHintRight = 'Right: link them';

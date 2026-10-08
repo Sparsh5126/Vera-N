@@ -22,7 +22,6 @@ These three changes were asked for by the user on 2026-10-08.
   - New `RevisitButtons` widget; `RevisitCard` no longer has its own Not now.
 - **Home's connections card shows no number.** It reads "New connections" however many wait, because a count creates urgency. `AppCopy.newConnections` is now a constant.
 - **Graph shows unlinked notes by default.** They are drawn quieter, and the toggle hides them. A new library's Graph, or a folder picked from a bubble, is no longer empty. The empty message now shows only when there are no notes.
-- **Review has no "Review 5 more" button.** One batch of 5 per visit; the next 5 come on the next visit from Home (user, 2026-10-08). `ReviewState.moreWaiting` and `AppCopy.reviewMore` are removed. The UI spec said otherwise and is updated.
 - Tests updated, plus 1 new Graph test. UI spec §5, §6 and §10 and product spec §5 are updated.
 
 ### Fixed

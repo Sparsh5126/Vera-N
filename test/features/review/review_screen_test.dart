@@ -95,18 +95,17 @@ void main() {
     await app.finish(tester);
   });
 
-  testWidgets('one batch per visit, no "more" button; the rest come on '
-      'the next visit', (tester) async {
+  testWidgets('Not sure keeps it; Review 5 more offers the rest', (
+    tester,
+  ) async {
     await suggest(count: 6);
     await openReview(tester);
     for (var i = 0; i < 5; i++) {
       await tapAndSettle(tester, find.text('Not sure'));
     }
     expect(find.text('All caught up.'), findsOneWidget);
-    expect(find.byType(FilledButton), findsNothing);
     expect(await app.storage.suggestions.pending(), hasLength(6));
-    await tapAndSettle(tester, find.byTooltip(AppCopy.close));
-    await tapAndSettle(tester, find.text(AppCopy.newConnections));
+    await tapAndSettle(tester, find.text('Review 5 more'));
     expect(find.text('Newer 5'), findsOneWidget);
     await app.finish(tester);
   });
