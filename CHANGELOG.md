@@ -6,7 +6,11 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ### Fixed
 - **Onboarding privacy line wrapped as "No / cloud"** (seen on the phone, 2026-10-08). Each item now uses non-breaking spaces, so the line breaks only between items. The reminders page's example uses curly quotes.
-- **Onboarding pages 1–4 checked on the phone (test app):** the wordmark, titles, copy and privacy line show on each, with 6 dots. The folder and name pages weren't reached: the phone was being swiped during the check.
+- **All six onboarding pages checked on the phone (test app), after the fix:**
+  - The privacy line now wraps as "… · No account · / No cloud".
+  - Every page shows it, including the name page above the keyboard.
+  - Not now on the folder page and Skip on the name page lead Home.
+  - The folder page's example name now uses curly quotes like the rest.
 
 ### Added
 - **Reminders a note asks for** (product spec §10a; decided by the user 2026-10-08).

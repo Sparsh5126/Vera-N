@@ -38,7 +38,7 @@ abstract final class AppCopy {
       'No account · No cloud';
   static const onboardingFolderTitle = 'Choose where your notes live.';
   static const onboardingFolderBody =
-      'Pick a folder on your phone, or make a new one such as "Vera N" in '
+      'Pick a folder on your phone, or make a new one such as “Vera N” in '
       'Documents. Your notes are saved there '
       'as plain files you can open in other apps, and they stay even if you '
       'remove Vera N. Nothing is uploaded.';
