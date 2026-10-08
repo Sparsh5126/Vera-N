@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:path/path.dart' as p;
 
@@ -13,6 +14,7 @@ class IoNoteFileStore implements NoteFileStore {
   final Directory root;
 
   static const appDir = '.app';
+  static const attachmentsDir = 'Attachments';
 
   @override
   Future<List<NoteFileEntry>> listNotes() async {
@@ -101,6 +103,25 @@ class IoNoteFileStore implements NoteFileStore {
           p.basename(entry.path),
     ];
   }
+
+  /// `Attachments/` sits next to the notes folder, inside `MyNotes/`.
+  @override
+  Future<Uint8List?> readAttachment(String name) async {
+    final file = _attachment(name);
+    return await file.exists() ? file.readAsBytes() : null;
+  }
+
+  @override
+  Future<void> writeAttachment(String name, Uint8List bytes) async {
+    final file = _attachment(name);
+    await file.parent.create(recursive: true);
+    final temp = File(p.join(file.parent.path, '.$name.tmp'));
+    await temp.writeAsBytes(bytes, flush: true);
+    await temp.rename(file.path);
+  }
+
+  File _attachment(String name) =>
+      File(p.join(root.parent.path, attachmentsDir, checkAppFileName(name)));
 
   File _appFile(String name) =>
       File(p.join(root.parent.path, appDir, checkAppFileName(name)));

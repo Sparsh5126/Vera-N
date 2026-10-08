@@ -51,9 +51,15 @@ abstract interface class NoteFileStore {
   /// Names of the files in `MyNotes/.app/` (empty if there is none), for
   /// example every device's rejections file.
   Future<List<String>> listAppFiles();
+
+  /// `MyNotes/Attachments/[name]`: a photo, drawing or voice recording a
+  /// note embeds (product spec §3). Null if it doesn't exist.
+  Future<Uint8List?> readAttachment(String name);
+
+  Future<void> writeAttachment(String name, Uint8List bytes);
 }
 
-/// Checks that [name] is a plain file name for `.app/`.
+/// Checks that [name] is a plain file name for `.app/` or `Attachments/`.
 String checkAppFileName(String name) {
   if (name.isEmpty ||
       name.contains('/') ||

@@ -14,6 +14,7 @@ import 'files/switching_note_file_store.dart';
 import 'indexer/note_indexer.dart';
 import 'indexer/note_writer.dart';
 import 'indexer/notes_relocator.dart';
+import 'repositories/attachments_repository.dart';
 import 'repositories/analysis_repository.dart';
 import 'repositories/conflict_resolver.dart';
 import 'repositories/notes_exporter.dart';
@@ -47,6 +48,7 @@ class StorageServices {
     notes = NotesRepository(db, store, writer);
     rejections = RejectionsRepository(db, store);
     trash = TrashRepository(db, store);
+    attachments = AttachmentsRepository(store);
     exporter = NotesExporter(db, writer);
     conflicts = ConflictResolver(db, store, writer, indexer, notes);
   }
@@ -90,6 +92,7 @@ class StorageServices {
   late final NotesRepository notes;
   late final RejectionsRepository rejections;
   late final TrashRepository trash;
+  late final AttachmentsRepository attachments;
   late final NotesExporter exporter;
   late final ConflictResolver conflicts;
   Future<void>? _reconciling;

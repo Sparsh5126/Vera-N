@@ -47,6 +47,9 @@ dependencies:
   dart_sentencepiece_tokenizer: 1.4.1
   workmanager: ^0.10.10
   archive: ^4.3.0
+  image_picker: ^1.2.4
+  record: ^7.1.1
+  audioplayers: ^6.8.1
 
 dev_dependencies:
   flutter_test:

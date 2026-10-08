@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 /// Kinds of Markdown the app shows as formatting instead of symbols.
-enum MarkupKind { link, bold, checkbox, bullet, numbered }
+enum MarkupKind { link, bold, checkbox, bullet, numbered, embed }
 
 /// One piece of Markdown in a note's text. The file keeps the Markdown; the
 /// editor shows [contentStart]..[contentEnd] formatted, hides the symbols,
@@ -26,6 +26,7 @@ class MarkupSpan {
   final int end;
 
   /// For links: what the link points at (`name` in `[[name|Title]]`).
+  /// For embeds: the attachment's file name in `Attachments/`.
   final String? target;
 
   /// For checkboxes: ticked (`- [x] `).
@@ -40,16 +41,25 @@ class MarkupSpan {
       kind == MarkupKind.bullet ||
       kind == MarkupKind.numbered;
 
-  /// Checkboxes and bullets are drawn as glyphs; numbers stay as written.
-  bool get hasGlyph => kind == MarkupKind.checkbox || kind == MarkupKind.bullet;
+  /// Checkboxes and bullets are drawn as glyphs, an embed as its preview;
+  /// numbers stay as written.
+  bool get hasGlyph =>
+      kind == MarkupKind.checkbox ||
+      kind == MarkupKind.bullet ||
+      kind == MarkupKind.embed;
 
-  /// The character drawn as a checkbox (the ` `/`x` in `- [ ] `) or a
-  /// bullet (the `-` in `- `).
+  /// The character drawn as a checkbox (the ` `/`x` in `- [ ] `), a
+  /// bullet (the `-` in `- `) or an attachment (the `!` of `![](…)`).
   int get glyphAt => kind == MarkupKind.checkbox ? start + 3 : start;
 
   /// Whether the character at [offset] is a hidden Markdown symbol.
   bool hides(int offset) {
     if (kind == MarkupKind.numbered) return false;
+    // An embed shows only its preview, drawn in place of its first
+    // character.
+    if (kind == MarkupKind.embed) {
+      return offset > start && offset < end;
+    }
     if (isLine) {
       // Everything before the content except the glyph and the space
       // that separates it from the text.
@@ -64,6 +74,8 @@ class MarkupSpan {
   bool blocksCaret(int offset) {
     // A number is ordinary visible text the user may edit.
     if (kind == MarkupKind.numbered) return false;
+    // An embed is one piece: the cursor sits before or after it.
+    if (kind == MarkupKind.embed) return offset > start && offset < end;
     if (isLine) return offset >= start && offset < contentStart;
     return (offset > start && offset < contentStart) ||
         (offset > contentEnd && offset < end);
@@ -79,6 +91,22 @@ abstract final class NoteMarkup {
   static final _checkbox = RegExp(r'^- \[([ xX])\] ', multiLine: true);
   static final _bullet = RegExp(r'^- (?!\[[ xX]\] )', multiLine: true);
   static final _numbered = RegExp(r'^(\d{1,9})\. ', multiLine: true);
+
+  /// An attachment on its own line: `![](Attachments/name.jpg)`, the path
+  /// from `MyNotes/` (product spec §3), so other apps find it too.
+  static final _embed = RegExp(
+    r'^!\[[^\]\n]*\]\(Attachments/([^()\s/\\]+)\)[ \t]*$',
+    multiLine: true,
+  );
+
+  /// An embed with its line break, so leaving it out leaves no gap.
+  static final _embedLine = RegExp(
+    r'^!\[[^\]\n]*\]\(Attachments/[^()\s/\\]+\)[ \t]*(\r?\n|$)',
+    multiLine: true,
+  );
+
+  /// The markup that embeds attachment [name].
+  static String embed(String name) => '![](Attachments/$name)';
 
   static const _cacheSize = 3;
   static final _cache = <String, List<MarkupSpan>>{};
@@ -134,8 +162,22 @@ abstract final class NoteMarkup {
           end: lineEnd(m.end),
           number: int.parse(m.group(1)!),
         ),
+      for (final m in _embed.allMatches(text))
+        MarkupSpan(
+          kind: MarkupKind.embed,
+          start: m.start,
+          contentStart: m.end,
+          contentEnd: m.end,
+          end: m.end,
+          target: m.group(1),
+        ),
     ];
   }
+
+  /// The attachments [text] embeds, in order.
+  static List<String> embeds(String text) => [
+    for (final m in _embed.allMatches(text)) m.group(1)!,
+  ];
 
   static MarkupSpan _linkSpan(RegExpMatch m) {
     final target = m.group(1)!;
@@ -151,7 +193,9 @@ abstract final class NoteMarkup {
   }
 
   /// [text] as a reader sees it, for cards and search results: links as
-  /// their titles, bold without `**`, checklists as ☐ / ☑, bullets as •.
+  /// their titles, bold without `**`, checklists as ☐ / ☑, bullets as •,
+  /// and attachments left out (their file names mean nothing to a reader
+  /// or to the AI).
   ///
   /// [forScreen] draws checklists as □ / ✓ instead: the app's font (Inter)
   /// has no ☐ / ☑, and Android then falls back to its color emoji, a blue
@@ -161,6 +205,7 @@ abstract final class NoteMarkup {
     final open = forScreen ? '□ ' : '☐ ';
     final done = forScreen ? '✓ ' : '☑ ';
     return text
+        .replaceAll(_embedLine, '')
         .replaceAllMapped(_link, (m) {
           final label = m.group(2)?.trim();
           return label == null || label.isEmpty ? m.group(1)!.trim() : label;

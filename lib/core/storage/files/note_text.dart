@@ -8,15 +8,14 @@ import 'note_markup.dart';
 abstract final class NoteText {
   static final _heading = RegExp(r'^#{1,6}\s+');
 
-  /// The title is the first non-empty line, without Markdown heading marks,
-  /// as a reader sees it (see [NoteMarkup.display]).
-  /// Empty when the note has no text.
+  /// The title is the first line with words, without Markdown heading
+  /// marks, as a reader sees it (see [NoteMarkup.display]); an attachment
+  /// on its own line is skipped. Empty when the note has no text.
   static String title(String body) {
     for (final line in const LineSplitter().convert(body)) {
-      final trimmed = line.trim();
-      if (trimmed.isNotEmpty) {
-        return NoteMarkup.display(trimmed.replaceFirst(_heading, ''));
-      }
+      final shown = NoteMarkup.display(line.trim().replaceFirst(_heading, ''))
+          .trim();
+      if (shown.isNotEmpty) return shown;
     }
     return '';
   }
@@ -24,7 +23,9 @@ abstract final class NoteText {
   /// The body after the title line, for card previews, as a reader sees it.
   static String preview(String body) {
     final lines = const LineSplitter().convert(body);
-    final titleAt = lines.indexWhere((l) => l.trim().isNotEmpty);
+    final titleAt = lines.indexWhere(
+      (l) => NoteMarkup.display(l).trim().isNotEmpty,
+    );
     if (titleAt == -1) return '';
     return NoteMarkup.display(
       lines.skip(titleAt + 1).join('\n').trim(),

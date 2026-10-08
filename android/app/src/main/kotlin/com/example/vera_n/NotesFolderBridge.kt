@@ -54,6 +54,11 @@ class NotesFolderBridge(private val activity: Activity) : MethodChannel.MethodCa
             "stat" -> docs.stat(path)
             "read" -> docs.read(path)
             "write" -> docs.write(path, call.argument<String>("content") ?: "")
+            "readBytes" -> docs.readBytes(path)
+            "writeBytes" -> {
+                docs.writeBytes(path, call.argument<ByteArray>("bytes") ?: ByteArray(0))
+                null
+            }
             "move" -> docs.move(path, call.argument<String>("to") ?: "")
             "delete" -> docs.delete(path)
             else -> throw IllegalArgumentException("unknown method ${call.method}")

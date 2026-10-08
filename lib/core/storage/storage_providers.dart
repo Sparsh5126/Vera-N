@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'repositories/attachments_repository.dart';
 import 'repositories/graph_repository.dart';
 import 'repositories/links_repository.dart';
 import 'repositories/notes_repository.dart';
@@ -32,3 +35,20 @@ final linksRepositoryProvider = Provider<LinksRepository>(
 final graphRepositoryProvider = Provider<GraphRepository>(
   (ref) => GraphRepository(ref.watch(storageProvider).db),
 );
+
+final attachmentsRepositoryProvider = Provider<AttachmentsRepository>(
+  (ref) => ref.watch(storageProvider).attachments,
+);
+
+/// An attachment's bytes, for its preview in the note. Invalidated after
+/// a drawing is saved again.
+final attachmentBytesProvider = FutureProvider.autoDispose
+    .family<Uint8List?, String>(
+      (ref, name) => ref.watch(attachmentsRepositoryProvider).read(name),
+    );
+
+/// A drawing's strokes, so the app draws it in the current theme's ink.
+final drawingStrokesProvider = FutureProvider.autoDispose
+    .family<String?, String>(
+      (ref, name) => ref.watch(attachmentsRepositoryProvider).strokes(name),
+    );

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'note_file_store.dart';
 import 'notes_folder_channel.dart';
 
@@ -9,6 +11,7 @@ class SafNoteFileStore implements NoteFileStore {
 
   static const notesDir = 'Notes';
   static const appDir = '.app';
+  static const attachmentsDir = 'Attachments';
 
   /// URI of the picked folder.
   final String tree;
@@ -89,6 +92,22 @@ class SafNoteFileStore implements NoteFileStore {
     final raw = await channel.call<List<Object?>>('names', tree, path: appDir);
     return [for (final name in raw ?? const []) name! as String];
   }
+
+  @override
+  Future<Uint8List?> readAttachment(String name) => channel.call<Uint8List>(
+    'readBytes',
+    tree,
+    path: '$attachmentsDir/${checkAppFileName(name)}',
+  );
+
+  @override
+  Future<void> writeAttachment(String name, Uint8List bytes) =>
+      channel.call<void>(
+        'writeBytes',
+        tree,
+        path: '$attachmentsDir/${checkAppFileName(name)}',
+        extra: {'bytes': bytes},
+      );
 
   String _full(String path) => '$notesDir/${checkNotePath(path).join('/')}';
 

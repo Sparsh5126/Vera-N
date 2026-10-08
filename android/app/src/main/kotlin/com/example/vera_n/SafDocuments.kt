@@ -58,20 +58,37 @@ class SafDocuments(private val resolver: ContentResolver, private val tree: Uri)
         return stream.use { it.readBytes().toString(Charsets.UTF_8) }
     }
 
+    /** A binary file (an attachment), or null if it doesn't exist. */
+    fun readBytes(path: String): ByteArray? {
+        val child = find(path) ?: return null
+        val stream = resolver.openInputStream(docUri(child.id)) ?: return null
+        return stream.use { it.readBytes() }
+    }
+
+    fun writeBytes(path: String, bytes: ByteArray) {
+        val stream = resolver.openOutputStream(create(path), "wt")
+            ?: throw IllegalStateException("can't write: $path")
+        stream.use { it.write(bytes) }
+    }
+
     /** Writes the whole file, creating it and its folders if needed. */
     fun write(path: String, content: String): Map<String, Any> {
+        val stream = resolver.openOutputStream(create(path), "wt")
+            ?: throw IllegalStateException("can't write: $path")
+        stream.use { it.write(content.toByteArray(Charsets.UTF_8)) }
+        return stat(path) ?: throw IllegalStateException("not written: $path")
+    }
+
+    /** The file's URI, creating it and its folders if needed. */
+    private fun create(path: String): Uri {
         val parts = segments(path)
         val parentId = ensureDir(parts.dropLast(1))
         val name = parts.last()
-        val uri = children(parentId).firstOrNull { it.name == name }?.let { docUri(it.id) }
+        return children(parentId).firstOrNull { it.name == name }?.let { docUri(it.id) }
             // octet-stream keeps the exact name; a text type may get an extension added.
             ?: DocumentsContract.createDocument(
                 resolver, docUri(parentId), "application/octet-stream", name,
             ) ?: throw IllegalStateException("can't create: $path")
-        val stream = resolver.openOutputStream(uri, "wt")
-            ?: throw IllegalStateException("can't write: $path")
-        stream.use { it.write(content.toByteArray(Charsets.UTF_8)) }
-        return stat(path) ?: throw IllegalStateException("not written: $path")
     }
 
     /** Copies then deletes, which works with every document provider. */

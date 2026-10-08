@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'note_file_store.dart';
 
 /// Forwards to the current notes folder, so the writer, indexer and
@@ -42,4 +44,12 @@ class SwitchingNoteFileStore implements NoteFileStore {
 
   @override
   Future<List<String>> listAppFiles() => _current.listAppFiles();
+
+  @override
+  Future<Uint8List?> readAttachment(String name) =>
+      _current.readAttachment(name);
+
+  @override
+  Future<void> writeAttachment(String name, Uint8List bytes) =>
+      _current.writeAttachment(name, bytes);
 }

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:vera_n/core/storage/files/note_file_store.dart';
 
 /// In-memory [NoteFileStore] with a fake clock, for fast storage tests.
@@ -73,4 +75,16 @@ class MemoryNoteFileStore implements NoteFileStore {
 
   @override
   Future<List<String>> listAppFiles() async => appFiles.keys.toList();
+
+  /// Files in `Attachments/`, by name.
+  final attachments = <String, Uint8List>{};
+
+  @override
+  Future<Uint8List?> readAttachment(String name) async =>
+      attachments[checkAppFileName(name)];
+
+  @override
+  Future<void> writeAttachment(String name, Uint8List bytes) async {
+    attachments[checkAppFileName(name)] = bytes;
+  }
 }

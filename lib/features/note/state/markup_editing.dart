@@ -82,6 +82,11 @@ abstract final class MarkupEditing {
     final e = s + previous.text.length - next.text.length;
     final text = previous.text;
     for (final span in NoteMarkup.find(text)) {
+      if (span.kind == MarkupKind.embed) {
+        final removed = _removeEmbed(text, span, s, e);
+        if (removed != null) return removed;
+        continue;
+      }
       final inStart = s < span.contentStart && e > span.start;
       final inEnd = !span.isLine && s < span.end && e > span.contentEnd;
       if (!inStart && !inEnd) continue;
@@ -114,9 +119,30 @@ abstract final class MarkupEditing {
             text.replaceRange(span.start, span.contentStart, ''),
             span.start,
           );
+        case MarkupKind.embed:
+          return null;
       }
     }
     return null;
+  }
+
+  /// Deleting into an attachment, or the line break right after it
+  /// (backspace at the start of the next line), removes the whole
+  /// attachment with its line, so its markup never shows half-deleted.
+  static TextEditingValue? _removeEmbed(
+    String text,
+    MarkupSpan span,
+    int s,
+    int e,
+  ) {
+    final breakAfter = span.end < text.length && text[span.end] == '\n' ? 1 : 0;
+    final into = s < span.end && e > span.start;
+    final lineBreak = s == span.end && e == span.end + breakAfter;
+    if (!into && !(lineBreak && breakAfter == 1)) return null;
+    final from = s < span.start ? s : span.start;
+    final lineEnd = span.end + breakAfter;
+    final to = e > lineEnd ? e : lineEnd;
+    return _value(text.replaceRange(from, to, ''), from);
   }
 
   static TextEditingValue _snapCaret(
@@ -128,6 +154,11 @@ abstract final class MarkupEditing {
     final at = sel.baseOffset;
     final forward = at >= previous.selection.baseOffset;
     for (final span in NoteMarkup.find(next.text)) {
+      if (span.kind == MarkupKind.embed) {
+        final to = _pastEmbed(next.text, span, at, forward);
+        if (to == null) continue;
+        return next.copyWith(selection: TextSelection.collapsed(offset: to));
+      }
       if (!span.blocksCaret(at)) continue;
       final int to;
       if (span.isLine) {
@@ -140,6 +171,17 @@ abstract final class MarkupEditing {
       return next.copyWith(selection: TextSelection.collapsed(offset: to));
     }
     return next;
+  }
+
+  /// Where the cursor goes instead of [at] on or inside an attachment's
+  /// line: the next line going forward, the previous line going back, so
+  /// typing never lands on the attachment's line. Null if [at] is clear.
+  static int? _pastEmbed(String text, MarkupSpan span, int at, bool forward) {
+    if (at < span.start || at > span.end) return null;
+    final after = span.end < text.length ? span.end + 1 : null;
+    final before = span.start > 0 ? span.start - 1 : null;
+    if (forward || before == null) return after ?? before;
+    return before;
   }
 
   static final _numberedLine = RegExp(r'^(\d{1,9})\. ');

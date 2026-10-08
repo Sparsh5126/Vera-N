@@ -5,6 +5,23 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Attachments, part 1: storage and the embed** (product spec §2–3, UI spec §7). Decided 2026-10-08 (user):
+  - Three kinds: photo, drawing and voice.
+  - Each sits inline at the cursor, on its own line.
+  - An attach row above the keyboard while editing.
+  - Drawings stay editable.
+  - Photos come from the camera or the gallery.
+  - **Files:** `MyNotes/Attachments/<id>.<ext>`, beside `Notes/`. A drawing is `<id>.drawing.png`, which any app can open, plus `<id>.drawing.json` with its strokes. Every file store (local files, the picked Android folder, the test store) reads and writes them; the Android bridge gains `readBytes` / `writeBytes`.
+  - **In the note:** a standard Markdown embed `![](Attachments/<name>)` on its own line, the path from `MyNotes/`, so other apps find it.
+  - **Editing:**
+    - The editor draws a preview in place of the line.
+    - The cursor never rests on that line.
+    - Deleting into it, or backspace at the start of the next line, removes the whole embed, so the markup never shows half-deleted.
+  - **Readers and the AI:** titles, card previews, copies and the AI's text leave embeds out. A note's title is its first line with words.
+  - **Moving notes:** when they move into a picked folder, the attachments they embed are copied too. The originals stay in the app's private folder for now.
+  - **New packages:** `image_picker` (official; camera through the system camera app, so no camera permission), `record` (microphone), `audioplayers` (playback). Their sizes are logged with the finished feature.
+  - Tests: 10.
+
 - **Graph: grouped bubbles for very large libraries** (UI spec §10, the last Graph item).
   - Past 200 notes, the whole-library Graph shows one bubble per top-level folder instead of dots. This applies only with no Folder or Tag filter and no Focus.
   - A bubble's area grows with its note count. Notes at the top level share a "No folder" bubble. A solid line joins two folders whose notes link.

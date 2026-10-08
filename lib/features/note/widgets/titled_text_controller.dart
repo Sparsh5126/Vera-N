@@ -23,6 +23,10 @@ class TitledTextController extends TextEditingController {
   /// Called after a checkbox is ticked or unticked, to save it.
   VoidCallback? onCheckboxToggled;
 
+  /// Draws an attachment (photo, drawing, voice note) in place of its
+  /// `![](Attachments/name)` line, given the file name.
+  Widget Function(String name)? embedBuilder;
+
   @override
   set value(TextEditingValue newValue) {
     super.value = MarkupEditing.protect(value, newValue);
@@ -105,6 +109,7 @@ class TitledTextController extends TextEditingController {
           }
         case MarkupKind.bullet:
         case MarkupKind.numbered:
+        case MarkupKind.embed:
           break;
       }
     }
@@ -112,6 +117,13 @@ class TitledTextController extends TextEditingController {
   }
 
   InlineSpan _glyph(MarkupSpan span, TextStyle style) {
+    if (span.kind == MarkupKind.embed) {
+      final build = embedBuilder;
+      return WidgetSpan(
+        alignment: PlaceholderAlignment.middle,
+        child: build == null ? const SizedBox.shrink() : build(span.target!),
+      );
+    }
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: CheckboxGlyph(

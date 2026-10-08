@@ -4,7 +4,9 @@ import 'package:drift/drift.dart';
 
 import '../db/app_database.dart';
 import '../db/note_rows.dart';
+import '../files/attachment_name.dart';
 import '../files/note_file_store.dart';
+import '../files/note_markup.dart';
 
 /// Moves note files from one notes folder to another, for example from the
 /// in-app holding folder into the folder the user picked.
@@ -28,12 +30,30 @@ class NotesRelocator {
       if (await to.exists(path) && await to.read(path) != text) {
         path = _withSuffix(path);
       }
+      await _copyAttachments(text, from, to);
       final written = await to.write(path, text);
       await _pointRowAt(entry.path, written);
       await from.delete(entry.path);
       moved++;
     }
     return moved;
+  }
+
+  /// The attachments [text] embeds go along, so the note still shows
+  /// them. One already in the target is kept. The originals stay where
+  /// they were, in case another note still embeds them there.
+  Future<void> _copyAttachments(
+    String text,
+    NoteFileStore from,
+    NoteFileStore to,
+  ) async {
+    for (final embedded in NoteMarkup.embeds(text)) {
+      for (final name in AttachmentName.withCompanions(embedded)) {
+        if (await to.readAttachment(name) != null) continue;
+        final bytes = await from.readAttachment(name);
+        if (bytes != null) await to.writeAttachment(name, bytes);
+      }
+    }
   }
 
   Future<void> _pointRowAt(String oldPath, NoteFileEntry written) {
