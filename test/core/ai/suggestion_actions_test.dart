@@ -72,6 +72,20 @@ void main() {
     expect(await suggestions.pending(), hasLength(1));
   });
 
+  test(
+    'accept and reject count toward the link bar; undo takes it back',
+    () async {
+      final settings = SettingsRepository(h.db);
+      await pair();
+      final undo = await actions.accept((await suggestions.pending()).single);
+      expect((await settings.learning('link')).recent, [true]);
+      await undo();
+      expect((await settings.learning('link')).recent, isEmpty);
+      await actions.reject((await suggestions.pending()).single);
+      expect((await settings.learning('link')).recent, [false]);
+    },
+  );
+
   test('undoing an accept never removes words typed since', () async {
     final (_, newer) = await pair();
     final undo = await actions.accept((await suggestions.pending()).single);

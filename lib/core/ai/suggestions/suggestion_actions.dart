@@ -9,6 +9,7 @@ import '../../storage/repositories/rejections_repository.dart';
 import '../../storage/repositories/settings_repository.dart';
 import '../../storage/repositories/suggestions_repository.dart';
 import '../matching/word_signature.dart';
+import 'suggestion_learning.dart';
 
 /// Undoes the choice just made.
 typedef Undo = Future<void> Function();
@@ -45,7 +46,9 @@ class SuggestionActions {
     final linked = NoteFooter.append(newer.body, link);
     await notes.updateBody(newer.ref, linked);
     await suggestions.remove(s.id);
+    final unlearn = await _learn(s.kind, accepted: true);
     return () async {
+      await unlearn();
       // Only if the note wasn't edited since: undo never touches the
       // user's own words.
       final now = await notes.getNote(newer.ref);
@@ -69,10 +72,30 @@ class SuggestionActions {
     );
     await rejections.add(rejection);
     await suggestions.remove(s.id);
+    final unlearn = await _learn(s.kind, accepted: false);
     return () async {
+      await unlearn();
       await rejections.remove(rejection.pairKey, deviceId);
       await suggestions.putBack(s);
     };
+  }
+
+  /// Counts the decision toward the kind's match bar (product spec §8);
+  /// returns its undo.
+  Future<Undo> _learn(String kind, {required bool accepted}) async {
+    final learned = await settings.learning(kind);
+    await settings.saveLearning(
+      kind,
+      SuggestionLearning.record(
+        learned,
+        accepted,
+        base: SuggestionLearning.baseFor(kind),
+      ),
+    );
+    return () async => settings.saveLearning(
+      kind,
+      SuggestionLearning.undoLast(await settings.learning(kind)),
+    );
   }
 
   /// Keeps it dimmed; it comes back in a later batch until it expires.

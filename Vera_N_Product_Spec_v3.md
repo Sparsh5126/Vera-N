@@ -152,6 +152,7 @@ Rules:
 - Rejections are kept in `MyNotes/.app/rejections-<deviceid>.jsonl` (see section 3), so they survive uninstall and reach every device. Each device appends only to its own file and reads all of them.
 - Rejections are not necessarily permanent: if either note changes substantially (about a third or more of its words, decided 2026-10-04), the pair may be reconsidered, but only if the new match is strong.
 - Learning is simple: track the accept rate per suggestion type (link, tag, topic). If a type is rejected often, raise its threshold. No model training at first.
+  - Built 2026-10-08: last 20 decisions per type; from 10 on, 70%+ rejected raises the bar 0.02 (cap +0.10), 80%+ accepted lowers it 0.02 (floor −0.04, so only strong matches still pass); the count restarts after each step. Device-local.
 
 ---
 

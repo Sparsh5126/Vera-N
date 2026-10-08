@@ -27,6 +27,7 @@ import 'repositories/trash_repository.dart';
 typedef AnalysisStorage = ({
   AnalysisRepository analysis,
   SuggestionsRepository suggestions,
+  SettingsRepository settings,
   Future<void> Function() close,
 });
 
@@ -70,6 +71,7 @@ class StorageServices {
     return (
       analysis: AnalysisRepository(db),
       suggestions: SuggestionsRepository(db),
+      settings: SettingsRepository(db),
       close: db.close,
     );
   }

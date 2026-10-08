@@ -4,6 +4,7 @@ import 'package:workmanager/workmanager.dart';
 import '../../storage/storage_services.dart';
 import '../ai_settings.dart';
 import '../embedder/onnx_embedder.dart';
+import '../suggestions/suggestion_learning.dart';
 import 'analysis_run.dart';
 
 /// Schedules on-device analysis with Android's WorkManager, only while the
@@ -80,11 +81,16 @@ void analysisDispatcher() {
     (task, _) async {
       final storage = StorageServices.openForAnalysis();
       try {
+        final learned = await storage.settings.learning('link');
         final done = await AnalysisRun(
           analysis: storage.analysis,
           suggestions: storage.suggestions,
           embedder: OnnxEmbedder(),
           stopRequested: () => stop,
+          linkThreshold: SuggestionLearning.thresholdFor(
+            learned,
+            SuggestionLearning.baseFor('link'),
+          ),
         ).run();
         // Large libraries: carry on in a later run while charging.
         if (!done && !stop) await _continueLater();

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import '../../models/kind_learning.dart';
 import '../../models/app_prefs.dart';
 import '../db/app_database.dart';
 
@@ -14,6 +15,7 @@ class SettingsRepository {
   static const _onboardingDone = 'onboardingDone';
   static const _recentSearches = 'recentSearches';
   static const _reviewHintSeen = 'reviewHintSeen';
+  static const _learning = 'learning.';
 
   /// Recent searches kept, newest first.
   static const recentSearchLimit = 8;
@@ -70,6 +72,23 @@ class SettingsRepository {
   Future<bool> reviewHintSeen() async => await _get(_reviewHintSeen) == 'true';
 
   Future<void> setReviewHintSeen() => _set(_reviewHintSeen, 'true');
+
+  /// What was learned about suggestions of [kind] (accept / reject
+  /// decisions and its match bar), kept on this device only.
+  Future<KindLearning> learning(String kind) async {
+    final raw = await _get('$_learning$kind');
+    if (raw == null) return const KindLearning();
+    final json = jsonDecode(raw) as Map<String, dynamic>;
+    return KindLearning(
+      recent: [for (final a in json['recent'] as List<dynamic>) a as bool],
+      threshold: (json['threshold'] as num?)?.toDouble(),
+    );
+  }
+
+  Future<void> saveLearning(String kind, KindLearning learned) => _set(
+    '$_learning$kind',
+    jsonEncode({'recent': learned.recent, 'threshold': learned.threshold}),
+  );
 
   /// The choices from Settings, with defaults for those never changed.
   Future<AppPrefs> prefs() async {

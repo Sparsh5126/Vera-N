@@ -30,10 +30,13 @@ class AnalysisRun {
     DateTime Function()? clock,
     Stopwatch? stopwatch,
     bool Function()? stopRequested,
+    this.linkThreshold = AiSettings.strongMatch,
   }) : _stopRequested = stopRequested ?? _never,
        _clock = clock ?? DateTime.now,
        _stopwatch = stopwatch ?? Stopwatch();
 
+  /// The link bar, as learned from accept rates (product spec §8).
+  final double linkThreshold;
   final AnalysisRepository analysis;
   final SuggestionsRepository suggestions;
   final Embedder embedder;
@@ -115,7 +118,7 @@ class AnalysisRun {
       final matches = NoteMatcher.strongMatches(
         own,
         all,
-        threshold: AiSettings.strongMatch,
+        threshold: linkThreshold,
         limit: AiSettings.suggestionsPerNote,
         exclude: {
           ref,
