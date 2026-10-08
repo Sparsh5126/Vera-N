@@ -11,10 +11,13 @@ void main() {
   ) async {
     final text =
         TitledTextController(
-            text: 'Title\n${NoteMarkup.embed('a.drawing.svg')}\nAfter',
+            text: 'Title\n${NoteMarkup.embed('a.drawing.svg')}',
           )
-          ..embedBuilder = (_) =>
-              const SizedBox(key: Key('embed'), width: 100, height: 200);
+          ..embedBuilder = (_) => ConstrainedBox(
+            key: const Key('embed'),
+            constraints: const BoxConstraints(maxHeight: 200, maxWidth: 86),
+            child: const AspectRatio(aspectRatio: 0.43),
+          );
     final focus = FocusNode();
     addTearDown(focus.dispose);
     await tester.pumpWidget(

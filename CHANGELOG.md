@@ -13,7 +13,22 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
   - The app starts with the new fragment activity.
   - The paperclip shows above the keyboard and its sheet lists the four choices.
   - A drawing is drawn, saved as `.drawing.svg` and embedded.
-  - Not yet checked, because the phone disconnected: photo, voice, the Locked folder prompt, and the clean-up rows.
+- **Rest of the phone check (2026-10-08, test app, after the fix):**
+  - **Drawing:** it now sits on its own line under the title, and text after it starts right below. A large gap under a drawing that was the last line showed once, then not again after reopening; the layout test covers that case.
+  - **Gallery:** the Android photo picker opens with no permission, and backing out inserts nothing.
+  - **Camera:** the system camera opens with no camera permission, and its ✕ cancels cleanly. No photo was taken, to avoid capturing the room; the save path is the same as the gallery's and is covered by tests.
+  - **Voice:** the microphone prompt appears on first use. Recording counts up, Save embeds a "Voice note" pill, and Play plays with the time shown. The microphone indicator goes off after saving.
+  - **Locked folder:**
+    - Locking left Home with Undo, and the Locked pill appeared with its icon.
+    - The system `BiometricPrompt` showed (the screen is blank to captures, as Android protects it) and unlocked with the user's fingerprint.
+    - Lock now shows the lock.
+    - The database held no passages, analysis or suggestions for the locked note.
+  - **Drawings saved as SVG:** the file holds one path per line and a light plate.
+  - **Settings → Attachments:**
+    - The row shows the space used.
+    - A dummy unused file showed as "1 not used in any note".
+    - Remove unused deleted it once Undo expired, and kept the files in use.
+  - **Background analysis without `WAKE_LOCK`:** forced with `cmd jobscheduler run -f -n androidx.work.systemjobscheduler`, it finished (`run finished, all done: true`) with no security error. Unforced, it waited for "charging", as designed: the phone was on power but not counted as charging.
 
 ### Added
 - **Locked folder** (product spec §15, UI spec §5 and §7). Decided 2026-10-08 (user): an app lock (not encryption), opened with the phone's own lock, one folder.
