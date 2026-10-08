@@ -281,6 +281,21 @@ abstract final class AppCopy {
   static const deleteForever = 'Delete forever';
   static const deletedForever = 'Deleted for good';
   static String deletedOn(String date) => 'Deleted $date';
+  static const attachmentsAllUsed = 'All used in notes';
+  static String attachmentsUnused(int n) =>
+      n == 1 ? '1 not used in any note' : '$n not used in any note';
+  static const removeUnused = 'Remove unused attachments';
+  static String unusedRemoved(int n) =>
+      n == 1 ? '1 attachment removed' : '$n attachments removed';
+  static const cleanAttachmentsAuto = 'Remove unused attachments on their own';
+  static const cleanAttachmentsHint = 'After 30 days in no note';
+  static String fileSize(int bytes) {
+    const mb = 1024 * 1024;
+    if (bytes == 0) return 'None';
+    if (bytes < mb) return '${(bytes / 1024).ceil()} KB';
+    return '${(bytes / mb).toStringAsFixed(1)} MB';
+  }
+
   static const exportNotes = 'Export notes';
   static const exportValue = 'Markdown .zip';
   static const exporting = 'Making the .zip…';

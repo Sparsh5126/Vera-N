@@ -120,6 +120,28 @@ class IoNoteFileStore implements NoteFileStore {
     await temp.rename(file.path);
   }
 
+  @override
+  Future<List<NoteFileEntry>> listAttachments() async {
+    final dir = Directory(p.join(root.parent.path, attachmentsDir));
+    if (!await dir.exists()) return const [];
+    final entries = <NoteFileEntry>[];
+    await for (final entry in dir.list()) {
+      final name = p.basename(entry.path);
+      if (entry is! File || name.startsWith('.')) continue;
+      final stat = await entry.stat();
+      entries.add(
+        NoteFileEntry(path: name, modified: stat.modified, size: stat.size),
+      );
+    }
+    return entries;
+  }
+
+  @override
+  Future<void> deleteAttachment(String name) async {
+    final file = _attachment(name);
+    if (await file.exists()) await file.delete();
+  }
+
   File _attachment(String name) =>
       File(p.join(root.parent.path, attachmentsDir, checkAppFileName(name)));
 

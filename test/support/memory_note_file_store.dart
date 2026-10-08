@@ -87,4 +87,15 @@ class MemoryNoteFileStore implements NoteFileStore {
   Future<void> writeAttachment(String name, Uint8List bytes) async {
     attachments[checkAppFileName(name)] = bytes;
   }
+
+  @override
+  Future<List<NoteFileEntry>> listAttachments() async => [
+    for (final e in attachments.entries)
+      NoteFileEntry(path: e.key, modified: _now, size: e.value.length),
+  ];
+
+  @override
+  Future<void> deleteAttachment(String name) async {
+    attachments.remove(checkAppFileName(name));
+  }
 }

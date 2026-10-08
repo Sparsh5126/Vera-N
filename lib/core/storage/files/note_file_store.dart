@@ -57,6 +57,12 @@ abstract interface class NoteFileStore {
   Future<Uint8List?> readAttachment(String name);
 
   Future<void> writeAttachment(String name, Uint8List bytes);
+
+  /// Every file in `Attachments/` (its name as the entry's path), for
+  /// cleaning up the ones no note uses.
+  Future<List<NoteFileEntry>> listAttachments();
+
+  Future<void> deleteAttachment(String name);
 }
 
 /// Checks that [name] is a plain file name for `.app/` or `Attachments/`.

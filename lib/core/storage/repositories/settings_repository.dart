@@ -16,6 +16,7 @@ class SettingsRepository {
   static const _recentSearches = 'recentSearches';
   static const _reviewHintSeen = 'reviewHintSeen';
   static const _learning = 'learning.';
+  static const _unusedSince = 'attachments.unusedSince';
 
   /// Recent searches kept, newest first.
   static const recentSearchLimit = 8;
@@ -106,6 +107,8 @@ class SettingsRepository {
       theme: pick(ThemeChoice.values, _Prefs.theme, d.theme),
       suggestions: (v[_Prefs.suggestions] ?? '${d.suggestions}') == 'true',
       chargingOnly: (v[_Prefs.chargingOnly] ?? '${d.chargingOnly}') == 'true',
+      cleanAttachments:
+          (v[_Prefs.cleanAttachments] ?? '${d.cleanAttachments}') == 'true',
     );
   }
 
@@ -117,7 +120,29 @@ class SettingsRepository {
     await _set(_Prefs.theme, p.theme.name);
     await _set(_Prefs.suggestions, '${p.suggestions}');
     await _set(_Prefs.chargingOnly, '${p.chargingOnly}');
+    await _set(_Prefs.cleanAttachments, '${p.cleanAttachments}');
   }
+
+  /// When each attachment was first seen unused, by name, for the
+  /// automatic clean-up (30 days unused).
+  Future<Map<String, DateTime>> unusedSince() async {
+    final raw = await _get(_unusedSince);
+    if (raw == null) return {};
+    return {
+      for (final e in (jsonDecode(raw) as Map<String, dynamic>).entries)
+        e.key: DateTime.fromMillisecondsSinceEpoch(e.value as int),
+    };
+  }
+
+  Future<void> setUnusedSince(Map<String, DateTime> since) => _set(
+    _unusedSince,
+    since.isEmpty
+        ? null
+        : jsonEncode({
+            for (final e in since.entries)
+              e.key: e.value.millisecondsSinceEpoch,
+          }),
+  );
 
   Future<String?> _get(String key) async {
     final row = await (_db.select(
@@ -147,7 +172,9 @@ abstract final class _Prefs {
   static const theme = 'theme';
   static const suggestions = 'suggestions';
   static const chargingOnly = 'chargingOnly';
+  static const cleanAttachments = 'cleanAttachments';
   static const keys = [
+    cleanAttachments,
     name,
     layout,
     startPage,

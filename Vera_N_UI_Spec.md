@@ -395,6 +395,11 @@ Laptop connection       Connected ›
 
 DATA
 Trash                   Kept 30 days ›
+Attachments                   12.4 MB
+  2 not used in any note
+Remove unused attachments
+Remove unused attachments on their own  [off]
+  After 30 days in no note
 Export notes            Markdown .zip ›
 
 ADVANCED ▾
@@ -412,6 +417,10 @@ Version
 - Laptop connection is one row: pair, test connection, forget device. "Not connected" is a normal state.
 - Advanced is collapsed by default.
 - Trash keeps deleted notes for 30 days.
+- **Attachments (built 2026-10-08, user's decision):**
+  - **The row:** shows the room attachments take, with "All used in notes" or "N not used in any note". Notes in the trash or the archive count as using theirs.
+  - **Remove unused attachments** appears only when some are unused. They disappear from the count at once, with Undo; the files are deleted only when the Undo message goes away.
+  - **Remove unused attachments on their own** is off by default. When on, a file in no note for 30 days is deleted at the next start. Turning it off starts the 30 days over.
 - Export produces a Markdown zip.
 - **Built 2026-10-08:** Trash opens a list of deleted notes (newest first) with **Restore** and **Delete forever** on each (user's choice, 2026-10-08); both offer Undo, and a note deleted forever is only removed once its Undo has gone. Notes older than 30 days are removed after each start. **Export notes** makes a .zip of every note in its folders (no trash, no app data) and saves it with Android's own "save as" screen.
 - **Built 2026-10-08:** YOU, APP, Notes folder, SMART SUGGESTIONS, ADVANCED and ABOUT (Privacy, Version, and a Licenses row for open-source and model licenses). Rebuild and Reset offer Undo instead of asking first. Quick capture, sync Status, Laptop connection, Trash and Export join with their features. "Suggest connections" off also hides suggestions that were already waiting, until it is turned back on.

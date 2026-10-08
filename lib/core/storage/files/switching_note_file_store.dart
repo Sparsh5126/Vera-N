@@ -52,4 +52,10 @@ class SwitchingNoteFileStore implements NoteFileStore {
   @override
   Future<void> writeAttachment(String name, Uint8List bytes) =>
       _current.writeAttachment(name, bytes);
+
+  @override
+  Future<List<NoteFileEntry>> listAttachments() => _current.listAttachments();
+
+  @override
+  Future<void> deleteAttachment(String name) => _current.deleteAttachment(name);
 }

@@ -10,10 +10,12 @@ import '../../../core/navigation/routes.dart';
 import '../../../shared/widgets/notice_snack_bar.dart';
 import '../../../shared/widgets/setting_row.dart';
 import '../state/settings_controller.dart';
+import 'attachments_settings.dart';
 import 'settings_group.dart';
 
-/// DATA: the trash (kept 30 days) and exporting every note as a Markdown
-/// .zip, saved where the user picks (Android).
+/// DATA: the trash (kept 30 days), attachments and their clean-up, and
+/// exporting every note as a Markdown .zip, saved where the user picks
+/// (Android).
 class DataSection extends ConsumerStatefulWidget {
   const DataSection({super.key});
 
@@ -50,6 +52,7 @@ class _DataSectionState extends ConsumerState<DataSection> {
           value: AppCopy.trashValue,
           onTap: () => context.push(Routes.trash),
         ),
+        const AttachmentsSettings(),
         if (android)
           SettingRow(
             label: AppCopy.exportNotes,

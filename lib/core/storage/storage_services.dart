@@ -48,7 +48,7 @@ class StorageServices {
     notes = NotesRepository(db, store, writer);
     rejections = RejectionsRepository(db, store);
     trash = TrashRepository(db, store);
-    attachments = AttachmentsRepository(store);
+    attachments = AttachmentsRepository(db, store);
     exporter = NotesExporter(db, writer);
     conflicts = ConflictResolver(db, store, writer, indexer, notes);
   }
@@ -141,9 +141,22 @@ class StorageServices {
     }
     try {
       await trash.purge(DateTime.now());
+      await _sweepAttachments();
     } on Object catch (e) {
       debugPrint('VeraN clean-up failed: $e');
     }
+  }
+
+  /// With "Remove unused attachments on their own" on, files no note has
+  /// used for 30 days go. Turned off, the clock starts over.
+  Future<void> _sweepAttachments() async {
+    if (!(await settings.prefs()).cleanAttachments) {
+      await settings.setUnusedSince({});
+      return;
+    }
+    await settings.setUnusedSince(
+      await attachments.sweep(await settings.unusedSince()),
+    );
   }
 
   /// App going to the background: get unsaved text into files now.

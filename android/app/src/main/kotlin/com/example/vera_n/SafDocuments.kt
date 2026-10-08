@@ -49,6 +49,14 @@ class SafDocuments(private val resolver: ContentResolver, private val tree: Uri)
         return children(dirId).filter { !it.isDir }.map { it.name }
     }
 
+    /** The plain files directly in [dir] with time and size, skipping names that start with `.`. */
+    fun files(dir: String): List<Map<String, Any>> {
+        val dirId = findDir(segments(dir)) ?: return emptyList()
+        return children(dirId)
+            .filter { !it.isDir && !it.name.startsWith(".") }
+            .map { entry(it) + ("name" to it.name) }
+    }
+
     fun stat(path: String): Map<String, Any>? = find(path)?.let(::entry)
 
     fun read(path: String): String {

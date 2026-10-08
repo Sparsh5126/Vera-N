@@ -94,14 +94,64 @@ void main() {
 
   group('files', () {
     test('drawings are saved as text; names never collide', () async {
-      final store = MemoryNoteFileStore();
-      final repo = AttachmentsRepository(store);
+      final h = StorageHarness();
+      addTearDown(h.dispose);
+      final repo = AttachmentsRepository(h.db, h.store);
       final name = await repo.addDrawing('<svg/>');
       expect(AttachmentName.kindOf(name), AttachmentKind.drawing);
       expect(utf8.decode((await repo.read(name))!), '<svg/>');
       final other = await repo.add(Uint8List.fromList([2]), '.jpg');
       expect(other, isNot(name));
       expect(await repo.read(other), [2]);
+    });
+  });
+
+  group('clean-up', () {
+    late StorageHarness h;
+    late AttachmentsRepository repo;
+    late DateTime now;
+    setUp(() {
+      h = StorageHarness();
+      now = DateTime(2026, 10, 8);
+      repo = AttachmentsRepository(h.db, h.store, clock: () => now);
+    });
+    tearDown(() => h.dispose());
+
+    Future<void> file(String name, int size) =>
+        h.store.writeAttachment(name, Uint8List(size));
+
+    test('unused means in no note; trashed notes still count', () async {
+      await file('used.jpg', 10);
+      await file('trashed.jpg', 20);
+      await file('loose.jpg', 30);
+      await h.repo.create('A\n${NoteMarkup.embed('used.jpg')}');
+      final t = await h.repo.create('B\n${NoteMarkup.embed('trashed.jpg')}');
+      await h.repo.trash(t);
+      final usage = await repo.usage();
+      expect((usage.count, usage.bytes), (3, 60));
+      expect(usage.unused, ['loose.jpg']);
+      expect(usage.unusedBytes, 30);
+    });
+
+    test('removing skips a file a note uses again by then', () async {
+      await file('a.jpg', 1);
+      await file('b.jpg', 1);
+      await h.repo.create('Back\n${NoteMarkup.embed('b.jpg')}');
+      await repo.delete(['a.jpg', 'b.jpg']);
+      expect(h.store.attachments.keys, ['b.jpg']);
+    });
+
+    test('the automatic clean-up waits 30 days unused', () async {
+      await file('old.jpg', 1);
+      var since = await repo.sweep({});
+      expect(since.keys, ['old.jpg']);
+      now = now.add(const Duration(days: 29));
+      since = await repo.sweep(since);
+      expect(h.store.attachments.keys, ['old.jpg']);
+      now = now.add(const Duration(days: 1));
+      since = await repo.sweep(since);
+      expect(h.store.attachments, isEmpty);
+      expect(since, isEmpty);
     });
 
     test('plain files keep attachments beside Notes/', () async {

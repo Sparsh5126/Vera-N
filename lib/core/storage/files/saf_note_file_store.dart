@@ -109,6 +109,26 @@ class SafNoteFileStore implements NoteFileStore {
         extra: {'bytes': bytes},
       );
 
+  @override
+  Future<List<NoteFileEntry>> listAttachments() async {
+    final raw = await channel.call<List<Object?>>(
+      'files',
+      tree,
+      path: attachmentsDir,
+    );
+    return [
+      for (final item in raw ?? const [])
+        _entry((item! as Map)['name'] as String, item),
+    ];
+  }
+
+  @override
+  Future<void> deleteAttachment(String name) => channel.call<void>(
+    'delete',
+    tree,
+    path: '$attachmentsDir/${checkAppFileName(name)}',
+  );
+
   String _full(String path) => '$notesDir/${checkNotePath(path).join('/')}';
 
   NoteFileEntry _entry(String path, Map<Object?, Object?> raw) {

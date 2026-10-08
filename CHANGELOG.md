@@ -4,6 +4,14 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Added
+- **Attachment clean-up in Settings → DATA** (user, 2026-10-08).
+  - **Attachments** shows the room they take and how many no note uses. Notes in the trash or archive count, so restoring one brings its attachments back.
+  - **Remove unused attachments** removes them at once with Undo. The files are deleted only when the Undo message goes away, and one a note uses again by then is kept.
+  - **Remove unused attachments on their own** is off by default. When on, files in no note for 30 days are deleted at start; when each was first seen unused is kept in this device's settings.
+  - **New in every file store:** list and delete attachments; the Android bridge gains `files`.
+  - Tests: 3 rule tests (usage, re-used files kept, 30-day sweep) and 2 widget tests. The settings test now scrolls to the row it needs, since DATA grew.
+
 ### Changed
 - **Removed two permissions WorkManager added** (user, 2026-10-08): `POST_NOTIFICATIONS` (the app sends none) and `WAKE_LOCK`. The minimum Android is 7 (API 24), where WorkManager runs on the system job scheduler, which holds the wake lock itself; the app schedules no expedited or foreground work. Removed in the manifest with `tools:node="remove"`.
   - Release permissions are now `RECORD_AUDIO` (voice notes, asked on first use), plus `RECEIVE_BOOT_COMPLETED`, `FOREGROUND_SERVICE(_SHORT_SERVICE)` and `ACCESS_NETWORK_STATE` from WorkManager.

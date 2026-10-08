@@ -70,7 +70,7 @@ App-private storage (per device, not synced, lost on uninstall)
   - Photos are shrunk to 2048 px and saved as JPEG at quality 80.
   - Voice notes are AAC in `.m4a`.
   - A drawing is one vector file, `<id>.drawing.svg` (changed 2026-10-08, user: "vector, so it never blurs"). Each line is a path, so it is sharp at any size and opens in any app; the app reads its own SVGs back to keep drawing.
-  - Attachment files are the user's and are never deleted by the app; removing one from a note leaves its file.
+  - Attachment files are the user's. Removing one from a note leaves its file. They are deleted only by the user's choice in Settings: "Remove unused attachments" (with Undo), or the optional automatic clean-up (off by default) of files in no note for 30 days.
   - The AI never reads attachments; their lines are left out of the text it analyzes.
 
 ---

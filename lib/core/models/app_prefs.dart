@@ -19,6 +19,7 @@ class AppPrefs {
     this.theme = ThemeChoice.system,
     this.suggestions = true,
     this.chargingOnly = true,
+    this.cleanAttachments = false,
   });
 
   /// For the greeting; null when skipped.
@@ -34,6 +35,11 @@ class AppPrefs {
   /// is idle with enough battery.
   final bool chargingOnly;
 
+  /// "Remove unused attachments on their own": attachments no note has
+  /// used for 30 days are deleted. Off by default; the files are the
+  /// user's (decided 2026-10-08).
+  final bool cleanAttachments;
+
   AppPrefs copyWith({
     ValueGetter<String?>? name,
     NotesLayout? layout,
@@ -41,6 +47,7 @@ class AppPrefs {
     ThemeChoice? theme,
     bool? suggestions,
     bool? chargingOnly,
+    bool? cleanAttachments,
   }) {
     return AppPrefs(
       name: name == null ? this.name : name(),
@@ -49,6 +56,7 @@ class AppPrefs {
       theme: theme ?? this.theme,
       suggestions: suggestions ?? this.suggestions,
       chargingOnly: chargingOnly ?? this.chargingOnly,
+      cleanAttachments: cleanAttachments ?? this.cleanAttachments,
     );
   }
 }
