@@ -4,6 +4,13 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Added
+- **Laptop version plan** (`docs/LAPTOP_PLAN.md`), with the user's decisions of 2026-10-08:
+  - Syncthing first; full notes app plus the AI booster; all four first AI jobs (written "Why?", new tag names, topics, duplicates); Windows first; local AI server only (LM Studio by default).
+  - Six phases: L0 foundation, L1 desktop layout, L2 booster engine, L3 phone shows laptop results, L4 settings, L5 packaging.
+  - Five open questions, to decide before the phase that needs them.
+  - Nothing is built yet.
+
 ### Fixed
 - **Onboarding privacy line wrapped as "No / cloud"** (seen on the phone, 2026-10-08). Each item now uses non-breaking spaces, so the line breaks only between items. The reminders page's example uses curly quotes.
 - **All six onboarding pages checked on the phone (test app), after the fix:**
