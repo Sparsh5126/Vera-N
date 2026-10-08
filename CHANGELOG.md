@@ -4,6 +4,10 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+- **Onboarding privacy line wrapped as "No / cloud"** (seen on the phone, 2026-10-08). Each item now uses non-breaking spaces, so the line breaks only between items. The reminders page's example uses curly quotes.
+- **Onboarding pages 1–4 checked on the phone (test app):** the wordmark, titles, copy and privacy line show on each, with 6 dots. The folder and name pages weren't reached: the phone was being swiped during the check.
+
 ### Added
 - **Reminders a note asks for** (product spec §10a; decided by the user 2026-10-08).
   - **Only when asked:** a line saying "remind me" with a future date and time schedules a notification.

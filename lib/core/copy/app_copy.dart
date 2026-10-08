@@ -23,7 +23,7 @@ abstract final class AppCopy {
       'devices. We have no servers that see your notes.';
   static const onboardingRemindTitle = 'Reminders, only when you ask.';
   static const onboardingRemindBody =
-      'Write "remind me tomorrow at 9 am" in any note and your phone reminds '
+      'Write “remind me tomorrow at 9 am” in any note and your phone reminds '
       'you then. Only notes that ask, only for a time ahead, and nothing '
       'else ever sends a notification. It all stays on this phone, and you '
       'can turn it off in Settings.';
@@ -31,8 +31,11 @@ abstract final class AppCopy {
       'Only for the greeting. It stays on this phone.';
 
   /// On every onboarding page.
+  /// Non-breaking spaces inside each item, so a line only breaks between
+  /// items, never as "No / cloud".
   static const privacyLine =
-      'Private · Open source · On this phone · No account · No cloud';
+      'Private · Open source · On this phone · '
+      'No account · No cloud';
   static const onboardingFolderTitle = 'Choose where your notes live.';
   static const onboardingFolderBody =
       'Pick a folder on your phone, or make a new one such as "Vera N" in '
