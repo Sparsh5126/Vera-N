@@ -1,12 +1,20 @@
 import 'package:drift/drift.dart';
 
+import '../../models/archive_folder.dart';
 import '../../models/search_filters.dart';
 
 /// The SQL conditions for [SearchFilters] on the `notes n` table, shared
-/// by Search and Home's folder and tag views.
+/// by Search, Home and the Graph.
+///
+/// Archived notes are left out unless [includeArchived] (Search) or the
+/// folder filter is the archive itself (browsing it under Folders).
 class NoteFilterSql {
-  NoteFilterSql(SearchFilters f, DateTime now) {
+  NoteFilterSql(SearchFilters f, DateTime now, {bool includeArchived = false}) {
     final folder = f.folder;
+    if (!includeArchived &&
+        !(folder != null && ArchiveFolder.contains(folder))) {
+      _add(ArchiveFolder.notArchivedSql, const []);
+    }
     if (folder != null) {
       // The folder itself or any subfolder; folders compare without case.
       _add(

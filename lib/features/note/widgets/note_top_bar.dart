@@ -5,7 +5,7 @@ import '../../../core/copy/app_copy.dart';
 import '../../../core/styles/app_styles.dart';
 import 'saved_tick.dart';
 
-/// Back, the saved tick, copy, pin, and the ⋮ menu.
+/// Back, the saved tick, copy, pin, and the ⋮ menu (archive, delete).
 class NoteTopBar extends StatelessWidget {
   const NoteTopBar({
     super.key,
@@ -15,6 +15,8 @@ class NoteTopBar extends StatelessWidget {
     required this.onPinChanged,
     required this.onCopy,
     required this.onDelete,
+    this.archived = false,
+    this.onArchive,
   });
 
   final ValueListenable<int> saves;
@@ -28,6 +30,11 @@ class NoteTopBar extends StatelessWidget {
   final VoidCallback? onCopy;
 
   final VoidCallback onDelete;
+
+  /// In the ⋮ menu: Archive, or Unarchive when [archived]. Null while the
+  /// note doesn't exist yet.
+  final VoidCallback? onArchive;
+  final bool archived;
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +67,11 @@ class NoteTopBar extends StatelessWidget {
             tooltip: AppCopy.moreOptions,
             onSelected: (action) => action(),
             itemBuilder: (_) => [
+              if (onArchive != null)
+                PopupMenuItem(
+                  value: onArchive,
+                  child: Text(archived ? AppCopy.unarchive : AppCopy.archive),
+                ),
               PopupMenuItem(value: onDelete, child: const Text(AppCopy.delete)),
             ],
           ),

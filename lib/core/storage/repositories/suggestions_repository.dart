@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../models/suggestion.dart';
 import '../../models/suggestion_draft.dart';
 import '../db/app_database.dart';
+import '../db/note_rows.dart';
 
 /// AI suggestions waiting for review (product spec §7). Kept only in the
 /// database: never written to note files, and rebuildable by analysis.
@@ -121,7 +122,12 @@ class SuggestionsRepository {
     return _db.select(_db.suggestions).join([
       innerJoin(a, a.id.equalsExp(_db.suggestions.noteA)),
       innerJoin(b, b.id.equalsExp(_db.suggestions.noteB)),
-    ])..where(a.trashedAt.isNull() & b.trashedAt.isNull());
+    ])..where(
+      a.trashedAt.isNull() &
+          b.trashedAt.isNull() &
+          NoteRows.notArchived(a) &
+          NoteRows.notArchived(b),
+    );
   }
 
   Selectable<SuggestionRow> _pending() {

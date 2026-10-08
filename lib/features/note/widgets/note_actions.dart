@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/copy/app_copy.dart';
+import '../../../core/models/archive_folder.dart';
 import '../../../core/models/note.dart';
 import '../../../core/storage/files/note_markup.dart';
 import '../../../core/storage/repositories/links_repository.dart';
@@ -112,6 +113,28 @@ class NoteActions {
         ? AppCopy.movedOutOfFolder
         : AppCopy.movedTo(folder);
     _undo(messenger, message, () => _editor.moveToFolder(old));
+  }
+
+  /// Archive moves the note into `Archive/` (keeping its folder inside)
+  /// and leaves it; Unarchive puts it back. Both offer Undo.
+  Future<void> toggleArchive(
+    BuildContext context,
+    Note note, {
+    required VoidCallback leave,
+  }) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final archiving = !ArchiveFolder.contains(note.folder);
+    final target = archiving
+        ? ArchiveFolder.into(note.folder)
+        : ArchiveFolder.outOf(note.folder);
+    final old = await _editor.moveToFolder(target);
+    if (old == null) return;
+    if (archiving) leave();
+    _undo(
+      messenger,
+      archiving ? AppCopy.archived : AppCopy.unarchived,
+      () => _editor.moveToFolder(old),
+    );
   }
 
   void _undo(

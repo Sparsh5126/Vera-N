@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/ai/suggestions/suggestion_providers.dart';
 import '../../core/copy/app_copy.dart';
+import '../../core/models/archive_folder.dart';
 import '../../core/models/note.dart';
 import '../../core/navigation/routes.dart';
 import '../../core/platform/launch_channel.dart';
@@ -241,6 +242,11 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
           ? null
           : () => unawaited(_actions.copy(context, _text?.text ?? note.body)),
       onDelete: () => unawaited(_delete()),
+      archived: note != null && ArchiveFolder.contains(note.folder),
+      onArchive: note == null
+          ? null
+          : () =>
+                unawaited(_actions.toggleArchive(context, note, leave: _leave)),
     );
   }
 

@@ -1,9 +1,11 @@
 import 'package:drift/drift.dart';
 
+import '../../models/archive_folder.dart';
 import '../../models/chunk_vector.dart';
 import '../../models/note_to_analyze.dart';
 import '../../models/rejected_pair.dart';
 import '../db/app_database.dart';
+import '../db/note_rows.dart';
 
 /// What on-device analysis reads and writes: which notes changed since
 /// they were embedded, and their chunk vectors. All of it is rebuildable
@@ -20,7 +22,8 @@ class AnalysisRepository {
         .customSelect(
           'SELECT n.id, n.body, n.content_hash FROM notes n '
           'LEFT JOIN note_analysis a ON a.note = n.id '
-          'WHERE n.trashed_at IS NULL AND (a.note IS NULL '
+          'WHERE n.trashed_at IS NULL AND ${ArchiveFolder.notArchivedSql} '
+          'AND (a.note IS NULL '
           'OR a.content_hash != n.content_hash OR a.model != ?) '
           'ORDER BY n.modified LIMIT ?',
           variables: [Variable(model), Variable(limit)],
@@ -49,9 +52,14 @@ class AnalysisRepository {
 
   /// Every chunk made with [model], of notes not in the trash.
   Future<List<ChunkVector>> allChunks(String model) async {
-    final query = _db.select(_db.chunks).join([
-      innerJoin(_db.notes, _db.notes.id.equalsExp(_db.chunks.note)),
-    ])..where(_db.chunks.model.equals(model) & _db.notes.trashedAt.isNull());
+    final query =
+        _db.select(_db.chunks).join([
+          innerJoin(_db.notes, _db.notes.id.equalsExp(_db.chunks.note)),
+        ])..where(
+          _db.chunks.model.equals(model) &
+              _db.notes.trashedAt.isNull() &
+              NoteRows.notArchived(_db.notes),
+        );
     final rows = await query.get();
     return [for (final r in rows) _vector(r.readTable(_db.chunks))];
   }

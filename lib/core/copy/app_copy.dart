@@ -145,6 +145,9 @@ abstract final class AppCopy {
   static String movedTo(String folder) => 'Moved to $folder';
   static const movedOutOfFolder = 'Moved out of its folder';
   static const archive = 'Archive';
+  static const unarchive = 'Unarchive';
+  static const archived = 'Archived';
+  static const unarchived = 'Back in its folder';
   static const delete = 'Delete';
   static const movedToTrash = 'Moved to trash';
   static const attachments = 'Attachments';

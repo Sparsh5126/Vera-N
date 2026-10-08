@@ -34,7 +34,11 @@ class SearchRepository {
   }) async {
     final match = ftsQuery(query);
     if (match == null && !filters.isActive) return const [];
-    final where = NoteFilterSql(filters, now ?? DateTime.now());
+    final where = NoteFilterSql(
+      filters,
+      now ?? DateTime.now(),
+      includeArchived: true,
+    );
     final rows = match == null
         ? await _browse(where, limit)
         : await _match(match, where, limit);

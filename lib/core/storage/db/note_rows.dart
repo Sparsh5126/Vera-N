@@ -1,6 +1,7 @@
 import 'package:characters/characters.dart';
 import 'package:drift/drift.dart';
 
+import '../../models/archive_folder.dart';
 import '../../models/note.dart';
 import '../../models/note_header.dart';
 import '../../models/note_summary.dart';
@@ -13,6 +14,13 @@ import 'app_database.dart';
 
 /// Converts between note files, database rows and models.
 abstract final class NoteRows {
+  /// Drift condition: note [n] is not archived (see [ArchiveFolder]).
+  static Expression<bool> notArchived($NotesTable n) {
+    final archive = ArchiveFolder.name.toLowerCase();
+    return n.folder.lower().equals(archive).not() &
+        n.folder.lower().like('$archive/%').not();
+  }
+
   /// Characters of body kept for a card preview.
   static const previewLength = 280;
 
