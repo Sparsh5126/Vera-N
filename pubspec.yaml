@@ -93,3 +93,9 @@ flutter:
     - family: InstrumentSerif
       fonts:
         - asset: assets/fonts/InstrumentSerif-Regular.ttf
+
+# Builds with Visual Studio 2026 (see third_party/local_auth_windows/
+# VERA_N_PATCH.md); remove once upstream is fixed.
+dependency_overrides:
+  local_auth_windows:
+    path: third_party/local_auth_windows

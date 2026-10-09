@@ -33,16 +33,16 @@ Checked 2026-10-08, from each package's platform list:
 
 Each phase is one change: tests, phone check where it touches the phone, changelog, commit.
 
-### L0. The app runs on Windows (foundation): code done 2026-10-09, not yet run on Windows (Visual Studio needed)
+### L0. The app runs on Windows (foundation): done 2026-10-09, run on Windows the same day (folder dialog, watcher, onboarding; conflicts and idle analysis covered by tests, real Syncthing not yet)
 - **Notes folder:** onboarding and Settings pick the Syncthing-shared `MyNotes/` folder with the system folder dialog (`file_selector`). Notes live in `Notes/`, attachments in `Attachments/`, as on the phone.
 - **Outside changes:** the app watches the folder while open (`Directory.watch`, debounced). Syncthing's edits reach the index within a second or two, with no polling.
 - **Syncthing conflict files:** `x.sync-conflict-<date>-<device>.md` must **not** become new notes. Each one is read as the other version of `x.md` and shown with the existing Compare / Keep this / Keep the other / Keep both, then removed once settled. Syncthing's own `.stfolder` and `.stversions` are ignored, as dot folders already are.
 - **Analysis on the laptop:** the same incremental analysis as the phone, run in-app when the computer is idle (no typing for a few minutes) and on mains power (battery state from `battery_plus`). It stops when either ends; no service runs when the app is closed.
 - **Device id and rejections:** the laptop gets its own `rejections-<deviceid>.jsonl`, and every device already reads all of them, so a pair rejected on one device never returns on the other.
-- **Window:** a sensible minimum size; the window size and position are remembered.
+- **Window:** a sensible minimum size (done: 400×600); the window size and position are remembered (moved to L5, packaging: it needs either runner code or a window package, and is not needed for testing).
 - **Tests:** a conflict file becomes a conflict, not a note; the watcher re-indexes; analysis waits for idle.
 
-### L1. Desktop layout: code done 2026-10-09 (window size and place left for the Windows build)
+### L1. Desktop layout: done 2026-10-09 and checked on Windows (sidebar, two panes, Ctrl+N / Ctrl+F, Settings in a readable column)
 - The same screens, laid out for a wide window when wider than a breakpoint. One adaptive shell, not duplicate screens (CLAUDE.md §5):
   - a sidebar with Home, Search, Graph, Review, Folders, Tags and Settings;
   - a note list and the open note side by side;

@@ -86,17 +86,22 @@ class AppShell extends ConsumerWidget {
   }
 
   Widget _wide(BuildContext context, WidgetRef ref, int index) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SideNav(
-          items: items,
-          currentIndex: index,
-          onSelected: (i) => context.go(tabs[i]),
-          onNewNote: () => newNote(context, ref),
-        ),
-        Expanded(child: child),
-      ],
+    // One surface under the sidebar and the panes: the app background and
+    // text defaults for parts that sit outside a Scaffold.
+    return Material(
+      color: context.colors.background,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SideNav(
+            items: items,
+            currentIndex: index,
+            onSelected: (i) => context.go(tabs[i]),
+            onNewNote: () => newNote(context, ref),
+          ),
+          Expanded(child: child),
+        ],
+      ),
     );
   }
 

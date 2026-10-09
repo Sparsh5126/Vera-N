@@ -30,6 +30,32 @@ abstract final class AppCopy {
   static const onboardingNameBody =
       'Only for the greeting. It stays on this phone.';
 
+  // The same pages on a laptop (docs/LAPTOP_PLAN.md): "this computer"
+  // and "your devices" instead of "your phone"; no reminders page
+  // (reminders are phone-only).
+  static const onboardingPrivateBodyDesktop =
+      'Built for privacy. Your notes live on your own devices, as plain '
+      'files. No account, no login, no cloud, no one else reading them. The '
+      'code is open source, so anyone can check.';
+  static const onboardingWhatBodyDesktop =
+      'Vera N quietly notices when your notes connect and suggests links and '
+      'tags, right here on this computer. Nothing changes unless you say yes.';
+  static const onboardingHowTitleDesktop =
+      'The thinking happens on your devices.';
+  static const onboardingHowBodyDesktop =
+      'Suggestions are worked out on this computer and on your phone, never '
+      'sent anywhere. Your notes travel between them only through your own '
+      'sync (such as Syncthing). We have no servers that see your notes.';
+  static const onboardingFolderBodyDesktop =
+      'Pick your notes folder: the one Syncthing shares with your phone, or '
+      'a new one such as “Vera N” in Documents. Notes are plain files you '
+      'can open in other apps. Nothing is uploaded.';
+  static const onboardingNameBodyDesktop =
+      'Only for the greeting. It stays on your devices.';
+  static const privacyLineDesktop =
+      'Private · Open\u00A0source · On\u00A0your\u00A0devices · '
+      'No\u00A0account · No\u00A0cloud';
+
   /// On every onboarding page.
   /// Non-breaking spaces inside each item, so a line only breaks between
   /// items, never as "No / cloud".

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/copy/app_copy.dart';
 import '../../core/feedback/motion.dart';
 import '../../core/navigation/routes.dart';
+import '../../core/platform/device_kind.dart';
 import '../../core/styles/app_styles.dart';
 import '../../shared/widgets/progress_dots.dart';
 import 'state/onboarding_controller.dart';
@@ -20,7 +21,28 @@ import 'widgets/onboarding_page.dart';
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
-  static const intro = [
+  /// The intro pages: a laptop speaks of "this computer" and has no
+  /// reminders page (reminders are phone-only).
+  static List<OnboardingPage> get intro =>
+      DeviceKind.isDesktop ? _desktopIntro : _phoneIntro;
+
+  static const _desktopIntro = [
+    OnboardingPage(
+      wordmark: AppCopy.appName,
+      title: AppCopy.onboardingPrivateTitle,
+      body: AppCopy.onboardingPrivateBodyDesktop,
+    ),
+    OnboardingPage(
+      title: AppCopy.onboardingWhatTitle,
+      body: AppCopy.onboardingWhatBodyDesktop,
+    ),
+    OnboardingPage(
+      title: AppCopy.onboardingHowTitleDesktop,
+      body: AppCopy.onboardingHowBodyDesktop,
+    ),
+  ];
+
+  static const _phoneIntro = [
     OnboardingPage(
       wordmark: AppCopy.appName,
       title: AppCopy.onboardingPrivateTitle,
@@ -140,55 +162,68 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final skipTo = _folderPage ?? _namePage;
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Skip on the first pages only; the same space stays after,
-            // so the pages don't jump.
-            Align(
-              alignment: Alignment.centerRight,
-              child: _page < skipTo
-                  ? TextButton(
-                      onPressed: () => _goTo(skipTo),
-                      child: const Text(AppCopy.skip),
-                    )
-                  : const SizedBox.square(dimension: AppSize.minTapTarget),
-            ),
-            Expanded(
-              child: PageView(
-                controller: _pages,
-                onPageChanged: _onPage,
-                children: [
-                  for (final page in OnboardingScreen.intro)
-                    Center(child: page),
-                  if (_folderPage != null)
-                    const Center(
-                      child: OnboardingPage(
-                        title: AppCopy.onboardingFolderTitle,
-                        body: AppCopy.onboardingFolderBody,
-                      ),
-                    ),
-                  Center(child: _namePageContent()),
-                ],
-              ),
-            ),
-            Center(
-              child: ProgressDots(
-                done: _page,
-                total: total,
-                label: AppCopy.onboardingPage(_page + 1, total),
-              ),
-            ),
-            _actions(),
-          ],
+        // A readable column on a wide window, not text across the screen.
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: AppSize.readableWidth),
+            child: _pagesAndActions(total, skipTo),
+          ),
         ),
       ),
     );
   }
 
+  Widget _pagesAndActions(int total, int skipTo) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Skip on the first pages only; the same space stays after,
+        // so the pages don't jump.
+        Align(
+          alignment: Alignment.centerRight,
+          child: _page < skipTo
+              ? TextButton(
+                  onPressed: () => _goTo(skipTo),
+                  child: const Text(AppCopy.skip),
+                )
+              : const SizedBox.square(dimension: AppSize.minTapTarget),
+        ),
+        Expanded(
+          child: PageView(
+            controller: _pages,
+            onPageChanged: _onPage,
+            children: [
+              for (final page in OnboardingScreen.intro) Center(child: page),
+              if (_folderPage != null)
+                Center(
+                  child: OnboardingPage(
+                    title: AppCopy.onboardingFolderTitle,
+                    body: DeviceKind.isDesktop
+                        ? AppCopy.onboardingFolderBodyDesktop
+                        : AppCopy.onboardingFolderBody,
+                  ),
+                ),
+              Center(child: _namePageContent()),
+            ],
+          ),
+        ),
+        Center(
+          child: ProgressDots(
+            done: _page,
+            total: total,
+            label: AppCopy.onboardingPage(_page + 1, total),
+          ),
+        ),
+        _actions(),
+      ],
+    );
+  }
+
   Widget _namePageContent() => OnboardingPage(
     title: AppCopy.onboardingNameTitle,
-    body: AppCopy.onboardingNameBody,
+    body: DeviceKind.isDesktop
+        ? AppCopy.onboardingNameBodyDesktop
+        : AppCopy.onboardingNameBody,
     child: TextField(
       controller: _name,
       focusNode: _nameFocus,

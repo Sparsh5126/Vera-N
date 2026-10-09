@@ -18,6 +18,9 @@ From the user's note `20261004-145445-ae09` (2026-10-04): "all these aren't urge
 
 ## Also open (found during work)
 
+- **Search card can hide the matched line (found 2026-10-09 on Windows; same code on the phone).** Searching "दाल" finds "Grocery list", but the card shows "# Grocery list · milk": the snippet starts at the note's first line, and the matching third line falls below the card's line limit, so the reader can't see why it matched. Start the snippet at the line that matches (and leave out the title line, which the card already shows).
+- **Windows test data (2026-10-09).** The first Windows runs used a throwaway folder in the session scratchpad and the name "Tester"; the app's own data is in `%APPDATA%\com.example\vera_n`. Before real use on the laptop, pick the real notes folder in Settings, or delete `vera_n.sqlite` there to see onboarding again.
+
 - ~~**Typing lag in long notes**~~ **Fixed (user, 2026-10-08).** Earlier notes kept for reference: Measured on the phone with `tool/perf/typing_scenario.sh long` (~150 lines: checklists, bullets, bold):
   - Short notes are fine (UI frame median ~3.5 ms).
   - Long notes: UI frame median 23 ms, about 70% of frames over 16 ms. The timeline shows ~18 ms of each frame in LAYOUT of the text field.

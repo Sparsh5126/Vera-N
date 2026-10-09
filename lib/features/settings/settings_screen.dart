@@ -18,31 +18,39 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                left: AppSpace.m,
-                right: AppSpace.m,
-                top: AppSpace.l,
-              ),
-              child: Semantics(
-                header: true,
-                child: Text(
-                  AppCopy.navSettings,
-                  style: context.textStyles.noteTitle,
-                ),
+        // A readable column on a wide window; the whole pane still scrolls.
+        child: LayoutBuilder(
+          builder: (context, box) => ListView(
+            padding: EdgeInsets.symmetric(
+              horizontal: ((box.maxWidth - AppSize.readableWidth) / 2).clamp(
+                0,
+                double.infinity,
               ),
             ),
-            const AppSection(),
-            const FolderSection(),
-            const SuggestionsSection(),
-            const DataSection(),
-            const AboutSection(),
-            const SizedBox(height: AppSize.floatingClearance),
-          ],
+            children: _rows(context),
+          ),
         ),
       ),
     );
   }
+
+  List<Widget> _rows(BuildContext context) => [
+    Padding(
+      padding: const EdgeInsets.only(
+        left: AppSpace.m,
+        right: AppSpace.m,
+        top: AppSpace.l,
+      ),
+      child: Semantics(
+        header: true,
+        child: Text(AppCopy.navSettings, style: context.textStyles.noteTitle),
+      ),
+    ),
+    const AppSection(),
+    const FolderSection(),
+    const SuggestionsSection(),
+    const DataSection(),
+    const AboutSection(),
+    const SizedBox(height: AppSize.floatingClearance),
+  ];
 }

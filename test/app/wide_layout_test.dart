@@ -65,6 +65,19 @@ void main() {
     await app.finish(tester);
   });
 
+  testWidgets('Ctrl+N works while typing in an open note', (tester) async {
+    await app.storage.notes.create('Groceries\nMilk and eggs.');
+    await wide(tester);
+    await tester.tap(find.text('Groceries'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Milk and eggs.').last);
+    await tester.pumpAndSettle();
+    await ctrl(tester, LogicalKeyboardKey.keyN);
+    expect(find.textContaining('Milk and eggs.'), findsOneWidget);
+    expect(find.byType(NoteScreen), findsOneWidget);
+    await app.finish(tester);
+  });
+
   testWidgets('right-click on a card offers what a long press offers', (
     tester,
   ) async {

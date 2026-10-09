@@ -5,6 +5,19 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **First run on Windows (2026-10-09): L0 and L1 checked in the real window** (Windows 11, Visual Studio Community 2026, debug build, a throwaway test folder; no real notes).
+  - **Checked:** onboarding (5 pages on a laptop), picking the folder with the system dialog, Home in two panes, opening a note beside the list, Ctrl+N and Ctrl+F, Graph, Settings, keyword search in Hindi, and the folder watcher (a file written by another program appeared in the list within about a second). Devanagari renders cleanly in cards and the editor.
+  - **Window:** titled "Vera N" (was "vera_n"), and no smaller than 400×600 (scaled for the screen), so the phone layout below the wide breakpoint always fits (`windows/runner`).
+  - **Onboarding on a laptop** speaks of "this computer" and "your devices", not "your phone", and has no reminders page (reminders are phone-only). New copy in `AppCopy` (`…Desktop`); the phone's pages are unchanged. On a wide window the pages sit in a readable column (680 px) instead of running across the screen.
+  - **Build fix, `local_auth_windows` under Visual Studio 2026:** the plugin (2.0.2) uses the old `/await` coroutine switch, which VS 2026 rejects, and a plain `return` inside a coroutine. A patched copy lives in `third_party/local_auth_windows` (two lines changed, recorded in its `VERA_N_PATCH.md`) and is used through `dependency_overrides`; `third_party/` is excluded from analysis. Drop it when the plugin publishes a fix. No size or battery change.
+  - Test: Ctrl+N still starts a new note while typing in an open note (6 wide-window tests).
+
+### Fixed
+- **Wide window:** the sidebar wordmark and "Pick a note…" were drawn with Flutter's yellow debug underline and the empty right pane was black, because the sidebar and panes had no Material surface behind them. The wide shell now has one, in the app background colour.
+- **Wide window:** "Vera N" showed twice (sidebar and Home); Home now shows only the greeting there. Phones are unchanged.
+- **Wide window:** Settings rows ran across the full width (label and value about 1,200 px apart); they now sit in the readable column, and the whole pane still scrolls.
+
+### Added
 - **Laptop, phase L1: desktop layout (code; tested in a wide window, not yet run on Windows)** (docs/LAPTOP_PLAN.md).
   - **A sidebar from 900 px wide** (`SideNav`, shared): the wordmark, New note, and the four places with their names, the current one on the ink plate. It replaces the floating pill bar and the floating New note button. Narrower windows and phones are unchanged.
   - **Home in two panes** (`app/home_tab.dart`, so features still don't import each other): the notes list on the left (400 px) and the open note on the right. Clicking a card opens it there, and Back, Delete or Archive close it there. With nothing open: "Pick a note, or start a new one." The open note is shared state in `core/navigation/open_note.dart`.

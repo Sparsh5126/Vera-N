@@ -396,6 +396,10 @@ One reusable card, two containers:
   Every shortcut has a visible button.
 - **Mouse:** right-click on a card opens the long-press menu.
 - **Reminders** don't appear on the laptop (phone-only).
+- **Home header:** the wordmark is in the sidebar, so Home shows only the greeting.
+- **Settings and onboarding** sit in a readable column (680 wide), centred in the pane.
+- **Onboarding on a laptop:** 5 pages (no reminders page). The copy says "this computer" and "your devices" instead of "your phone"; the privacy line reads "Private · Open source · On your devices · No account · No cloud" (exact strings in `AppCopy`, `…Desktop`).
+- **Window:** titled "Vera N", no smaller than 400×600.
 
 ## 11. Settings
 

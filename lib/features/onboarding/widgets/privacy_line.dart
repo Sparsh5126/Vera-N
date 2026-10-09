@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/copy/app_copy.dart';
+import '../../../core/platform/device_kind.dart';
 import '../../../core/styles/app_styles.dart';
 
 /// "Private · Open source · On this phone · No account · No cloud", with a
@@ -21,7 +22,12 @@ class PrivacyLine extends StatelessWidget {
           color: colors.textSecondary,
         ),
         Expanded(
-          child: Text(AppCopy.privacyLine, style: context.textStyles.small),
+          child: Text(
+            DeviceKind.isDesktop
+                ? AppCopy.privacyLineDesktop
+                : AppCopy.privacyLine,
+            style: context.textStyles.small,
+          ),
         ),
       ],
     );
