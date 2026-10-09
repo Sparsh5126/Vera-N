@@ -17,6 +17,7 @@ class DesktopAnalysis {
     required this.enabled,
     Future<bool> Function()? onPower,
     Future<bool> Function(AnalysisStorage, bool Function())? run,
+    this.boost,
   }) : _onPower = onPower ?? _mainsPower,
        _run =
            run ??
@@ -30,6 +31,10 @@ class DesktopAnalysis {
   final bool Function() enabled;
   final Future<bool> Function() _onPower;
   final Future<bool> Function(AnalysisStorage, bool Function()) _run;
+
+  /// The laptop booster (docs/LAPTOP_PLAN.md, L2), run once analysis is
+  /// done; returns true when it has nothing left.
+  final Future<bool> Function(bool Function() stop)? boost;
   Timer? _idle;
   bool _running = false;
   bool _stop = false;
@@ -52,6 +57,11 @@ class DesktopAnalysis {
         done = await _run(_storage, () => _stop);
       }
       debugPrint('VeraN analysis (laptop): finished, all done: $done');
+      final boost = this.boost;
+      var boosted = boost == null;
+      while (done && !boosted && !_stop) {
+        boosted = await boost!(() => _stop);
+      }
     } on Object catch (e) {
       debugPrint('VeraN analysis (laptop): failed: $e');
     } finally {

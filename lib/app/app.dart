@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/ai/scheduler/analysis_scheduler.dart';
 import '../core/ai/scheduler/desktop_analysis.dart';
+import '../core/booster/laptop_booster.dart';
 import '../core/ai/suggestions/suggestion_providers.dart';
 import '../core/copy/app_copy.dart';
 import '../core/models/app_prefs.dart';
@@ -83,6 +84,12 @@ class _AppState extends ConsumerState<App> {
     final analysis = DesktopAnalysis(
       storage.forAnalysis,
       enabled: () => ref.read(appPrefsProvider).suggestions,
+      boost: LaptopBooster(
+        booster: storage.booster,
+        analysis: storage.analysis,
+        suggestions: storage.suggestions,
+        settings: storage.settings,
+      ).runOnce,
     );
     _analysis = analysis;
     GestureBinding.instance.pointerRouter.addGlobalRoute(_onPointer);

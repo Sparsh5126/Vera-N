@@ -5,6 +5,23 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Laptop, phase L2: the booster engine (code; tested with a fake server, not yet with a real model)** (`core/booster/`, docs/LAPTOP_PLAN.md).
+  - **A local AI server only.** `AiServerAddress` accepts an address only if it resolves to this computer (or, when allowed later in Settings, to the user's own network: private ranges and Tailscale), and refuses cloud addresses. `AiServerClient` speaks the OpenAI-compatible API with `dart:io` (no new package). It connects to the checked IP, uses no proxy and follows no redirects, so note text can't be carried elsewhere. It prefers IPv4 because LM Studio listens on 127.0.0.1 only, and drops a model's `<think>` reasoning from replies.
+  - **The four jobs** (`BoosterRun`), in order, at most 12 questions per idle spell, stopping at the next key press or click:
+    1. a one-sentence "Why?" for each waiting link, from the two matched passages only;
+    2. duplicates: pairs whose whole-note meanings are 0.93 or closer and of similar length, confirmed by the model;
+    3. topics: groups of 3–8 notes at 0.70 or closer, named by the model as a tag (decided 2026-10-09: topics become tag suggestions);
+    4. up to two tag names for notes of 12 words or more, folded into an existing tag when it is the same name written differently, and leaving out tags the note already has.
+  - **Results file** (`BoosterRepository`): one line per job in `.app/laptop-<deviceid>.jsonl`, holding note ids and text hashes plus the short AI-written text, never note text. "Nothing found" is recorded too, so nothing is asked twice; a changed note gets new jobs. The file is compacted each run (stale and superseded lines dropped). Notes are matched across devices by header id, or by path for a note without one, so the booster never writes ids into note files.
+  - **When it runs:** on the laptop, after the on-device analysis, in the same idle-and-on-mains-power window (`DesktopAnalysis.boost`). With no AI server running it does nothing and stays silent (one refused local connection per idle spell). The phone is unchanged; showing the results is L3.
+  - **Model:** the first chat model the server lists (embedding models skipped) until Settings (L4) lets the user choose.
+  - Tests: 31 (address rules, client against a fake server including redirect and no server, reply parsing including Hindi, grouping maths, the results file, and the four jobs end to end).
+
+### Changed
+- **Every kind of user (user, 2026-10-09):** the app must work for phone-only and laptop-only users, and on laptops with no local AI or too weak to run one. Recorded in docs/LAPTOP_PLAN.md, with the rules for L3 and L4. The laptop onboarding no longer assumes a phone: "The thinking happens on this computer.", and Syncthing is mentioned only "if you also use Vera N on your phone".
+- **Onboarding copy moved to `OnboardingCopy`** (`core/copy/onboarding_copy.dart`, exported by `app_copy.dart`, so there is still one import point): `app_copy.dart` had grown to 412 lines, past the 400-line limit (CLAUDE.md §3). Wording unchanged.
+
+### Added
 - **First run on Windows (2026-10-09): L0 and L1 checked in the real window** (Windows 11, Visual Studio Community 2026, debug build, a throwaway test folder; no real notes).
   - **Checked:** onboarding (5 pages on a laptop), picking the folder with the system dialog, Home in two panes, opening a note beside the list, Ctrl+N and Ctrl+F, Graph, Settings, keyword search in Hindi, and the folder watcher (a file written by another program appeared in the list within about a second). Devanagari renders cleanly in cards and the editor.
   - **Window:** titled "Vera N" (was "vera_n"), and no smaller than 400×600 (scaled for the screen), so the phone layout below the wide breakpoint always fits (`windows/runner`).

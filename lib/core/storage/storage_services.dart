@@ -22,6 +22,7 @@ import 'repositories/conflict_resolver.dart';
 import 'repositories/notes_exporter.dart';
 import 'repositories/notes_repository.dart';
 import 'repositories/rejections_repository.dart';
+import 'repositories/booster_repository.dart';
 import 'repositories/settings_repository.dart';
 import 'repositories/suggestions_repository.dart';
 import 'repositories/trash_repository.dart';
@@ -49,6 +50,7 @@ class StorageServices {
     indexer = NoteIndexer(db, store);
     notes = NotesRepository(db, store, writer);
     rejections = RejectionsRepository(db, store);
+    booster = BoosterRepository(db, store);
     trash = TrashRepository(db, store);
     attachments = AttachmentsRepository(db, store);
     exporter = NotesExporter(db, writer);
@@ -97,6 +99,7 @@ class StorageServices {
   late final NoteIndexer indexer;
   late final NotesRepository notes;
   late final RejectionsRepository rejections;
+  late final BoosterRepository booster;
   late final TrashRepository trash;
   late final AttachmentsRepository attachments;
   late final NotesExporter exporter;

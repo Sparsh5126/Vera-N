@@ -54,7 +54,7 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 - **Mouse:** hover states; right-click on a card gives the same actions as long-press on the phone.
 - The same styles file and shared widgets. Only layout tokens (sidebar width, two-pane breakpoint) are added.
 
-### L2. The booster engine (`core/booster/`)
+### L2. The booster engine (`core/booster/`): code done 2026-10-09 and tested with a fake server; not yet tried with a real model (connection test and model choice in Settings move to L4)
 - **AI server client:**
   - Speaks the OpenAI-compatible chat API at `http://localhost:1234/v1` (LM Studio) by default.
   - **Only addresses on this computer are accepted** unless the user deliberately allows another of their own machines (the "always-on AI box", spec §2). A cloud URL is refused.
@@ -104,6 +104,23 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 3. **Reminders are a phone-only feature.** The laptop never schedules them; its note view and Settings don't show them.
 4. **AI-written text** (topic names, "Why?" sentences) travelling in the user's own synced folder is fine.
 5. **Model:** the user has **Gemma 4** in LM Studio on an external SSD, to plug in when L2 starts testing.
+
+## Every kind of user (user, 2026-10-09)
+
+"we also have to account the app for users who will have no local llm model on their laptop or their laptop isnt capable to run a llm model locally. also for users who will only use laptop or only use mobile app."
+
+| User | What they get |
+|---|---|
+| Phone only | Everything on the phone today. No laptop results arrive, and nothing waits for or mentions them beyond onboarding page 3's "If you have a laptop…". |
+| Laptop only | The full notes app with a local folder (no Syncthing needed), and on-device links, tags and Revisit from the same small model (it runs on any laptop). No reminders (phone-only). |
+| Laptop without a local AI server, or too weak to run one | The same as "laptop only". The booster finds no server, does nothing, and says nothing: one refused local connection per idle spell, no error, no nagging. |
+| Phone and laptop with a local AI server | Everything, including the four booster jobs. |
+
+Rules that follow:
+- The booster is an extra, never a requirement. No screen, empty state or copy may assume a phone, a laptop or an AI server exists.
+- Laptop onboarding speaks of "this computer"; a phone appears only as "if you also use Vera N on your phone".
+- L4: "AI on this computer" reads "Not set up" as a normal state, with a switch to turn the booster off completely (then not even the local check runs), and a short line on what it needs (a local AI app such as LM Studio, and a computer that can run it).
+- L3: the phone shows laptop results only when they exist; with none, nothing on the phone changes.
 
 ## Risks
 

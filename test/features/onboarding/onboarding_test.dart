@@ -26,17 +26,17 @@ void main() {
       'says it is private', (tester) async {
     await start(tester);
     for (final title in [
-      AppCopy.onboardingPrivateTitle,
-      AppCopy.onboardingWhatTitle,
-      AppCopy.onboardingHowTitle,
-      AppCopy.onboardingRemindTitle,
+      OnboardingCopy.onboardingPrivateTitle,
+      OnboardingCopy.onboardingWhatTitle,
+      OnboardingCopy.onboardingHowTitle,
+      OnboardingCopy.onboardingRemindTitle,
     ]) {
       expect(find.text(title), findsOneWidget);
-      expect(find.text(AppCopy.privacyLine), findsWidgets);
+      expect(find.text(OnboardingCopy.privacyLine), findsWidgets);
       await tapText(tester, AppCopy.next);
     }
-    expect(find.text(AppCopy.onboardingFolderTitle), findsOneWidget);
-    expect(find.text(AppCopy.privacyLine), findsWidgets);
+    expect(find.text(OnboardingCopy.onboardingFolderTitle), findsOneWidget);
+    expect(find.text(OnboardingCopy.privacyLine), findsWidgets);
     expect(await app.storage.settings.onboardingDone(), isFalse);
     await app.finish(tester);
   });
@@ -47,7 +47,7 @@ void main() {
     await start(tester);
     await tapText(tester, AppCopy.skip);
     await tapText(tester, AppCopy.notNow);
-    expect(find.text(AppCopy.onboardingNameTitle), findsOneWidget);
+    expect(find.text(OnboardingCopy.onboardingNameTitle), findsOneWidget);
     await tapText(tester, AppCopy.skip);
     expect(find.text(AppCopy.emptyHome), findsOneWidget);
     expect(await app.storage.settings.onboardingDone(), isTrue);
@@ -61,7 +61,7 @@ void main() {
     await tapText(tester, AppCopy.skip);
     await tapText(tester, AppCopy.chooseFolder);
     expect(await app.storage.settings.notesFolder(), folders.nextPick);
-    expect(find.text(AppCopy.onboardingNameTitle), findsOneWidget);
+    expect(find.text(OnboardingCopy.onboardingNameTitle), findsOneWidget);
     await tester.enterText(find.byType(TextField), 'Asha');
     await tester.pump();
     await tapText(tester, AppCopy.done);
@@ -77,7 +77,7 @@ void main() {
     await start(tester);
     await tapText(tester, AppCopy.skip);
     await tapText(tester, AppCopy.chooseFolder);
-    expect(find.text(AppCopy.onboardingFolderTitle), findsOneWidget);
+    expect(find.text(OnboardingCopy.onboardingFolderTitle), findsOneWidget);
     await app.finish(tester);
   });
 
@@ -89,7 +89,7 @@ void main() {
       await tester.fling(find.byType(PageView), const Offset(-400, 0), 1000);
       await tester.pumpAndSettle();
     }
-    expect(find.text(AppCopy.onboardingNameTitle), findsOneWidget);
+    expect(find.text(OnboardingCopy.onboardingNameTitle), findsOneWidget);
     expect(await app.storage.settings.onboardingDone(), isFalse);
     await app.finish(tester);
   });
@@ -101,7 +101,7 @@ void main() {
     app = AppHarness();
     await start(tester);
     await tapText(tester, AppCopy.skip);
-    expect(find.text(AppCopy.onboardingNameTitle), findsOneWidget);
+    expect(find.text(OnboardingCopy.onboardingNameTitle), findsOneWidget);
     await app.finish(tester);
   });
 }

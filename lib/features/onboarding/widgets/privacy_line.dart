@@ -24,8 +24,8 @@ class PrivacyLine extends StatelessWidget {
         Expanded(
           child: Text(
             DeviceKind.isDesktop
-                ? AppCopy.privacyLineDesktop
-                : AppCopy.privacyLine,
+                ? OnboardingCopy.privacyLineDesktop
+                : OnboardingCopy.privacyLine,
             style: context.textStyles.small,
           ),
         ),

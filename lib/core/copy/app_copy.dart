@@ -1,3 +1,5 @@
+export 'onboarding_copy.dart';
+
 /// Every user-facing string in Vera N (UI spec §4–§12), so wording changes
 /// are one edit.
 ///
@@ -6,79 +8,15 @@
 abstract final class AppCopy {
   static const appName = 'Vera N';
 
-  // Onboarding (UI spec §4). Every claim must be true at launch.
-  static const onboardingPrivateTitle = 'Notes that stay yours.';
-  static const onboardingPrivateBody =
-      'Built for privacy. Your notes live on your phone. No account, no '
-      'login, no cloud, no one else reading them. The code is open source, '
-      'so anyone can check.';
-  static const onboardingWhatTitle = 'Just write.';
-  static const onboardingWhatBody =
-      'Vera N quietly notices when your notes connect and suggests links and '
-      'tags, right here on your phone. Nothing changes unless you say yes.';
-  static const onboardingHowTitle = 'The thinking happens on your phone.';
-  static const onboardingHowBody =
-      'Suggestions are worked out on this phone, never sent anywhere. If you '
-      'have a laptop, it can help with deeper analysis over your own '
-      'devices. We have no servers that see your notes.';
-  static const onboardingRemindTitle = 'Reminders, only when you ask.';
-  static const onboardingRemindBody =
-      'Write “remind me tomorrow at 9 am” in any note and your phone reminds '
-      'you then. Only notes that ask, only for a time ahead, and nothing '
-      'else ever sends a notification. It all stays on this phone, and you '
-      'can turn it off in Settings.';
-  static const onboardingNameBody =
-      'Only for the greeting. It stays on this phone.';
-
-  // The same pages on a laptop (docs/LAPTOP_PLAN.md): "this computer"
-  // and "your devices" instead of "your phone"; no reminders page
-  // (reminders are phone-only).
-  static const onboardingPrivateBodyDesktop =
-      'Built for privacy. Your notes live on your own devices, as plain '
-      'files. No account, no login, no cloud, no one else reading them. The '
-      'code is open source, so anyone can check.';
-  static const onboardingWhatBodyDesktop =
-      'Vera N quietly notices when your notes connect and suggests links and '
-      'tags, right here on this computer. Nothing changes unless you say yes.';
-  static const onboardingHowTitleDesktop =
-      'The thinking happens on your devices.';
-  static const onboardingHowBodyDesktop =
-      'Suggestions are worked out on this computer and on your phone, never '
-      'sent anywhere. Your notes travel between them only through your own '
-      'sync (such as Syncthing). We have no servers that see your notes.';
-  static const onboardingFolderBodyDesktop =
-      'Pick your notes folder: the one Syncthing shares with your phone, or '
-      'a new one such as “Vera N” in Documents. Notes are plain files you '
-      'can open in other apps. Nothing is uploaded.';
-  static const onboardingNameBodyDesktop =
-      'Only for the greeting. It stays on your devices.';
-  static const privacyLineDesktop =
-      'Private · Open\u00A0source · On\u00A0your\u00A0devices · '
-      'No\u00A0account · No\u00A0cloud';
-
-  /// On every onboarding page.
-  /// Non-breaking spaces inside each item, so a line only breaks between
-  /// items, never as "No / cloud".
-  static const privacyLine =
-      'Private · Open source · On this phone · '
-      'No account · No cloud';
-  static const onboardingFolderTitle = 'Choose where your notes live.';
-  static const onboardingFolderBody =
-      'Pick a folder on your phone, or make a new one such as “Vera N” in '
-      'Documents. Your notes are saved there '
-      'as plain files you can open in other apps, and they stay even if you '
-      'remove Vera N. Nothing is uploaded.';
   static const chooseFolder = 'Choose folder';
   static const notNow = 'Not now';
   static const folderError = "Couldn't use that folder. Try another one.";
 
   /// Suggested name for the new folder in the system folder picker.
   static const suggestedFolderName = 'Vera N';
-  static const onboardingNameTitle = 'What should we call you?';
   static const skip = 'Skip';
   static const next = 'Next';
   static const done = 'Done';
-  static String onboardingPage(int page, int total) => 'Page $page of $total';
 
   // A note changed both here and outside the app (product spec §14).
   static const conflictNotice = 'This note was also changed outside Vera N.';

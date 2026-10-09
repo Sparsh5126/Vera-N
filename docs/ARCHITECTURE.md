@@ -253,6 +253,7 @@ Raised by the storage stage — **built as proposed, easy to change; please conf
   - pairs already linked are never suggested.
 
 **Suggestion lifecycle** (built 2026-10-04)
+- `core/booster/` (laptop only, docs/LAPTOP_PLAN.md L2): `AiServerAddress` (a local AI server address; refused unless it resolves to this computer, or to the user's own network when allowed), `AiServerClient` (OpenAI-compatible chat over `dart:io`; no proxy, no redirects), `BoosterRun` (the four jobs), `LaptopBooster` (entry point, run by `DesktopAnalysis` after analysis), `NoteGroups` (topics and duplicate candidates from stored vectors), and the prompts, reply parsing and tunables. Results go through `BoosterRepository` to `.app/laptop-<deviceid>.jsonl`. Nothing here runs on the phone.
 - `core/ai/suggestions/SuggestionActions`: accept, reject, not sure, each returning an undo. It is used by both the Review screen and the note's suggestion sheet.
 - **Accept** appends a link to the older note in the newer note's "## Linked notes" footer (`NoteFooter`).
 - **Reject** writes a `rejections` row (schema 5) and a line in `.app/rejections-<deviceid>.jsonl`.

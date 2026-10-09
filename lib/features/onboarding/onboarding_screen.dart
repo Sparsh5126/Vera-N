@@ -29,36 +29,36 @@ class OnboardingScreen extends ConsumerStatefulWidget {
   static const _desktopIntro = [
     OnboardingPage(
       wordmark: AppCopy.appName,
-      title: AppCopy.onboardingPrivateTitle,
-      body: AppCopy.onboardingPrivateBodyDesktop,
+      title: OnboardingCopy.onboardingPrivateTitle,
+      body: OnboardingCopy.onboardingPrivateBodyDesktop,
     ),
     OnboardingPage(
-      title: AppCopy.onboardingWhatTitle,
-      body: AppCopy.onboardingWhatBodyDesktop,
+      title: OnboardingCopy.onboardingWhatTitle,
+      body: OnboardingCopy.onboardingWhatBodyDesktop,
     ),
     OnboardingPage(
-      title: AppCopy.onboardingHowTitleDesktop,
-      body: AppCopy.onboardingHowBodyDesktop,
+      title: OnboardingCopy.onboardingHowTitleDesktop,
+      body: OnboardingCopy.onboardingHowBodyDesktop,
     ),
   ];
 
   static const _phoneIntro = [
     OnboardingPage(
       wordmark: AppCopy.appName,
-      title: AppCopy.onboardingPrivateTitle,
-      body: AppCopy.onboardingPrivateBody,
+      title: OnboardingCopy.onboardingPrivateTitle,
+      body: OnboardingCopy.onboardingPrivateBody,
     ),
     OnboardingPage(
-      title: AppCopy.onboardingWhatTitle,
-      body: AppCopy.onboardingWhatBody,
+      title: OnboardingCopy.onboardingWhatTitle,
+      body: OnboardingCopy.onboardingWhatBody,
     ),
     OnboardingPage(
-      title: AppCopy.onboardingHowTitle,
-      body: AppCopy.onboardingHowBody,
+      title: OnboardingCopy.onboardingHowTitle,
+      body: OnboardingCopy.onboardingHowBody,
     ),
     OnboardingPage(
-      title: AppCopy.onboardingRemindTitle,
-      body: AppCopy.onboardingRemindBody,
+      title: OnboardingCopy.onboardingRemindTitle,
+      body: OnboardingCopy.onboardingRemindBody,
     ),
   ];
 
@@ -197,10 +197,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               if (_folderPage != null)
                 Center(
                   child: OnboardingPage(
-                    title: AppCopy.onboardingFolderTitle,
+                    title: OnboardingCopy.onboardingFolderTitle,
                     body: DeviceKind.isDesktop
-                        ? AppCopy.onboardingFolderBodyDesktop
-                        : AppCopy.onboardingFolderBody,
+                        ? OnboardingCopy.onboardingFolderBodyDesktop
+                        : OnboardingCopy.onboardingFolderBody,
                   ),
                 ),
               Center(child: _namePageContent()),
@@ -211,7 +211,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           child: ProgressDots(
             done: _page,
             total: total,
-            label: AppCopy.onboardingPage(_page + 1, total),
+            label: OnboardingCopy.onboardingPage(_page + 1, total),
           ),
         ),
         _actions(),
@@ -220,10 +220,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Widget _namePageContent() => OnboardingPage(
-    title: AppCopy.onboardingNameTitle,
+    title: OnboardingCopy.onboardingNameTitle,
     body: DeviceKind.isDesktop
-        ? AppCopy.onboardingNameBodyDesktop
-        : AppCopy.onboardingNameBody,
+        ? OnboardingCopy.onboardingNameBodyDesktop
+        : OnboardingCopy.onboardingNameBody,
     child: TextField(
       controller: _name,
       focusNode: _nameFocus,
