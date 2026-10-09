@@ -125,4 +125,113 @@ void main() {
     expect(find.byType(EditableText), findsOneWidget);
     await app.finish(tester);
   });
+
+  group('laptop results', () {
+    Future<void> add(SuggestionDraft d) async {
+      await app.storage.suggestions.add(
+        [d],
+        DateTime.now(),
+        const Duration(days: 30),
+      );
+      await app.storage.settings.setReviewHintSeen();
+    }
+
+    testWidgets('a link shows the laptop\'s sentence under the reason', (
+      tester,
+    ) async {
+      final a = await app.storage.notes.create('Triund\nSpring trek.');
+      final b = await app.storage.notes.create('Packing\nFor the trek.');
+      await add(
+        SuggestionDraft(
+          kind: 'link',
+          noteA: a,
+          noteB: b,
+          score: .7,
+          chunkA: 0,
+          chunkB: 0,
+          detail: 'Both are about the spring trek.',
+        ),
+      );
+      await openReview(tester);
+      expect(find.text('Both are about the spring trek.'), findsOneWidget);
+      await app.finish(tester);
+    });
+
+    testWidgets('a new tag name shows only the note to tag', (tester) async {
+      final a = await app.storage.notes.create('Triund\nSpring trek.');
+      await add(
+        SuggestionDraft(
+          kind: 'tag',
+          noteA: a,
+          noteB: a,
+          tag: 'trek-planning',
+          score: 1,
+          chunkA: 0,
+          chunkB: 0,
+          fromLaptop: true,
+        ),
+      );
+      await openReview(tester);
+      expect(find.text(AppCopy.newTagReason('trek-planning')), findsOneWidget);
+      expect(find.text('Triund'), findsOneWidget);
+      await app.finish(tester);
+    });
+
+    Future<bool> trashed(int ref) async {
+      final db = app.storage.db;
+      final row = await (db.select(
+        db.notes,
+      )..where((n) => n.id.equals(ref))).getSingle();
+      return row.trashedAt != null;
+    }
+
+    Future<(int, int)> copies() async {
+      final short = await app.storage.notes.create('Groceries\nMilk');
+      final long = await app.storage.notes.create('Shopping\nMilk\nBread');
+      await add(
+        SuggestionDraft(
+          kind: 'duplicate',
+          noteA: short,
+          noteB: long,
+          score: 1,
+          chunkA: 0,
+          chunkB: 0,
+          detail: 'Both list groceries.',
+          fromLaptop: true,
+        ),
+      );
+      return (short, long);
+    }
+
+    testWidgets('copies: Merge keeps the longer note and says so; Undo '
+        'brings the other back', (tester) async {
+      final (short, long) = await copies();
+      await openReview(tester);
+      expect(find.text(AppCopy.duplicateReason), findsOneWidget);
+      expect(find.text(AppCopy.mergeKeeps('Shopping')), findsOneWidget);
+      await tapAndSettle(tester, find.byTooltip(AppCopy.merge));
+      expect(find.text(AppCopy.merged), findsOneWidget);
+      expect(
+        (await app.storage.notes.getNote(long))!.body,
+        'Shopping\nMilk\nBread\n\nGroceries\n',
+      );
+      expect(await trashed(short), isTrue);
+      await tapAndSettle(tester, find.text(AppCopy.undo).last);
+      expect(await trashed(short), isFalse);
+      await app.finish(tester);
+    });
+
+    testWidgets('copies: Remove one asks which, and moves it to the trash', (
+      tester,
+    ) async {
+      final (short, long) = await copies();
+      await openReview(tester);
+      await tapAndSettle(tester, find.text(AppCopy.removeOne));
+      await tapAndSettle(tester, find.text(AppCopy.removeThis('Groceries')));
+      expect(await trashed(short), isTrue);
+      expect(await trashed(long), isFalse);
+      expect(find.text(AppCopy.movedToTrash), findsOneWidget);
+      await app.finish(tester);
+    });
+  });
 }

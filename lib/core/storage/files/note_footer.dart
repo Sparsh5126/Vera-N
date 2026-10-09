@@ -14,6 +14,23 @@ abstract final class NoteFooter {
     return '$trimmed$gap$heading\n$line\n';
   }
 
+  /// [body] split into the text above the footer and the footer's link
+  /// lines (none when it has no footer).
+  static (String, List<String>) split(String body) {
+    final lines = body.trimRight().split('\n');
+    var i = lines.length;
+    while (i > 0 && lines[i - 1].trim().startsWith('- [[')) {
+      i--;
+    }
+    if (i == 0 || lines[i - 1].trim() != heading) {
+      return (body.trimRight(), const []);
+    }
+    return (
+      lines.take(i - 1).join('\n').trimRight(),
+      [for (final l in lines.skip(i)) l.trim()],
+    );
+  }
+
   /// Whether the last lines of [text] are the heading and link lines.
   static bool _endsWithFooter(String text) {
     final lines = text.split('\n');

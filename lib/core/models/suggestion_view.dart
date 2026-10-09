@@ -19,9 +19,22 @@ class SuggestedNote {
 
 /// A suggestion with both notes ready to show: the newer note first.
 class SuggestionView {
-  const SuggestionView(this.suggestion, this.newer, this.older);
+  const SuggestionView(this.suggestion, this.newer, this.older, {this.keep});
 
   final Suggestion suggestion;
   final SuggestedNote newer;
   final SuggestedNote older;
+
+  /// For copies: the note Merge keeps.
+  final int? keep;
+
+  /// A new tag name from the laptop: no other note has it, so the card
+  /// shows only the note to tag.
+  bool get single => suggestion.isTag && suggestion.noteA == suggestion.noteB;
+
+  SuggestedNote? noteOf(int ref) => newer.ref == ref
+      ? newer
+      : older.ref == ref
+      ? older
+      : null;
 }

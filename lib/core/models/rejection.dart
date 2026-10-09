@@ -32,6 +32,17 @@ class Rejection {
   /// a tag rejection is the pair (note id, `#tag`) in the same file.
   static String tagSide(String tag) => '#${tag.toLowerCase()}';
 
+  /// The other side of "these two aren't copies" (docs/LAPTOP_PLAN.md,
+  /// L3): the pair (first id, `=` and the second id), ids in sorted
+  /// order, so it never blocks a link between the same two notes.
+  static (String, String) duplicateSides(String a, String b) =>
+      a.compareTo(b) < 0 ? (a, '=$b') : (b, '=$a');
+
+  static String duplicatePairKey(String a, String b) {
+    final (first, second) = duplicateSides(a, b);
+    return pairKeyOf(first, second);
+  }
+
   static String pairKeyOf(String a, String b) =>
       a.compareTo(b) < 0 ? '$a|$b' : '$b|$a';
 

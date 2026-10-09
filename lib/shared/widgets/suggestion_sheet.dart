@@ -46,8 +46,10 @@ abstract final class SuggestionSheet {
             children: [
               SuggestionCard(
                 newer: side(words.first, view.newer),
-                older: side(words.second, view.older),
+                older: view.single ? null : side(words.second, view.older),
                 reason: words.reason,
+                detail: view.suggestion.detail,
+                hint: words.hint,
               ),
               const SizedBox(height: AppSpace.m),
               DecisionButtons(

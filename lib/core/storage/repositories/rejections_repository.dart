@@ -105,6 +105,13 @@ class RejectionsRepository {
     await _store.writeAppFile(name, kept.map((l) => '$l\n').join());
   }
 
+  /// The pair keys of every remembered rejection.
+  Future<Set<String>> pairKeys() async {
+    final query = _db.selectOnly(_db.rejections)
+      ..addColumns([_db.rejections.pairKey]);
+    return {for (final r in await query.get()) r.read(_db.rejections.pairKey)!};
+  }
+
   /// Every remembered rejection (kept by "Reset" for its Undo).
   Future<List<Rejection>> all() async {
     final rows = await _db.select(_db.rejections).get();

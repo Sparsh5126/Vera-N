@@ -87,6 +87,21 @@ class ReviewController extends Notifier<ReviewState> {
     }
   }
 
+  /// Copies: moves [note] to the trash and keeps the other one.
+  Future<void> removeOne(int note) async {
+    final current = state.current;
+    if (current == null || _busy) return;
+    _busy = true;
+    try {
+      final actions = ref.read(suggestionActionsProvider);
+      _undos.add(await actions.duplicates.removeOne(current.suggestion, note));
+      state = state.copyWith(done: state.done + 1);
+      if (state.finished) await _checkMore();
+    } finally {
+      _busy = false;
+    }
+  }
+
   /// Reverses the last choice and shows that card again.
   Future<void> undo() async {
     if (_undos.isEmpty || _busy) return;

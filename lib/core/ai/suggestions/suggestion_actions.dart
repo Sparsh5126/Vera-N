@@ -12,6 +12,7 @@ import '../../storage/repositories/settings_repository.dart';
 import '../../storage/repositories/suggestions_repository.dart';
 import '../matching/word_signature.dart';
 import '../ai_settings.dart';
+import 'duplicate_actions.dart';
 import 'suggestion_learning.dart';
 
 /// Undoes the choice just made.
@@ -36,10 +37,21 @@ class SuggestionActions {
   final SettingsRepository settings;
   final DateTime Function() _clock;
 
+  /// Merge, Remove one and "not copies" for the laptop's duplicates.
+  late final duplicates = DuplicateActions(
+    notes: notes,
+    suggestions: suggestions,
+    rejections: rejections,
+    settings: settings,
+    clock: _clock,
+  );
+
   /// Links the two notes: the newer note gets a link to the older one in
   /// its "Linked notes" footer (only added to, never rewritten).
+  /// For copies, accepting is Merge (see [DuplicateActions.merge]).
   Future<Undo> accept(Suggestion s) async {
     if (s.isTag) return _acceptTag(s);
+    if (s.isDuplicate) return duplicates.merge(s);
     final pair = await _notes(s);
     if (pair == null) return _removeOnly(s);
     final (newer, older) = pair.$1.created.isAfter(pair.$2.created)
@@ -50,7 +62,7 @@ class SuggestionActions {
     final linked = NoteFooter.append(newer.body, link);
     await notes.updateBody(newer.ref, linked);
     await suggestions.remove(s.id);
-    final unlearn = await _learn(s.kind, accepted: true);
+    final unlearn = await _learn(s, accepted: true);
     return () async {
       await unlearn();
       // Only if the note wasn't edited since: undo never touches the
@@ -62,8 +74,10 @@ class SuggestionActions {
   }
 
   /// Remembers the pair so it isn't suggested again (product spec §8).
+  /// For copies: "these aren't copies".
   Future<Undo> reject(Suggestion s) async {
     if (s.isTag) return _rejectTag(s);
+    if (s.isDuplicate) return duplicates.notCopies(s);
     final pair = await _notes(s);
     if (pair == null) return _removeOnly(s);
     final idA = await notes.ensureId(s.noteA);
@@ -77,7 +91,7 @@ class SuggestionActions {
     );
     await rejections.add(rejection);
     await suggestions.remove(s.id);
-    final unlearn = await _learn(s.kind, accepted: false);
+    final unlearn = await _learn(s, accepted: false);
     return () async {
       await unlearn();
       await rejections.remove(rejection.pairKey, deviceId);
@@ -86,8 +100,11 @@ class SuggestionActions {
   }
 
   /// Counts the decision toward the kind's match bar (product spec §8);
-  /// returns its undo.
-  Future<Undo> _learn(String kind, {required bool accepted}) async {
+  /// returns its undo. The laptop's suggestions never passed this
+  /// device's bar, so they don't move it.
+  Future<Undo> _learn(Suggestion s, {required bool accepted}) async {
+    if (s.fromLaptop) return () async {};
+    final kind = s.kind;
     final learned = await settings.learning(kind);
     await settings.saveLearning(
       kind,
@@ -113,7 +130,7 @@ class SuggestionActions {
     final after = [...before, s.tag];
     await notes.setTags(s.noteA, after);
     await suggestions.remove(s.id);
-    final unlearn = await _learn(s.kind, accepted: true);
+    final unlearn = await _learn(s, accepted: true);
     return () async {
       await unlearn();
       final now = await notes.getNote(s.noteA);
@@ -145,7 +162,7 @@ class SuggestionActions {
     );
     await rejections.add(rejection);
     await suggestions.remove(s.id);
-    final unlearn = await _learn(s.kind, accepted: false);
+    final unlearn = await _learn(s, accepted: false);
     return () async {
       await unlearn();
       await rejections.remove(rejection.pairKey, deviceId);

@@ -293,3 +293,7 @@ Raised by the storage stage — **built as proposed, easy to change; please conf
 ## Tag suggestions (2026-10-08)
 
 Stored in `suggestions` with `kind = 'tag'`, `noteA` = the note to tag, `noteB` = the closest note that already has the tag (the reason), `tag` = the tag (schema 6). Rejected tags reuse the rejections table and file as the pair (note id, `#tag`). Only existing tags are suggested on the phone (`TagSuggester`).
+
+## Laptop results (schema 7, 2026-10-09)
+
+`LaptopResultsImport` (`core/ai/suggestions/`) turns fresh lines of every `.app/laptop-*.jsonl` into suggestions. It runs through `StorageServices.afterOutsideChanges` (start, resume, folder change), which `main.dart` sets, so storage still never imports `core/ai`. `suggestions` gains `detail` (the laptop's sentence) and `fromLaptop` (doesn't move learned bars). The new kind `duplicate` is handled by `DuplicateActions` (Merge via `NoteMerge`, Remove one, Not copies). `imported_results` remembers offered results by job key, so expired or rejected ones never return; keys are dropped once their result is stale.

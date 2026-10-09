@@ -12,11 +12,13 @@ class Suggestion {
     required this.createdAt,
     required this.expiresAt,
     this.tag = '',
+    this.detail = '',
+    this.fromLaptop = false,
   });
 
   final int id;
 
-  /// `link`, `tag` or `resurface`.
+  /// `link`, `tag`, `resurface` or `duplicate`.
   final String kind;
 
   /// A link joins [noteA] and [noteB]. A tag is suggested for [noteA];
@@ -27,11 +29,23 @@ class Suggestion {
   /// The suggested tag, without `#`; empty for links.
   final String tag;
 
+  /// A sentence the laptop wrote (docs/LAPTOP_PLAN.md, L3): why a link
+  /// fits, or what two copies share. Empty when there is none.
+  final String detail;
+
+  /// Made by the laptop booster; see the `fromLaptop` column.
+  final bool fromLaptop;
+
   bool get isTag => kind == tagKind;
   bool get isLink => kind == linkKind;
+  bool get isDuplicate => kind == duplicateKind;
 
   static const linkKind = 'link';
   static const tagKind = 'tag';
+
+  /// Two notes that say the same thing, found by the laptop: Merge or
+  /// Remove one (docs/LAPTOP_PLAN.md, decided 2026-10-09).
+  static const duplicateKind = 'duplicate';
 
   /// Revisit (product spec §10): [noteA] is an old note worth another
   /// look, [noteB] the recent note it relates to. Never reviewed in

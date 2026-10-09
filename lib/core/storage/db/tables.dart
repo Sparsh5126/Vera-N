@@ -142,7 +142,7 @@ class Chunks extends Table {
 class Suggestions extends Table {
   IntColumn get id => integer().autoIncrement()();
 
-  /// `link` or `tag`; later `resurface`.
+  /// `link`, `tag`, `resurface`, or `duplicate` (from the laptop, schema 7).
   TextColumn get kind => text()();
   IntColumn get noteA =>
       integer().references(Notes, #id, onDelete: KeyAction.cascade)();
@@ -154,6 +154,14 @@ class Suggestions extends Table {
 
   /// The suggested tag (without `#`); empty for links (schema 6).
   TextColumn get tag => text().withDefault(const Constant(''))();
+
+  /// A sentence the laptop wrote: why a link fits, or what two copies
+  /// share. Empty when there is none (schema 7).
+  TextColumn get detail => text().withDefault(const Constant(''))();
+
+  /// Made by the laptop booster, not by this device's matching: it never
+  /// moves this device's learned match bars (schema 7).
+  BoolColumn get fromLaptop => boolean().withDefault(const Constant(false))();
   RealColumn get score => real()();
 
   /// The best-matching chunk of each note, for "why related".
@@ -192,4 +200,15 @@ class Rejections extends Table {
 
   @override
   Set<Column<Object>> get primaryKey => {pairKey};
+}
+
+/// Laptop results already turned into suggestions (docs/LAPTOP_PLAN.md,
+/// L3), by `BoosterResult.jobKey`, so one that expired or was rejected
+/// doesn't come back. Rebuildable; forgotten once the result is stale.
+class ImportedResults extends Table {
+  TextColumn get jobKey => text()();
+  DateTimeColumn get importedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {jobKey};
 }

@@ -4,6 +4,7 @@ import '../../models/suggestion_view.dart';
 import '../../storage/files/note_markup.dart';
 import '../../storage/repositories/analysis_repository.dart';
 import '../../storage/repositories/notes_repository.dart';
+import 'duplicate_actions.dart';
 
 /// Turns stored suggestions into what the suggestion card shows: both
 /// notes, newer first, each with the passage that matched.
@@ -22,9 +23,10 @@ class SuggestionViews {
     final second = await _side(b, s.chunkB);
     // A tag: the note to tag first, then the note that already has it.
     if (s.isTag) return SuggestionView(s, first, second);
+    final keep = s.isDuplicate ? DuplicateActions.keepByDefault(a, b) : null;
     return a.created.isAfter(b.created)
-        ? SuggestionView(s, first, second)
-        : SuggestionView(s, second, first);
+        ? SuggestionView(s, first, second, keep: keep)
+        : SuggestionView(s, second, first, keep: keep);
   }
 
   Future<List<SuggestionView>> loadAll(List<Suggestion> list) async {

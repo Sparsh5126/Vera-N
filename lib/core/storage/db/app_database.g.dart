@@ -2679,6 +2679,31 @@ class $SuggestionsTable extends Suggestions
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
+  static const VerificationMeta _detailMeta = const VerificationMeta('detail');
+  @override
+  late final GeneratedColumn<String> detail = GeneratedColumn<String>(
+    'detail',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _fromLaptopMeta = const VerificationMeta(
+    'fromLaptop',
+  );
+  @override
+  late final GeneratedColumn<bool> fromLaptop = GeneratedColumn<bool>(
+    'from_laptop',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("from_laptop" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _scoreMeta = const VerificationMeta('score');
   @override
   late final GeneratedColumn<double> score = GeneratedColumn<double>(
@@ -2744,6 +2769,8 @@ class $SuggestionsTable extends Suggestions
     noteA,
     noteB,
     tag,
+    detail,
+    fromLaptop,
     score,
     chunkA,
     chunkB,
@@ -2794,6 +2821,18 @@ class $SuggestionsTable extends Suggestions
       context.handle(
         _tagMeta,
         tag.isAcceptableOrUnknown(data['tag']!, _tagMeta),
+      );
+    }
+    if (data.containsKey('detail')) {
+      context.handle(
+        _detailMeta,
+        detail.isAcceptableOrUnknown(data['detail']!, _detailMeta),
+      );
+    }
+    if (data.containsKey('from_laptop')) {
+      context.handle(
+        _fromLaptopMeta,
+        fromLaptop.isAcceptableOrUnknown(data['from_laptop']!, _fromLaptopMeta),
       );
     }
     if (data.containsKey('score')) {
@@ -2877,6 +2916,14 @@ class $SuggestionsTable extends Suggestions
         DriftSqlType.string,
         data['${effectivePrefix}tag'],
       )!,
+      detail: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}detail'],
+      )!,
+      fromLaptop: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}from_laptop'],
+      )!,
       score: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}score'],
@@ -2913,7 +2960,7 @@ class $SuggestionsTable extends Suggestions
 class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
   final int id;
 
-  /// `link` or `tag`; later `resurface`.
+  /// `link`, `tag`, `resurface`, or `duplicate` (from the laptop, schema 7).
   final String kind;
   final int noteA;
 
@@ -2923,6 +2970,14 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
 
   /// The suggested tag (without `#`); empty for links (schema 6).
   final String tag;
+
+  /// A sentence the laptop wrote: why a link fits, or what two copies
+  /// share. Empty when there is none (schema 7).
+  final String detail;
+
+  /// Made by the laptop booster, not by this device's matching: it never
+  /// moves this device's learned match bars (schema 7).
+  final bool fromLaptop;
   final double score;
 
   /// The best-matching chunk of each note, for "why related".
@@ -2939,6 +2994,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     required this.noteA,
     required this.noteB,
     required this.tag,
+    required this.detail,
+    required this.fromLaptop,
     required this.score,
     required this.chunkA,
     required this.chunkB,
@@ -2954,6 +3011,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     map['note_a'] = Variable<int>(noteA);
     map['note_b'] = Variable<int>(noteB);
     map['tag'] = Variable<String>(tag);
+    map['detail'] = Variable<String>(detail);
+    map['from_laptop'] = Variable<bool>(fromLaptop);
     map['score'] = Variable<double>(score);
     map['chunk_a'] = Variable<int>(chunkA);
     map['chunk_b'] = Variable<int>(chunkB);
@@ -2970,6 +3029,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       noteA: Value(noteA),
       noteB: Value(noteB),
       tag: Value(tag),
+      detail: Value(detail),
+      fromLaptop: Value(fromLaptop),
       score: Value(score),
       chunkA: Value(chunkA),
       chunkB: Value(chunkB),
@@ -2990,6 +3051,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       noteA: serializer.fromJson<int>(json['noteA']),
       noteB: serializer.fromJson<int>(json['noteB']),
       tag: serializer.fromJson<String>(json['tag']),
+      detail: serializer.fromJson<String>(json['detail']),
+      fromLaptop: serializer.fromJson<bool>(json['fromLaptop']),
       score: serializer.fromJson<double>(json['score']),
       chunkA: serializer.fromJson<int>(json['chunkA']),
       chunkB: serializer.fromJson<int>(json['chunkB']),
@@ -3007,6 +3070,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       'noteA': serializer.toJson<int>(noteA),
       'noteB': serializer.toJson<int>(noteB),
       'tag': serializer.toJson<String>(tag),
+      'detail': serializer.toJson<String>(detail),
+      'fromLaptop': serializer.toJson<bool>(fromLaptop),
       'score': serializer.toJson<double>(score),
       'chunkA': serializer.toJson<int>(chunkA),
       'chunkB': serializer.toJson<int>(chunkB),
@@ -3022,6 +3087,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     int? noteA,
     int? noteB,
     String? tag,
+    String? detail,
+    bool? fromLaptop,
     double? score,
     int? chunkA,
     int? chunkB,
@@ -3034,6 +3101,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     noteA: noteA ?? this.noteA,
     noteB: noteB ?? this.noteB,
     tag: tag ?? this.tag,
+    detail: detail ?? this.detail,
+    fromLaptop: fromLaptop ?? this.fromLaptop,
     score: score ?? this.score,
     chunkA: chunkA ?? this.chunkA,
     chunkB: chunkB ?? this.chunkB,
@@ -3048,6 +3117,10 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       noteA: data.noteA.present ? data.noteA.value : this.noteA,
       noteB: data.noteB.present ? data.noteB.value : this.noteB,
       tag: data.tag.present ? data.tag.value : this.tag,
+      detail: data.detail.present ? data.detail.value : this.detail,
+      fromLaptop: data.fromLaptop.present
+          ? data.fromLaptop.value
+          : this.fromLaptop,
       score: data.score.present ? data.score.value : this.score,
       chunkA: data.chunkA.present ? data.chunkA.value : this.chunkA,
       chunkB: data.chunkB.present ? data.chunkB.value : this.chunkB,
@@ -3065,6 +3138,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
           ..write('noteA: $noteA, ')
           ..write('noteB: $noteB, ')
           ..write('tag: $tag, ')
+          ..write('detail: $detail, ')
+          ..write('fromLaptop: $fromLaptop, ')
           ..write('score: $score, ')
           ..write('chunkA: $chunkA, ')
           ..write('chunkB: $chunkB, ')
@@ -3082,6 +3157,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     noteA,
     noteB,
     tag,
+    detail,
+    fromLaptop,
     score,
     chunkA,
     chunkB,
@@ -3098,6 +3175,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
           other.noteA == this.noteA &&
           other.noteB == this.noteB &&
           other.tag == this.tag &&
+          other.detail == this.detail &&
+          other.fromLaptop == this.fromLaptop &&
           other.score == this.score &&
           other.chunkA == this.chunkA &&
           other.chunkB == this.chunkB &&
@@ -3112,6 +3191,8 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
   final Value<int> noteA;
   final Value<int> noteB;
   final Value<String> tag;
+  final Value<String> detail;
+  final Value<bool> fromLaptop;
   final Value<double> score;
   final Value<int> chunkA;
   final Value<int> chunkB;
@@ -3124,6 +3205,8 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     this.noteA = const Value.absent(),
     this.noteB = const Value.absent(),
     this.tag = const Value.absent(),
+    this.detail = const Value.absent(),
+    this.fromLaptop = const Value.absent(),
     this.score = const Value.absent(),
     this.chunkA = const Value.absent(),
     this.chunkB = const Value.absent(),
@@ -3137,6 +3220,8 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     required int noteA,
     required int noteB,
     this.tag = const Value.absent(),
+    this.detail = const Value.absent(),
+    this.fromLaptop = const Value.absent(),
     required double score,
     required int chunkA,
     required int chunkB,
@@ -3158,6 +3243,8 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     Expression<int>? noteA,
     Expression<int>? noteB,
     Expression<String>? tag,
+    Expression<String>? detail,
+    Expression<bool>? fromLaptop,
     Expression<double>? score,
     Expression<int>? chunkA,
     Expression<int>? chunkB,
@@ -3171,6 +3258,8 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
       if (noteA != null) 'note_a': noteA,
       if (noteB != null) 'note_b': noteB,
       if (tag != null) 'tag': tag,
+      if (detail != null) 'detail': detail,
+      if (fromLaptop != null) 'from_laptop': fromLaptop,
       if (score != null) 'score': score,
       if (chunkA != null) 'chunk_a': chunkA,
       if (chunkB != null) 'chunk_b': chunkB,
@@ -3186,6 +3275,8 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     Value<int>? noteA,
     Value<int>? noteB,
     Value<String>? tag,
+    Value<String>? detail,
+    Value<bool>? fromLaptop,
     Value<double>? score,
     Value<int>? chunkA,
     Value<int>? chunkB,
@@ -3199,6 +3290,8 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
       noteA: noteA ?? this.noteA,
       noteB: noteB ?? this.noteB,
       tag: tag ?? this.tag,
+      detail: detail ?? this.detail,
+      fromLaptop: fromLaptop ?? this.fromLaptop,
       score: score ?? this.score,
       chunkA: chunkA ?? this.chunkA,
       chunkB: chunkB ?? this.chunkB,
@@ -3225,6 +3318,12 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     }
     if (tag.present) {
       map['tag'] = Variable<String>(tag.value);
+    }
+    if (detail.present) {
+      map['detail'] = Variable<String>(detail.value);
+    }
+    if (fromLaptop.present) {
+      map['from_laptop'] = Variable<bool>(fromLaptop.value);
     }
     if (score.present) {
       map['score'] = Variable<double>(score.value);
@@ -3255,6 +3354,8 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
           ..write('noteA: $noteA, ')
           ..write('noteB: $noteB, ')
           ..write('tag: $tag, ')
+          ..write('detail: $detail, ')
+          ..write('fromLaptop: $fromLaptop, ')
           ..write('score: $score, ')
           ..write('chunkA: $chunkA, ')
           ..write('chunkB: $chunkB, ')
@@ -3835,6 +3936,224 @@ class RejectionsCompanion extends UpdateCompanion<RejectionRow> {
   }
 }
 
+class $ImportedResultsTable extends ImportedResults
+    with TableInfo<$ImportedResultsTable, ImportedResult> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ImportedResultsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _jobKeyMeta = const VerificationMeta('jobKey');
+  @override
+  late final GeneratedColumn<String> jobKey = GeneratedColumn<String>(
+    'job_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _importedAtMeta = const VerificationMeta(
+    'importedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> importedAt = GeneratedColumn<DateTime>(
+    'imported_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [jobKey, importedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'imported_results';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ImportedResult> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('job_key')) {
+      context.handle(
+        _jobKeyMeta,
+        jobKey.isAcceptableOrUnknown(data['job_key']!, _jobKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_jobKeyMeta);
+    }
+    if (data.containsKey('imported_at')) {
+      context.handle(
+        _importedAtMeta,
+        importedAt.isAcceptableOrUnknown(data['imported_at']!, _importedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_importedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {jobKey};
+  @override
+  ImportedResult map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ImportedResult(
+      jobKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}job_key'],
+      )!,
+      importedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}imported_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ImportedResultsTable createAlias(String alias) {
+    return $ImportedResultsTable(attachedDatabase, alias);
+  }
+}
+
+class ImportedResult extends DataClass implements Insertable<ImportedResult> {
+  final String jobKey;
+  final DateTime importedAt;
+  const ImportedResult({required this.jobKey, required this.importedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['job_key'] = Variable<String>(jobKey);
+    map['imported_at'] = Variable<DateTime>(importedAt);
+    return map;
+  }
+
+  ImportedResultsCompanion toCompanion(bool nullToAbsent) {
+    return ImportedResultsCompanion(
+      jobKey: Value(jobKey),
+      importedAt: Value(importedAt),
+    );
+  }
+
+  factory ImportedResult.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ImportedResult(
+      jobKey: serializer.fromJson<String>(json['jobKey']),
+      importedAt: serializer.fromJson<DateTime>(json['importedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'jobKey': serializer.toJson<String>(jobKey),
+      'importedAt': serializer.toJson<DateTime>(importedAt),
+    };
+  }
+
+  ImportedResult copyWith({String? jobKey, DateTime? importedAt}) =>
+      ImportedResult(
+        jobKey: jobKey ?? this.jobKey,
+        importedAt: importedAt ?? this.importedAt,
+      );
+  ImportedResult copyWithCompanion(ImportedResultsCompanion data) {
+    return ImportedResult(
+      jobKey: data.jobKey.present ? data.jobKey.value : this.jobKey,
+      importedAt: data.importedAt.present
+          ? data.importedAt.value
+          : this.importedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImportedResult(')
+          ..write('jobKey: $jobKey, ')
+          ..write('importedAt: $importedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(jobKey, importedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ImportedResult &&
+          other.jobKey == this.jobKey &&
+          other.importedAt == this.importedAt);
+}
+
+class ImportedResultsCompanion extends UpdateCompanion<ImportedResult> {
+  final Value<String> jobKey;
+  final Value<DateTime> importedAt;
+  final Value<int> rowid;
+  const ImportedResultsCompanion({
+    this.jobKey = const Value.absent(),
+    this.importedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ImportedResultsCompanion.insert({
+    required String jobKey,
+    required DateTime importedAt,
+    this.rowid = const Value.absent(),
+  }) : jobKey = Value(jobKey),
+       importedAt = Value(importedAt);
+  static Insertable<ImportedResult> custom({
+    Expression<String>? jobKey,
+    Expression<DateTime>? importedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (jobKey != null) 'job_key': jobKey,
+      if (importedAt != null) 'imported_at': importedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ImportedResultsCompanion copyWith({
+    Value<String>? jobKey,
+    Value<DateTime>? importedAt,
+    Value<int>? rowid,
+  }) {
+    return ImportedResultsCompanion(
+      jobKey: jobKey ?? this.jobKey,
+      importedAt: importedAt ?? this.importedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (jobKey.present) {
+      map['job_key'] = Variable<String>(jobKey.value);
+    }
+    if (importedAt.present) {
+      map['imported_at'] = Variable<DateTime>(importedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImportedResultsCompanion(')
+          ..write('jobKey: $jobKey, ')
+          ..write('importedAt: $importedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3846,6 +4165,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ChunksTable chunks = $ChunksTable(this);
   late final $SuggestionsTable suggestions = $SuggestionsTable(this);
   late final $RejectionsTable rejections = $RejectionsTable(this);
+  late final $ImportedResultsTable importedResults = $ImportedResultsTable(
+    this,
+  );
   late final Index notesModified = Index(
     'notes_modified',
     'CREATE INDEX notes_modified ON notes (trashed_at, modified)',
@@ -3899,6 +4221,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     chunks,
     suggestions,
     rejections,
+    importedResults,
     notesModified,
     notesNoteId,
     notesFolder,
@@ -6153,6 +6476,8 @@ typedef $$SuggestionsTableCreateCompanionBuilder =
       required int noteA,
       required int noteB,
       Value<String> tag,
+      Value<String> detail,
+      Value<bool> fromLaptop,
       required double score,
       required int chunkA,
       required int chunkB,
@@ -6167,6 +6492,8 @@ typedef $$SuggestionsTableUpdateCompanionBuilder =
       Value<int> noteA,
       Value<int> noteB,
       Value<String> tag,
+      Value<String> detail,
+      Value<bool> fromLaptop,
       Value<double> score,
       Value<int> chunkA,
       Value<int> chunkB,
@@ -6235,6 +6562,16 @@ class $$SuggestionsTableFilterComposer
 
   ColumnFilters<String> get tag => $composableBuilder(
     column: $table.tag,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get detail => $composableBuilder(
+    column: $table.detail,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get fromLaptop => $composableBuilder(
+    column: $table.fromLaptop,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6339,6 +6676,16 @@ class $$SuggestionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get detail => $composableBuilder(
+    column: $table.detail,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get fromLaptop => $composableBuilder(
+    column: $table.fromLaptop,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get score => $composableBuilder(
     column: $table.score,
     builder: (column) => ColumnOrderings(column),
@@ -6433,6 +6780,14 @@ class $$SuggestionsTableAnnotationComposer
 
   GeneratedColumn<String> get tag =>
       $composableBuilder(column: $table.tag, builder: (column) => column);
+
+  GeneratedColumn<String> get detail =>
+      $composableBuilder(column: $table.detail, builder: (column) => column);
+
+  GeneratedColumn<bool> get fromLaptop => $composableBuilder(
+    column: $table.fromLaptop,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<double> get score =>
       $composableBuilder(column: $table.score, builder: (column) => column);
@@ -6532,6 +6887,8 @@ class $$SuggestionsTableTableManager
                 Value<int> noteA = const Value.absent(),
                 Value<int> noteB = const Value.absent(),
                 Value<String> tag = const Value.absent(),
+                Value<String> detail = const Value.absent(),
+                Value<bool> fromLaptop = const Value.absent(),
                 Value<double> score = const Value.absent(),
                 Value<int> chunkA = const Value.absent(),
                 Value<int> chunkB = const Value.absent(),
@@ -6544,6 +6901,8 @@ class $$SuggestionsTableTableManager
                 noteA: noteA,
                 noteB: noteB,
                 tag: tag,
+                detail: detail,
+                fromLaptop: fromLaptop,
                 score: score,
                 chunkA: chunkA,
                 chunkB: chunkB,
@@ -6558,6 +6917,8 @@ class $$SuggestionsTableTableManager
                 required int noteA,
                 required int noteB,
                 Value<String> tag = const Value.absent(),
+                Value<String> detail = const Value.absent(),
+                Value<bool> fromLaptop = const Value.absent(),
                 required double score,
                 required int chunkA,
                 required int chunkB,
@@ -6570,6 +6931,8 @@ class $$SuggestionsTableTableManager
                 noteA: noteA,
                 noteB: noteB,
                 tag: tag,
+                detail: detail,
+                fromLaptop: fromLaptop,
                 score: score,
                 chunkA: chunkA,
                 chunkB: chunkB,
@@ -6942,6 +7305,166 @@ typedef $$RejectionsTableProcessedTableManager =
       RejectionRow,
       PrefetchHooks Function()
     >;
+typedef $$ImportedResultsTableCreateCompanionBuilder =
+    ImportedResultsCompanion Function({
+      required String jobKey,
+      required DateTime importedAt,
+      Value<int> rowid,
+    });
+typedef $$ImportedResultsTableUpdateCompanionBuilder =
+    ImportedResultsCompanion Function({
+      Value<String> jobKey,
+      Value<DateTime> importedAt,
+      Value<int> rowid,
+    });
+
+class $$ImportedResultsTableFilterComposer
+    extends Composer<_$AppDatabase, $ImportedResultsTable> {
+  $$ImportedResultsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get jobKey => $composableBuilder(
+    column: $table.jobKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get importedAt => $composableBuilder(
+    column: $table.importedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ImportedResultsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ImportedResultsTable> {
+  $$ImportedResultsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get jobKey => $composableBuilder(
+    column: $table.jobKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get importedAt => $composableBuilder(
+    column: $table.importedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ImportedResultsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ImportedResultsTable> {
+  $$ImportedResultsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get jobKey =>
+      $composableBuilder(column: $table.jobKey, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get importedAt => $composableBuilder(
+    column: $table.importedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$ImportedResultsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ImportedResultsTable,
+          ImportedResult,
+          $$ImportedResultsTableFilterComposer,
+          $$ImportedResultsTableOrderingComposer,
+          $$ImportedResultsTableAnnotationComposer,
+          $$ImportedResultsTableCreateCompanionBuilder,
+          $$ImportedResultsTableUpdateCompanionBuilder,
+          (
+            ImportedResult,
+            BaseReferences<
+              _$AppDatabase,
+              $ImportedResultsTable,
+              ImportedResult
+            >,
+          ),
+          ImportedResult,
+          PrefetchHooks Function()
+        > {
+  $$ImportedResultsTableTableManager(
+    _$AppDatabase db,
+    $ImportedResultsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ImportedResultsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ImportedResultsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ImportedResultsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> jobKey = const Value.absent(),
+                Value<DateTime> importedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ImportedResultsCompanion(
+                jobKey: jobKey,
+                importedAt: importedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String jobKey,
+                required DateTime importedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ImportedResultsCompanion.insert(
+                jobKey: jobKey,
+                importedAt: importedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ImportedResultsTable, ImportedResult>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ImportedResultsTable,
+                    ImportedResult
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ImportedResultsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ImportedResultsTable,
+      ImportedResult,
+      $$ImportedResultsTableFilterComposer,
+      $$ImportedResultsTableOrderingComposer,
+      $$ImportedResultsTableAnnotationComposer,
+      $$ImportedResultsTableCreateCompanionBuilder,
+      $$ImportedResultsTableUpdateCompanionBuilder,
+      (
+        ImportedResult,
+        BaseReferences<_$AppDatabase, $ImportedResultsTable, ImportedResult>,
+      ),
+      ImportedResult,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6962,4 +7485,6 @@ class $AppDatabaseManager {
       $$SuggestionsTableTableManager(_db, _db.suggestions);
   $$RejectionsTableTableManager get rejections =>
       $$RejectionsTableTableManager(_db, _db.rejections);
+  $$ImportedResultsTableTableManager get importedResults =>
+      $$ImportedResultsTableTableManager(_db, _db.importedResults);
 }

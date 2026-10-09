@@ -8,6 +8,8 @@ class SuggestionDraft {
     required this.chunkA,
     required this.chunkB,
     this.tag = '',
+    this.detail = '',
+    this.fromLaptop = false,
   });
 
   /// `link` or `tag` (product spec §16: link / tag / topic / resurface).
@@ -20,6 +22,10 @@ class SuggestionDraft {
 
   /// The suggested tag, without `#`; empty for links.
   final String tag;
+
+  /// A sentence the laptop wrote; see [Suggestion.detail].
+  final String detail;
+  final bool fromLaptop;
   final double score;
 
   /// The best-matching chunk of each note, for "why related".

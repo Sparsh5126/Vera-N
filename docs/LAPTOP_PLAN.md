@@ -72,12 +72,16 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 - **Prompts:** short, one job each, with the note text sent only to the local server. Hindi and English allowed, and results keep the note's language.
 - **Tests:** a fake server; stale results dropped; nothing is called when no server is running; non-local addresses are refused.
 
-### L3. The phone shows laptop results
-- It imports `laptop-*.jsonl` on start and when the folder changes (the same path as rejections).
-- **New suggestion kinds:** `topic` and `duplicate`. Tags gain an `isNew` flag.
-- **Display:** the written "Why?" shows under the matched passages, in the same dimmed / seal style (it is AI output).
-- **Review:** topic and duplicate cards use the existing swipe card. Accept, reject and "not sure" are remembered and learned from per kind, as today.
-- Laptop and phone suggestions for the same pair merge into one, keeping the laptop's sentence.
+### L3. The phone shows laptop results: built 2026-10-09 (tested; not yet seen with real laptop results)
+- It imports `laptop-*.jsonl` on start, on resume, when the folder changes, and on the laptop after each booster run (`LaptopResultsImport`).
+- **As built:**
+  - A "Why?" sentence is set on the waiting link between the same two notes (`suggestions.detail`). Laptop and phone suggestions for a pair are one row, so they merge by themselves.
+  - New tag names and topics are ordinary tag suggestions (decided 2026-10-09). A new name has no reason note (`noteB = noteA`); the card shows one note.
+  - Copies are a new kind, `duplicate`, with Merge / Remove one / Not copies (decided 2026-10-09).
+  - Each result is offered once (`imported_results`, schema 7): an expired or rejected one never returns. "Not copies" is the pair (id, `=other id`) in the rejections file.
+  - Laptop suggestions don't move this device's learned match bars (`fromLaptop`): they never passed them. **This differs from the line above ("learned from per kind").**
+  - The sentence uses the secondary text colour rather than a 55% fade, which could drop below 4.5:1 contrast.
+- **Chosen without asking, to confirm with the user:** Merge keeps the note with more text (the older one if equal), and the card says which; "Remove one" lets the user pick either note.
 - Analysis on the phone needs no change.
 
 ### L4. Settings on both devices

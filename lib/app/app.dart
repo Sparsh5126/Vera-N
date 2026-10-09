@@ -81,15 +81,21 @@ class _AppState extends ConsumerState<App> {
   void _startDesktop() {
     final storage = ref.read(storageProvider);
     unawaited(storage.watchFolder());
+    final booster = LaptopBooster(
+      booster: storage.booster,
+      analysis: storage.analysis,
+      suggestions: storage.suggestions,
+      settings: storage.settings,
+    );
     final analysis = DesktopAnalysis(
       storage.forAnalysis,
       enabled: () => ref.read(appPrefsProvider).suggestions,
-      boost: LaptopBooster(
-        booster: storage.booster,
-        analysis: storage.analysis,
-        suggestions: storage.suggestions,
-        settings: storage.settings,
-      ).runOnce,
+      boost: (stop) async {
+        final done = await booster.runOnce(stop);
+        // Offer what it found right away, here on the laptop.
+        await storage.afterOutsideChanges?.call();
+        return done;
+      },
     );
     _analysis = analysis;
     GestureBinding.instance.pointerRouter.addGlobalRoute(_onPointer);

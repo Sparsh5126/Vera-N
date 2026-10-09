@@ -138,6 +138,20 @@ class StorageServices {
     } on Object catch (e) {
       debugPrint('VeraN folder change: $e');
     }
+    await _afterOutsideChanges();
+  }
+
+  /// Runs after outside changes were picked up (start, resume, a folder
+  /// change on a laptop): the app uses it to offer the laptop's results.
+  /// Storage itself knows nothing about suggestions.
+  Future<void> Function()? afterOutsideChanges;
+
+  Future<void> _afterOutsideChanges() async {
+    try {
+      await afterOutsideChanges?.call();
+    } on Object catch (e) {
+      debugPrint('VeraN after outside changes: $e');
+    }
   }
 
   /// Lets the user pick the notes folder and moves the notes there.
@@ -187,6 +201,7 @@ class StorageServices {
     } on Object catch (e) {
       debugPrint('VeraN clean-up failed: $e');
     }
+    await _afterOutsideChanges();
   }
 
   /// With "Remove unused attachments on their own" on, files no note has
@@ -205,7 +220,7 @@ class StorageServices {
   Future<void> onPause() => writer.flush();
 
   /// App back in front: pick up outside changes.
-  void onResume() => unawaited(reconcile());
+  void onResume() => unawaited(reconcile().then((_) => _afterOutsideChanges()));
 
   /// Uses the picked folder if access is still granted. If access was
   /// removed, notes go back to the holding folder: every note is rewritten

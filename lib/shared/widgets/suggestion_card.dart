@@ -22,10 +22,11 @@ class SuggestionSide {
   final VoidCallback onOpen;
 }
 
-/// The words around a suggestion card: each side's label and the reason.
-/// A link names the other note ([otherTitle], or the older note); a tag
-/// says which tag and that notes like this one have it.
-({String first, String second, String reason}) suggestionWording(
+/// The words around a suggestion card: each side's label, the reason,
+/// and for copies which note Merge keeps ([hint]). A link names the other
+/// note ([otherTitle], or the older note); a tag says which tag and that
+/// notes like this one have it, or that it is a new one.
+({String first, String second, String reason, String? hint}) suggestionWording(
   SuggestionView view, {
   String? otherTitle,
 }) {
@@ -34,30 +35,46 @@ class SuggestionSide {
     return (
       first: AppCopy.tagThisNote,
       second: AppCopy.tagHasIt(s.tag),
-      reason: AppCopy.tagReason(s.tag),
+      reason: view.single
+          ? AppCopy.newTagReason(s.tag)
+          : AppCopy.tagReason(s.tag),
+      hint: null,
     );
   }
+  final kept = view.keep == null ? null : view.noteOf(view.keep!);
   return (
     first: AppCopy.reviewNewLabel,
     second: AppCopy.reviewOlderLabel,
-    reason: AppCopy.suggestionReason(otherTitle ?? view.older.title),
+    reason: s.isDuplicate
+        ? AppCopy.duplicateReason
+        : AppCopy.suggestionReason(otherTitle ?? view.older.title),
+    hint: kept == null ? null : AppCopy.mergeKeeps(kept.title),
   );
 }
 
 /// The suggestion card (UI spec §8): both notes with the matching passage
 /// highlighted, the plain-language reason between them, and "Why?" to see
 /// the passages in full. Used by Review and the note's suggestion sheet.
+///
+/// The laptop's sentence ([detail]) shows under the reason, dimmed like
+/// every AI suggestion; [hint] closes the card (what Merge does).
 class SuggestionCard extends StatefulWidget {
   const SuggestionCard({
     super.key,
     required this.newer,
     required this.older,
     required this.reason,
+    this.detail = '',
+    this.hint,
   });
 
   final SuggestionSide newer;
-  final SuggestionSide older;
+
+  /// Null shows one note only (a new tag no other note has).
+  final SuggestionSide? older;
   final String reason;
+  final String detail;
+  final String? hint;
 
   @override
   State<SuggestionCard> createState() => _SuggestionCardState();
@@ -81,8 +98,20 @@ class _SuggestionCardState extends State<SuggestionCard> {
             _side(context, widget.newer),
             const SizedBox(height: AppSpace.m),
             _reason(context),
-            const SizedBox(height: AppSpace.m),
-            _side(context, widget.older),
+            if (widget.detail.isNotEmpty) _detail(context),
+            if (widget.older case final older?) ...[
+              const SizedBox(height: AppSpace.m),
+              _side(context, older),
+            ],
+            if (widget.hint case final hint?) ...[
+              const SizedBox(height: AppSpace.m),
+              Text(
+                hint,
+                style: context.textStyles.small.copyWith(
+                  color: context.colors.textSecondary,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -114,6 +143,20 @@ class _SuggestionCardState extends State<SuggestionCard> {
             maxLines: _why ? _expandedLines : _collapsedLines,
           ),
         ],
+      ),
+    );
+  }
+
+  /// Written by the laptop's AI: in the quieter colour of suggestions,
+  /// set under the reason (kept at full contrast for reading).
+  Widget _detail(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: AppSpace.l, top: AppSpace.xs),
+      child: Text(
+        widget.detail,
+        style: context.textStyles.body.copyWith(
+          color: context.colors.textSecondary,
+        ),
       ),
     );
   }

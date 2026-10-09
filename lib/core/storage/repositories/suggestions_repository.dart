@@ -36,6 +36,8 @@ class SuggestionsRepository {
             noteA: a,
             noteB: z,
             tag: Value(d.tag),
+            detail: Value(d.detail),
+            fromLaptop: Value(d.fromLaptop),
             score: d.score,
             chunkA: swapped ? d.chunkB : d.chunkA,
             chunkB: swapped ? d.chunkA : d.chunkB,
@@ -123,6 +125,47 @@ class SuggestionsRepository {
   Future<void> remove(int id) =>
       (_db.delete(_db.suggestions)..where((s) => s.id.equals(id))).go();
 
+  /// Sets the laptop's sentence on the waiting link between [a] and [b],
+  /// if there is one.
+  Future<void> setLinkDetail(int a, int b, String detail) {
+    final (first, second) = a < b ? (a, b) : (b, a);
+    return (_db.update(_db.suggestions)..where(
+          (s) =>
+              s.kind.equals(Suggestion.linkKind) &
+              s.noteA.equals(first) &
+              s.noteB.equals(second),
+        ))
+        .write(SuggestionsCompanion(detail: Value(detail)));
+  }
+
+  /// Laptop results already offered (docs/LAPTOP_PLAN.md, L3), by job key.
+  Future<Set<String>> importedResults() async => {
+    for (final r in await _db.select(_db.importedResults).get()) r.jobKey,
+  };
+
+  /// Records that [jobKeys] were offered, and forgets the ones not in
+  /// [current] (their notes changed or are gone).
+  Future<void> markImported(
+    Iterable<String> jobKeys,
+    Set<String> current,
+    DateTime now,
+  ) {
+    return _db.transaction(() async {
+      await (_db.delete(
+        _db.importedResults,
+      )..where((r) => r.jobKey.isNotIn(current))).go();
+      await _db.batch((b) {
+        for (final k in jobKeys) {
+          b.insert(
+            _db.importedResults,
+            ImportedResultsCompanion.insert(jobKey: k, importedAt: now),
+            mode: InsertMode.insertOrIgnore,
+          );
+        }
+      });
+    });
+  }
+
   /// Removes every suggestion waiting for review ("Rebuild suggestions").
   Future<void> clear() => _db.delete(_db.suggestions).go();
 
@@ -137,6 +180,8 @@ class SuggestionsRepository {
             noteA: s.noteA,
             noteB: s.noteB,
             tag: Value(s.tag),
+            detail: Value(s.detail),
+            fromLaptop: Value(s.fromLaptop),
             score: s.score,
             chunkA: s.chunkA,
             chunkB: s.chunkB,
@@ -189,5 +234,7 @@ class SuggestionsRepository {
     createdAt: r.createdAt,
     expiresAt: r.expiresAt,
     tag: r.tag,
+    detail: r.detail,
+    fromLaptop: r.fromLaptop,
   );
 }

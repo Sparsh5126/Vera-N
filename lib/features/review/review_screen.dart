@@ -19,6 +19,7 @@ import '../../shared/widgets/undo_snack_bar.dart';
 import 'state/review_controller.dart';
 import 'widgets/review_buttons.dart';
 import 'widgets/review_done.dart';
+import 'widgets/remove_one_sheet.dart';
 import 'widgets/review_hint.dart';
 import 'widgets/swipe_card.dart';
 
@@ -60,12 +61,26 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       ReviewChoice.reject => null,
     };
     if (haptic != null) unawaited(Haptics.play(haptic));
+    final copies = ref.read(reviewProvider).current?.suggestion.isDuplicate;
     await review.choose(choice);
     if (choice == ReviewChoice.accept) {
-      UndoSnackBar.show(messenger, message: AppCopy.linked, onUndo: _undo);
+      UndoSnackBar.show(
+        messenger,
+        message: copies == true ? AppCopy.merged : AppCopy.linked,
+        onUndo: _undo,
+      );
     } else {
       messenger.hideCurrentSnackBar();
     }
+  }
+
+  /// Copies: pick which note goes to the trash; Undo brings it back.
+  Future<void> _removeOne(SuggestionView view) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final note = await RemoveOneSheet.show(context, view);
+    if (note == null) return;
+    await ref.read(reviewProvider.notifier).removeOne(note);
+    UndoSnackBar.show(messenger, message: AppCopy.movedToTrash, onUndo: _undo);
   }
 
   void _undo() {
@@ -118,18 +133,25 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             children: [
               _topBar(state),
               Expanded(child: _body(state, current)),
-              if (current != null)
-                ReviewButtons(
-                  onReject: () => unawaited(_choose(ReviewChoice.reject)),
-                  onNotSure: () => unawaited(_choose(ReviewChoice.notSure)),
-                  onAccept: () => unawaited(_choose(ReviewChoice.accept)),
-                  onUndo: state.canUndo ? _undo : null,
-                ),
+              if (current != null) _buttons(state, current),
               const SizedBox(height: AppSpace.m),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buttons(ReviewState state, SuggestionView current) {
+    final copies = current.suggestion.isDuplicate;
+    return ReviewButtons(
+      onReject: () => unawaited(_choose(ReviewChoice.reject)),
+      onNotSure: () => unawaited(_choose(ReviewChoice.notSure)),
+      onAccept: () => unawaited(_choose(ReviewChoice.accept)),
+      onUndo: state.canUndo ? _undo : null,
+      acceptLabel: copies ? AppCopy.merge : AppCopy.accept,
+      rejectLabel: copies ? AppCopy.notCopies : AppCopy.reject,
+      onRemoveOne: copies ? () => unawaited(_removeOne(current)) : null,
     );
   }
 
@@ -197,8 +219,10 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
         physics: const NeverScrollableScrollPhysics(),
         child: SuggestionCard(
           newer: side(words.first, view.newer),
-          older: side(words.second, view.older),
+          older: view.single ? null : side(words.second, view.older),
           reason: words.reason,
+          detail: view.suggestion.detail,
+          hint: words.hint,
         ),
       ),
     );

@@ -99,6 +99,18 @@ abstract final class AppCopy {
   static const linked = 'Linked';
   static const reviewNewLabel = 'NEW';
   static const reviewOlderLabel = 'OLDER';
+
+  // The laptop's results (docs/LAPTOP_PLAN.md, L3).
+  static String newTagReason(String tag) =>
+      'A new tag that could fit: ${tagLabel(tag)}.';
+  static const duplicateReason = 'These two notes look like copies.';
+  static String mergeKeeps(String title) =>
+      'Merge keeps “$title” and adds the lines only the other has.';
+  static const merge = 'Merge';
+  static const merged = 'Merged';
+  static const notCopies = 'Not copies';
+  static const removeOne = 'Remove one';
+  static String removeThis(String title) => 'Move “$title” to the trash';
   static const allCaughtUp = 'All caught up.';
   // No number, so it never reads as a pile to clear.
   static const reviewMore = 'Review more';

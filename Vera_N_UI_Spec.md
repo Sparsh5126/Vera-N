@@ -323,6 +323,16 @@ One reusable card, two containers:
 - After a choice, the chip on the note updates immediately (dimmed becomes solid, or disappears).
 - Graph dashed lines open this same sheet.
 
+### Laptop results on the card (built 2026-10-09, docs/LAPTOP_PLAN.md L3)
+
+- **A link with the laptop's sentence:** the sentence sits under the one-line reason, in the secondary text colour (AI output, kept readable).
+- **A new tag name** (no note has it yet): one note only, with "A new tag that could fit: #name." A topic's tag shows another note of the topic as the reason, like today's tag suggestions.
+- **Copies** (Review only):
+  - Reason: "These two notes look like copies." The laptop's sentence under it, and at the bottom: "Merge keeps “title” and adds the lines only the other has."
+  - ✓ / swipe right is **Merge** (keeps the note with more text and adds the other's missing lines above its "Linked notes", then moves the other to the trash). ✕ / swipe left is **Not copies** (remembered; a link between them is still possible). Swipe up is Not sure, as everywhere. The buttons' names say Merge and Not copies.
+  - **Remove one** sits beside Undo and asks which note to move to the trash.
+  - Every choice shows Undo ("Merged", "Moved to trash").
+
 ---
 
 ## 9. Search

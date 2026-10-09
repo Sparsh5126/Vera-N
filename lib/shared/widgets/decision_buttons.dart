@@ -11,7 +11,14 @@ class DecisionButtons extends StatelessWidget {
     required this.onReject,
     required this.onAccept,
     this.onNotSure,
+    this.acceptLabel = AppCopy.accept,
+    this.rejectLabel = AppCopy.reject,
   });
+
+  /// What ✓ and ✕ do, for the tooltip and screen readers (for copies:
+  /// "Merge" and "Not copies").
+  final String acceptLabel;
+  final String rejectLabel;
 
   final VoidCallback? onReject;
   final VoidCallback? onAccept;
@@ -34,7 +41,7 @@ class DecisionButtons extends StatelessWidget {
         IconButton.outlined(
           onPressed: onReject,
           icon: Icon(Icons.close, color: colors.reject),
-          tooltip: AppCopy.reject,
+          tooltip: rejectLabel,
           constraints: _big,
         ),
         if (onNotSure != null)
@@ -45,7 +52,7 @@ class DecisionButtons extends StatelessWidget {
         IconButton.outlined(
           onPressed: onAccept,
           icon: Icon(Icons.check, color: colors.accept),
-          tooltip: AppCopy.accept,
+          tooltip: acceptLabel,
           constraints: _big,
         ),
       ],

@@ -18,6 +18,7 @@ part 'app_database.g.dart';
     Chunks,
     Suggestions,
     Rejections,
+    ImportedResults,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -39,7 +40,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -70,8 +71,24 @@ class AppDatabase extends _$AppDatabase {
         // Tag suggestions: a tag column, and the unique key now includes
         // it (the table is rebuilt; pending suggestions are kept).
         await m.alterTable(
-          TableMigration(suggestions, newColumns: [suggestions.tag]),
+          TableMigration(
+            suggestions,
+            newColumns: [
+              suggestions.tag,
+              suggestions.detail,
+              suggestions.fromLaptop,
+            ],
+          ),
         );
+      }
+      if (from < 7) {
+        // Laptop results (docs/LAPTOP_PLAN.md, L3). Older versions just
+        // built or rebuilt the suggestions table with these columns.
+        if (from == 6) {
+          await m.addColumn(suggestions, suggestions.detail);
+          await m.addColumn(suggestions, suggestions.fromLaptop);
+        }
+        await m.createTable(importedResults);
       }
     },
     beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),

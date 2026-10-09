@@ -5,6 +5,23 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Laptop, phase L3: the laptop's results in the app (phone and laptop)** (docs/LAPTOP_PLAN.md).
+  - **Import** (`LaptopResultsImport`): on start, on resume, when the folder changes, and on the laptop after each booster run. Only results whose notes are unchanged are used; with no laptop results nothing happens.
+    - The written "Why?" goes on the waiting link between the same two notes, under the reason on the card.
+    - New tag names and topics become tag suggestions (a new name shows one note: "A new tag that could fit: #name.").
+    - Copies become a new suggestion kind, `duplicate`.
+    - Each result is offered once: one that expired or was rejected never comes back.
+  - **Copies in Review:** "These two notes look like copies." with the laptop's sentence and which note Merge keeps.
+    - ✓ is **Merge**: the note with more text gains the other's missing lines (lines in both appear once, nothing rewritten, new lines above "Linked notes", the two footers joined), and the other goes to the trash.
+    - ✕ is **Not copies**, remembered in the rejections file as (id, `=other id`), so it never blocks a link.
+    - **Remove one** asks which note goes to the trash.
+    - Each has Undo.
+  - **Schema 7:** `suggestions.detail`, `suggestions.fromLaptop`, and an `imported_results` table. Upgrades from every earlier version are tested (versions 1–5 get the columns when the table is built or rebuilt, version 6 by adding them).
+  - **Laptop suggestions don't move this device's learned match bars**: they never passed them. This differs from the plan's "learned from per kind"; recorded there.
+  - **Chosen without asking, to confirm:** Merge keeps the note with more text (the older one if equal).
+  - Tests: import (5), merge text and duplicate actions (7), Review with laptop results (4), migration 6 → 7.
+
+### Added
 - **Laptop, phase L2: the booster engine (code; tested with a fake server, not yet with a real model)** (`core/booster/`, docs/LAPTOP_PLAN.md).
   - **A local AI server only.** `AiServerAddress` accepts an address only if it resolves to this computer (or, when allowed later in Settings, to the user's own network: private ranges and Tailscale), and refuses cloud addresses. `AiServerClient` speaks the OpenAI-compatible API with `dart:io` (no new package). It connects to the checked IP, uses no proxy and follows no redirects, so note text can't be carried elsewhere. It prefers IPv4 because LM Studio listens on 127.0.0.1 only, and drops a model's `<think>` reasoning from replies.
   - **The four jobs** (`BoosterRun`), in order, at most 12 questions per idle spell, stopping at the next key press or click:
