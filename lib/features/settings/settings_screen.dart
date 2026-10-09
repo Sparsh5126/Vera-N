@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../../core/copy/app_copy.dart';
+import '../../core/platform/device_kind.dart';
 import '../../core/styles/app_styles.dart';
 import 'widgets/about_section.dart';
 import 'widgets/app_section.dart';
 import 'widgets/data_section.dart';
 import 'widgets/folder_section.dart';
+import 'widgets/laptop_ai_section.dart';
 import 'widgets/suggestions_section.dart';
 
-/// Settings: one scrollable page (UI spec §11). Rows for features not built
-/// yet (sync status, laptop) join later.
+/// Settings: one scrollable page (UI spec §11). A laptop adds AI ON THIS
+/// COMPUTER; a phone shows a Laptop row (docs/LAPTOP_PLAN.md, L4).
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -49,6 +51,7 @@ class SettingsScreen extends StatelessWidget {
     const AppSection(),
     const FolderSection(),
     const SuggestionsSection(),
+    if (DeviceKind.isDesktop) const LaptopAiSection(),
     const DataSection(),
     const AboutSection(),
     const SizedBox(height: AppSize.floatingClearance),

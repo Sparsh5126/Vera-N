@@ -84,7 +84,7 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 - **Chosen without asking, to confirm with the user:** Merge keeps the note with more text (the older one if equal), and the card says which; "Remove one" lets the user pick either note.
 - Analysis on the phone needs no change.
 
-### L4. Settings on both devices
+### L4. Settings on both devices: built 2026-10-09 (tested; not yet tried with a real AI app)
 - **Phone, "Laptop" row** (UI spec §11 said "pair, test, forget", which belongs to built-in pairing later). With Syncthing it reads "Last helped 2 h ago", or "Not connected", which is a normal state. Tapping it explains Syncthing in two lines.
 - **Laptop:** an "AI on this computer" group with the server address (local), a connection test, the model, and the four jobs, each with its own switch.
 - **Onboarding page 3** says "If you have a laptop, it can help with deeper analysis…". This phase makes that true.

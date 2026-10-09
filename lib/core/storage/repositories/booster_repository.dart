@@ -56,6 +56,16 @@ class BoosterRepository {
     return latest.values.toList();
   }
 
+  /// When any laptop last finished a job, or null if none ever has: for
+  /// "Last helped" in Settings.
+  Future<DateTime?> lastHelped() async {
+    DateTime? last;
+    for (final r in await readAll()) {
+      if (last == null || r.madeAt.isAfter(last)) last = r.madeAt;
+    }
+    return last;
+  }
+
   /// Adds [results] to this device's file.
   Future<void> add(String deviceId, List<BoosterResult> results) async {
     if (results.isEmpty) return;

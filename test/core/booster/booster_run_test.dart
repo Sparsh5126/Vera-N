@@ -9,6 +9,7 @@ import 'package:vera_n/core/booster/ai_server_client.dart';
 import 'package:vera_n/core/booster/booster_prompts.dart';
 import 'package:vera_n/core/booster/booster_run.dart';
 import 'package:vera_n/core/booster/laptop_booster.dart';
+import 'package:vera_n/core/models/booster_prefs.dart';
 import 'package:vera_n/core/models/booster_result.dart';
 import 'package:vera_n/core/models/chunk_vector.dart';
 import 'package:vera_n/core/models/suggestion_draft.dart';
@@ -203,22 +204,87 @@ void main() {
     expect(server.chats, hasLength(1));
   });
 
+  LaptopBooster laptop() => LaptopBooster(
+    booster: booster,
+    analysis: analysis,
+    suggestions: suggestions,
+    settings: SettingsRepository(h.db),
+  );
+
+  Future<void> prefs(BoosterPrefs p) =>
+      SettingsRepository(h.db).saveBoosterPrefs(p);
+
+  String here() => 'http://localhost:${server.port}/v1';
+
   test(
-    'no server running: nothing happens and nothing is left to do',
+    'no AI app running: nothing happens and nothing is left to do',
     () async {
-      final port = server.port;
+      final address = here();
       await server.stop();
-      final laptop = LaptopBooster(
-        booster: booster,
-        analysis: analysis,
-        suggestions: suggestions,
-        settings: SettingsRepository(h.db),
-        address: AiServerAddress.parse('http://localhost:$port/v1'),
-      );
-      expect(await laptop.runOnce(() => false), isTrue);
+      await prefs(BoosterPrefs(address: address));
+      expect(await laptop().runOnce(() => false), isTrue);
       expect(await booster.readAll(), isEmpty);
     },
   );
+
+  test('switched off: not even the local check runs', () async {
+    await prefs(BoosterPrefs(address: here(), on: false));
+    expect(await laptop().runOnce(() => false), isTrue);
+    expect(server.requests, isEmpty);
+  });
+
+  test('only the jobs switched on run, with the chosen model', () async {
+    await prefs(
+      BoosterPrefs(address: here(), model: 'gemma-4', jobs: {BoosterKind.why}),
+    );
+    expect(await laptop().runOnce(() => false), isTrue);
+    expect(server.chats.map((c) => c.$1), [BoosterPrompts.why]);
+    expect(server.requests.last.$3!['model'], 'gemma-4');
+  });
+
+  test('the check in Settings: found with chat models only, nothing, or '
+      'refused', () async {
+    final found = await LaptopBooster.check(BoosterPrefs(address: here()));
+    expect(found.reach, BoosterReach.found);
+    expect(found.models, ['gemma-4']);
+    expect(
+      (await LaptopBooster.check(
+        const BoosterPrefs(address: 'http://8.8.8.8/v1'),
+      )).reach,
+      BoosterReach.notLocal,
+    );
+    expect(
+      (await LaptopBooster.check(const BoosterPrefs(address: 'nonsense')))
+          .reach,
+      BoosterReach.invalid,
+    );
+    final address = here();
+    await server.stop();
+    expect(
+      (await LaptopBooster.check(BoosterPrefs(address: address))).reach,
+      BoosterReach.nothing,
+    );
+  });
+
+  test('prefs survive a round trip; damaged ones fall back to defaults', () {
+    const p = BoosterPrefs(
+      on: false,
+      address: 'http://localhost:11434/v1',
+      ownNetwork: true,
+      model: 'qwen',
+      jobs: {BoosterKind.tags},
+    );
+    final back = BoosterPrefs.fromJson(p.toJson());
+    expect(back.on, isFalse);
+    expect(back.address, p.address);
+    expect(back.ownNetwork, isTrue);
+    expect(back.model, 'qwen');
+    expect(back.jobs, {BoosterKind.tags});
+    final broken = BoosterPrefs.fromJson({'jobs': 'x', 'address': 3});
+    expect(broken.address, BoosterPrefs.defaultAddress);
+    expect(broken.jobs, BoosterKind.values.toSet());
+    expect(BoosterPrefs.fromJson(null).on, isTrue);
+  });
 
   test('the model: the preferred one, else the first chat model', () {
     const ids = ['text-embedding-nomic', 'gemma-4', 'qwen'];

@@ -5,6 +5,20 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Laptop, phase L4: Settings for the laptop helper** (docs/LAPTOP_PLAN.md).
+  - **Laptop, AI ON THIS COMPUTER:**
+    - "Help from a local AI app" (on by default, described as optional);
+    - a status line with Check: ready, "Not set up" (a normal state), or why the address is refused;
+    - the address, and "Also allow my own network";
+    - the model (Automatic, or one the AI app offers; embedding models left out);
+    - one switch per job, and "Last helped".
+    - Off hides the rest, and then not even the local check runs.
+  - **Phone, SMART SUGGESTIONS:** a "Laptop" row: "Last helped: Today", or "Not set up". Tapping it explains Syncthing in two lines.
+  - The helper reads these settings before every run (`BoosterPrefs`, one JSON value in the private settings table). The check is a local request only.
+  - The laptop copy lives in `LaptopCopy`, exported by `app_copy.dart`.
+  - Tests: settings on both devices (3); the helper with prefs: off, jobs, model, the check, prefs round trip (5).
+
+### Added
 - **Laptop, phase L3: the laptop's results in the app (phone and laptop)** (docs/LAPTOP_PLAN.md).
   - **Import** (`LaptopResultsImport`): on start, on resume, when the folder changes, and on the laptop after each booster run. Only results whose notes are unchanged are used; with no laptop results nothing happens.
     - The written "Why?" goes on the waiting link between the same two notes, under the reason on the card.

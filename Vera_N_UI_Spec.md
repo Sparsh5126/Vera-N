@@ -457,6 +457,9 @@ Version
 - Smart Suggestions is the only place AI appears: no model picker, no thresholds, no jargon. One switch turns it off completely.
 - Notes folder shows the chosen folder's name; tapping it opens the folder picker to change it. If no folder is chosen (or access was removed), the row reads "On this phone only" with the line "Choose a folder so your notes stay if the app is removed." Choosing a folder moves the notes there.
 - Laptop connection is one row: pair, test connection, forget device. "Not connected" is a normal state.
+- **Built 2026-10-09 (docs/LAPTOP_PLAN.md L4), replacing the row above until built-in pairing exists:**
+  - **Phone:** a "Laptop" row in SMART SUGGESTIONS reads "Last helped: Today" (or a date), or "Not set up" (a normal state). Tapping it explains in a dialog: a laptop with Vera N can add deeper suggestions with an AI app there; share the notes folder with Syncthing; the phone works fine on its own.
+  - **Laptop:** a group AI ON THIS COMPUTER: "Help from a local AI app" (on by default; it says it's optional), a status line with Check ("Ready. The AI app answered." / "Not set up. No AI app answered at this address, which is fine." / the address is refused), Address, "Also allow my own network" (never the internet), Model (Automatic or one the app offers), four switches (Explain suggested links, Suggest new tags, Find topics, Find copies), and Last helped. Off hides the rest, and nothing runs.
 - Advanced is collapsed by default.
 - Trash keeps deleted notes for 30 days.
 - **Attachments (built 2026-10-08, user's decision):**

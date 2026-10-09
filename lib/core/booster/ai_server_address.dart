@@ -33,9 +33,6 @@ class AddressRefused implements Exception {
 class AiServerAddress {
   AiServerAddress._(this.uri, this.ownNetwork);
 
-  /// LM Studio's default (product spec §5).
-  static const fallback = 'http://localhost:1234/v1';
-
   final Uri uri;
   final bool ownNetwork;
 

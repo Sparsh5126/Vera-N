@@ -3,6 +3,7 @@ import 'dart:math';
 
 import '../../models/kind_learning.dart';
 import '../../models/app_prefs.dart';
+import '../../models/booster_prefs.dart';
 import '../db/app_database.dart';
 
 /// Per-device settings, kept in app-private storage (never synced).
@@ -18,6 +19,7 @@ class SettingsRepository {
   static const _learning = 'learning.';
   static const _unusedSince = 'attachments.unusedSince';
   static const _notificationsAsked = 'reminders.notificationsAsked';
+  static const _booster = 'booster';
 
   /// Recent searches kept, newest first.
   static const recentSearchLimit = 8;
@@ -125,6 +127,20 @@ class SettingsRepository {
     await _set(_Prefs.cleanAttachments, '${p.cleanAttachments}');
     await _set(_Prefs.reminders, '${p.reminders}');
   }
+
+  /// The laptop booster's settings (docs/LAPTOP_PLAN.md, L4).
+  Future<BoosterPrefs> boosterPrefs() async {
+    final raw = await _get(_booster);
+    if (raw == null) return const BoosterPrefs();
+    try {
+      return BoosterPrefs.fromJson(jsonDecode(raw));
+    } on FormatException {
+      return const BoosterPrefs();
+    }
+  }
+
+  Future<void> saveBoosterPrefs(BoosterPrefs p) =>
+      _set(_booster, jsonEncode(p.toJson()));
 
   /// Whether the notification prompt was shown once already (reminders).
   Future<bool> notificationsAsked() async =>

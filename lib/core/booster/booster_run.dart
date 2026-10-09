@@ -27,6 +27,7 @@ class BoosterRun {
     required this.deviceId,
     required this.embedderModel,
     required this.stopRequested,
+    this.jobs = const {...BoosterKind.values},
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now;
 
@@ -40,6 +41,9 @@ class BoosterRun {
   /// The on-device embedder's model, whose stored vectors are grouped.
   final String embedderModel;
   final bool Function() stopRequested;
+
+  /// The jobs switched on in Settings.
+  final Set<BoosterKind> jobs;
   final DateTime Function() _clock;
 
   final _byRef = <int, NoteStamp>{};
@@ -59,14 +63,15 @@ class BoosterRun {
     }
     _done.addAll((await booster.readAll()).map((r) => r.jobKey));
     final tags = await _knownTags();
-    await _why();
+    if (jobs.contains(BoosterKind.why)) await _why();
     final meanings = NoteGroups.meanings(
       (await analysis.allChunks(embedderModel))
           .where((c) => _byRef.containsKey(c.note)),
     );
-    if (!_mustStop) await _duplicates(meanings);
-    if (!_mustStop) await _topics(meanings, tags);
-    if (!_mustStop) await _tags(tags);
+    bool on(BoosterKind kind) => jobs.contains(kind) && !_mustStop;
+    if (on(BoosterKind.duplicate)) await _duplicates(meanings);
+    if (on(BoosterKind.topic)) await _topics(meanings, tags);
+    if (on(BoosterKind.tags)) await _tags(tags);
     return !_mustStop;
   }
 
