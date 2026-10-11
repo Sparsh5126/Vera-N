@@ -10,6 +10,13 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
   - A spot no monitor shows any more falls back to the default.
   - No new dependency: about 50 lines of Win32 instead of a window package.
   - Checked on Windows: moved and resized, maximized, and off-screen.
+- **Laptop, phase L5: Windows setup .exe** (user chose Inno Setup, 2026-10-11). Run `tool/build_windows_installer.ps1` to get `build/installer/VeraN-Setup-<version>.exe` (42.6 MB). The version comes from `pubspec.yaml`.
+  - It installs for the current user, with no admin prompt. It adds a Start menu entry, and a desktop icon only if ticked.
+  - Uninstalling never touches the notes or the database.
+  - Unsigned for now, so SmartScreen warns on first run.
+  - **New build tool:** Inno Setup 6, installed with winget on the build machine only. It isn't an app dependency, so app size and battery are unchanged.
+  - The exe's file description now reads "Vera N", as shown in Task Manager and SmartScreen. Company and product names are unchanged, because they decide where the app keeps its data.
+- **Measured: Windows release size.** 92.4 MB unpacked, 47.9 MB zipped. Of that, the model is 42.8 MB, `flutter_windows.dll` 20.3 MB, `onnxruntime.dll` 11.8 MB, and app code 8.6 MB.
 
 ### Fixed
 - **Screen readers heard the note's Markdown** (UI spec §7). TalkBack read a link card as `[Octopus - Wikipedia](https://…)` and links, bold and checkboxes with their symbols. Each piece of the editor's text now carries what should be heard (`MarkupSemantics`). The spoken text keeps the same length as the text, so the cursor position read out still matches. Checked on the phone: the field now reads "Link: Octopus - Wikipedia, en.wikipedia.org", then "☐ Milk and eggs". Tests: spoken text (8).

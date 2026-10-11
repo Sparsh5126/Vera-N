@@ -91,7 +91,13 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 
 ### L5. Packaging for Windows
 - **Window placement: done 2026-10-11.** The runner (`windows/runner/window_placement.cpp`, no package) saves the size, position and maximized state when the window closes, under `HKCU\Software\Vera N\Window`: per-computer window state, never in the synced folder. A spot no monitor shows any more (an unplugged screen) falls back to the default. Checked on Windows: moved and resized, maximized, and off-screen.
-- An installer (MSIX or a signed zip), with the user's own application id (backlog).
+- **Release size, measured 2026-10-11:** 92.4 MB unpacked (30 files), 47.9 MB zipped. The model is 42.8 MB of it (`model_int8.onnx`), then `flutter_windows.dll` 20.3 MB, `onnxruntime.dll` 11.8 MB, app code 8.6 MB. The model already ships inside: it is a Flutter asset.
+- **Installer: done 2026-10-11 (user chose a setup .exe made with Inno Setup over a zip or MSIX).** `windows/installer/vera_n.iss`, built by `tool/build_windows_installer.ps1` (a release build, then Inno Setup 6), gives `build/installer/VeraN-Setup-<version>.exe`, 42.6 MB.
+  - It installs for the current user only, with no admin prompt, in `%LOCALAPPDATA%\Programs\Vera N`. It adds a Start menu entry, and a desktop icon only if ticked.
+  - Uninstalling removes the app and its window placement. It never removes the notes folder or the app's database (`%APPDATA%\com.example\vera_n`).
+  - Checked 2026-10-11: silent install, the app runs, silent uninstall.
+  - Unsigned, so SmartScreen says "unknown publisher" on first run. Signing needs a code-signing certificate (later).
+  - The application id stays `com.example.vera_n` for now (user, 2026-10-11), and the installer's `AppId` GUID must never change.
 - The model ships inside, as on the phone. Release size is measured and logged.
 - No auto-update service: updates come from GitHub releases.
 
