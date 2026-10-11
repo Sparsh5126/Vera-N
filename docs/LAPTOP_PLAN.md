@@ -39,7 +39,7 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 - **Syncthing conflict files:** `x.sync-conflict-<date>-<device>.md` must **not** become new notes. Each one is read as the other version of `x.md` and shown with the existing Compare / Keep this / Keep the other / Keep both, then removed once settled. Syncthing's own `.stfolder` and `.stversions` are ignored, as dot folders already are.
 - **Analysis on the laptop:** the same incremental analysis as the phone, run in-app when the computer is idle (no typing for a few minutes) and on mains power (battery state from `battery_plus`). It stops when either ends; no service runs when the app is closed.
 - **Device id and rejections:** the laptop gets its own `rejections-<deviceid>.jsonl`, and every device already reads all of them, so a pair rejected on one device never returns on the other.
-- **Window:** a sensible minimum size (done: 400×600); the window size and position are remembered (moved to L5, packaging: it needs either runner code or a window package, and is not needed for testing).
+- **Window:** a sensible minimum size (done: 400×600); the window size and position are remembered (moved to L5; done 2026-10-11 in the runner, see L5).
 - **Tests:** a conflict file becomes a conflict, not a note; the watcher re-indexes; analysis waits for idle.
 
 ### L1. Desktop layout: done 2026-10-09 and checked on Windows (sidebar, two panes, Ctrl+N / Ctrl+F, Settings in a readable column)
@@ -90,6 +90,7 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 - **Onboarding page 3** says "If you have a laptop, it can help with deeper analysis…". This phase makes that true.
 
 ### L5. Packaging for Windows
+- **Window placement: done 2026-10-11.** The runner (`windows/runner/window_placement.cpp`, no package) saves the size, position and maximized state when the window closes, under `HKCU\Software\Vera N\Window`: per-computer window state, never in the synced folder. A spot no monitor shows any more (an unplugged screen) falls back to the default. Checked on Windows: moved and resized, maximized, and off-screen.
 - An installer (MSIX or a signed zip), with the user's own application id (backlog).
 - The model ships inside, as on the phone. Release size is measured and logged.
 - No auto-update service: updates come from GitHub releases.

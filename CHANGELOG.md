@@ -4,6 +4,13 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Added
+- **Laptop, phase L5 (start): the window opens where it was closed** (docs/LAPTOP_PLAN.md). The Windows runner saves the size, position and maximized state on close and restores them on start (`window_placement.cpp`).
+  - Kept in `HKCU\Software\Vera N\Window`: it is per-computer state, so it stays out of the synced notes folder.
+  - A spot no monitor shows any more falls back to the default.
+  - No new dependency: about 50 lines of Win32 instead of a window package.
+  - Checked on Windows: moved and resized, maximized, and off-screen.
+
 ### Fixed
 - **Screen readers heard the note's Markdown** (UI spec §7). TalkBack read a link card as `[Octopus - Wikipedia](https://…)` and links, bold and checkboxes with their symbols. Each piece of the editor's text now carries what should be heard (`MarkupSemantics`). The spoken text keeps the same length as the text, so the cursor position read out still matches. Checked on the phone: the field now reads "Link: Octopus - Wikipedia, en.wikipedia.org", then "☐ Milk and eggs". Tests: spoken text (8).
 - **A bare link on its own line crashed the note's markup scan.** `NoteMarkup.find` asked a one-group match for group 2, which throws. Any note with a pasted address on its own line would fail to open in the editor. Found by the new screen-reader tests; added a regression test (1).

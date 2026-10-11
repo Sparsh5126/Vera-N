@@ -92,6 +92,10 @@ class Win32Window {
 
   bool quit_on_close_ = false;
 
+  // How Show() reveals the window: maximized if it was closed maximized
+  // (see window_placement.h).
+  int show_command_ = SW_SHOWNORMAL;
+
   // window handle for top level window.
   HWND window_handle_ = nullptr;
 
