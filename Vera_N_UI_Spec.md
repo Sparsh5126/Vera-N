@@ -290,6 +290,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
   - **Cursor:** after a photo or drawing is added at the end, or a tap below a note that ends with one, the cursor lands on a fresh line right under it.
   - **Missing file:** an attachment whose file isn't there (still syncing) reads "This attachment isn't here yet."
   - **Elsewhere:** titles, card previews, search snippets and copies leave attachments out.
+- **Screen readers (2026-10-11):** the note's text is read as it is shown, never as Markdown. Hidden symbols are silent; a checkbox is read as ☐ or ☑ before its line; a link card as "Link: title, site"; an attachment as "Photo", "Drawing" or "Voice note". The spoken text keeps the same length as the note's text, so the cursor position read out still matches. Cards and checkboxes stay separate buttons a screen reader can activate ("Open link: …", "Not done").
 - **Link cards (built 2026-10-10, decided by the user: offline cards only, nothing fetched):**
   - **What makes one:** a web link (`http`/`https`) on a line of its own, either as shared to the app (`[Title](https://…)`, optionally with `"Description"`) or a bare address pasted or typed. A link inside a sentence stays text.
   - **Look:** a card (radius 24, hairline border) up to 360 wide: the title (two lines at most), the description when there is one (three lines, secondary colour), then a row with a link mark, the site (e.g. "youtube.com") and an open-outside mark.

@@ -171,6 +171,15 @@ abstract final class AppCopy {
   // Link cards (UI spec §7).
   static String openLink(String title) => 'Open link: $title';
   static const linkOpenFailed = "Couldn't open this link.";
+
+  /// What a screen reader says for a link card in the note's text.
+  static String linkSpoken(String title, String site) =>
+      title == site ? 'Link: $title' : 'Link: $title, $site';
+
+  /// What a screen reader says for a checkbox in the note's text (the
+  /// symbols are read as "ballot box" and "ballot box with check").
+  static const checkboxOpenSpoken = '☐';
+  static const checkboxDoneSpoken = '☑';
   static const microphoneNeeded =
       'Voice notes need the microphone. You can allow it in Settings.';
   static String duration(Duration d) =>

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/storage/files/note_markup.dart';
 import '../../../core/styles/app_styles.dart';
 import '../state/markup_editing.dart';
+import '../state/markup_semantics.dart';
 import 'checkbox_glyph.dart';
 
 /// The note editor's text: one plain Markdown text, shown as formatting.
@@ -12,6 +13,8 @@ import 'checkbox_glyph.dart';
 ///   web link on its own line shows as a card. The
 ///   Markdown symbols stay in the text but are hidden ([MarkupEditing]
 ///   keeps the cursor and deletions away from them).
+/// - Screen readers hear the text as shown, not the Markdown
+///   ([MarkupSemantics]).
 /// - The keyboard's composing underline is kept, which Hindi and other
 ///   transliterating keyboards rely on.
 class TitledTextController extends TextEditingController {
@@ -52,6 +55,7 @@ class TitledTextController extends TextEditingController {
     final lineBreak = text.indexOf('\n');
     final titleEnd = lineBreak == -1 ? text.length : lineBreak;
     final spans = NoteMarkup.find(text);
+    final spoken = MarkupSemantics.of(text, spans);
     final composing = value.composing;
     final showComposing = withComposing && value.isComposingRangeValid;
 
@@ -90,7 +94,15 @@ class TitledTextController extends TextEditingController {
       if (showComposing && a >= composing.start && b <= composing.end) {
         s = s.copyWith(decoration: TextDecoration.underline);
       }
-      children.add(TextSpan(text: text.substring(a, b), style: s));
+      final piece = text.substring(a, b);
+      final heard = spoken.substring(a, b);
+      children.add(
+        TextSpan(
+          text: piece,
+          style: s,
+          semanticsLabel: heard == piece ? null : heard,
+        ),
+      );
     }
     return TextSpan(style: base, children: children);
   }

@@ -5,6 +5,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Fixed
+- **Screen readers heard the note's Markdown** (UI spec §7). TalkBack read a link card as `[Octopus - Wikipedia](https://…)` and links, bold and checkboxes with their symbols. Each piece of the editor's text now carries what should be heard (`MarkupSemantics`). The spoken text keeps the same length as the text, so the cursor position read out still matches. Checked on the phone: the field now reads "Link: Octopus - Wikipedia, en.wikipedia.org", then "☐ Milk and eggs". Tests: spoken text (8).
 - **A bare link on its own line crashed the note's markup scan.** `NoteMarkup.find` asked a one-group match for group 2, which throws. Any note with a pasted address on its own line would fail to open in the editor. Found by the new screen-reader tests; added a regression test (1).
 
 ### Changed
