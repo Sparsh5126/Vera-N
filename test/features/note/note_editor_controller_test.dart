@@ -65,4 +65,58 @@ void main() {
     expect((await h.row(ref)).trashedAt, isNotNull);
     await editor.dispose();
   });
+  group('a note left empty is deleted on leaving', () {
+    test('typed, then cleared: the note and its file go', () async {
+      final editor = NoteEditorController(h.repo);
+      editor.onTextChanged('Short-lived');
+      await editor.save();
+      final path = (await h.row(editor.noteRef.value!)).path;
+      editor.onTextChanged(' \n ');
+      await editor.dispose();
+      expect(await noteCount(), 0);
+      expect(h.store.files.containsKey(path), isFalse);
+    });
+
+    test('an existing note cleared and left goes too', () async {
+      final ref = await h.repo.create('Old thought');
+      final editor = NoteEditorController(h.repo, ref: ref);
+      editor.onTextChanged('');
+      await editor.dispose();
+      expect(await noteCount(), 0);
+    });
+
+    test('opening a note and leaving it unchanged keeps it', () async {
+      final ref = await h.repo.create('Keep me');
+      await NoteEditorController(h.repo, ref: ref).dispose();
+      expect(await noteCount(), 1);
+    });
+
+    test('a note with only an attachment or a link is not empty', () async {
+      final photo = await h.repo.create('![](Attachments/a.jpg)');
+      final link = await h.repo.create('https://ex.com/a');
+      await NoteEditorController(h.repo, ref: photo).dispose();
+      await NoteEditorController(h.repo, ref: link).dispose();
+      expect(await noteCount(), 2);
+    });
+
+    test('text that arrived meanwhile (sync) keeps the note', () async {
+      final ref = await h.repo.create('Draft');
+      final editor = NoteEditorController(h.repo, ref: ref);
+      editor.onTextChanged('');
+      await editor.save();
+      await h.repo.updateBody(ref, 'Written on the laptop');
+      await editor.dispose();
+      expect((await h.row(ref)).body, 'Written on the laptop');
+    });
+
+    test('a trashed note is left for the trash', () async {
+      final editor = NoteEditorController(h.repo);
+      editor.onTextChanged('Bin me');
+      await editor.save();
+      final ref = await editor.trash();
+      await h.repo.updateBody(ref!, '');
+      await editor.dispose();
+      expect((await h.row(ref)).trashedAt, isNotNull);
+    });
+  });
 }

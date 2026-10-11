@@ -266,7 +266,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 └─────────────────────────┘
 ```
 
-**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a link card copies as its title with the address on the next line, 2026-10-10; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (attach, archive, Move to Locked folder / Take out of Locked folder, delete; move to folder moved below the text, as the Folder row, 2026-10-04, backlog #5). A tiny "saved" tick fades in and out; there is no save button (autosave).
+**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a link card copies as its title with the address on the next line, 2026-10-10; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (attach, archive, Move to Locked folder / Take out of Locked folder, delete; move to folder moved below the text, as the Folder row, 2026-10-04, backlog #5). A tiny "saved" tick fades in and out; there is no save button (autosave). A note left with no text (only spaces or line breaks) is deleted for good on leaving it, quietly, with no prompt (2026-10-11, user request); its saved text decides, so a note filled in by sync meanwhile stays. Only notes left in the app are removed: empty files that arrive by sync or are made in other apps are never swept.
 
 **Writing**
 - Title is optional; if empty, the first line becomes the title.

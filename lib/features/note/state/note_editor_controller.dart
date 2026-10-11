@@ -10,7 +10,8 @@ import '../../../core/utils/timings.dart';
 /// to the database a moment after typing stops, and when leaving.
 ///
 /// A new note is only created once it has some text, so opening "New
-/// note" and backing out leaves nothing behind.
+/// note" and backing out leaves nothing behind; a note left with no text
+/// is deleted on leaving.
 class NoteEditorController {
   NoteEditorController(this._repo, {int? ref}) : noteRef = ValueNotifier(ref);
 
@@ -91,9 +92,12 @@ class NoteEditorController {
     return ref;
   }
 
-  /// Saves what's left, then releases the notifiers.
+  /// Saves what's left, deletes the note if it was left empty, then
+  /// releases the notifiers.
   Future<void> dispose() async {
     await save();
+    final ref = noteRef.value;
+    if (ref != null) await _repo.deleteIfEmpty(ref);
     _disposed = true;
     noteRef.dispose();
     saves.dispose();

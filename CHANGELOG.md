@@ -4,6 +4,12 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Changed
+- **Empty notes are deleted on leaving** (UI spec §7; user request 2026-10-11). Clearing a note and leaving it (or typing in a new note, then deleting it all) used to leave an empty note behind. Now `NotesRepository.deleteIfEmpty` removes the file and the row for good when the editor closes.
+  - **Why for good, not Trash:** there is nothing to restore, and the trash would fill with untitled entries.
+  - **Why only on leaving, not a sweep:** an empty `.md` may be a file Syncthing is still copying, or one made in another app; those are never touched. The saved text is checked again before deleting.
+  - Tests: cleared new and old notes go, an unchanged note stays, attachment- or link-only notes stay, text from sync wins, trashed notes are left alone (6).
+
 ### Added
 - **Share to Vera N, and link cards** (UI spec §5 and §7, product spec §3; decided by the user 2026-10-10: offline cards only, option A of three).
   - **Why offline:** fetching a page's title would need the internet permission (the release app has none, which anyone can check), and would tell the website which link was saved and when. Options B (the laptop fetches) and C (a per-link "Get preview" tap) were set aside.

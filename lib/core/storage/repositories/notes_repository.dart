@@ -210,6 +210,20 @@ class NotesRepository {
     return (await _row(ref).getSingleOrNull())?.noteId;
   }
 
+  /// Deletes the note for good if it has no text (only spaces and line
+  /// breaks), as when the user clears a note and leaves it (UI spec §7).
+  /// The saved text decides, so a note filled in meanwhile (by sync) is
+  /// kept; trashed notes are left alone. Returns whether it was deleted.
+  Future<bool> deleteIfEmpty(int ref) async {
+    final row = await _row(ref).getSingleOrNull();
+    if (row == null || row.trashedAt != null || row.body.trim().isNotEmpty) {
+      return false;
+    }
+    if (await _store.exists(row.path)) await _store.delete(row.path);
+    await (_db.delete(_db.notes)..where((n) => n.id.equals(ref))).go();
+    return true;
+  }
+
   /// Moves the note's file into `.trash/`; the file is kept for undo.
   Future<void> trash(int ref) => _placement.trash(ref);
 
