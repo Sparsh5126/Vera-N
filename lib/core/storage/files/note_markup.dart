@@ -174,20 +174,20 @@ abstract final class NoteMarkup {
           end: m.end,
           target: m.group(1),
         ),
-      for (final m in [
-        ...WebLink.card.allMatches(text),
-        ...WebLink.bare.allMatches(text),
-      ])
-        MarkupSpan(
-          kind: MarkupKind.webLink,
-          start: m.start,
-          contentStart: m.end,
-          contentEnd: m.end,
-          end: m.end,
-          target: m.group(2) ?? m.group(1),
-        ),
+      // The address is group 2 of a card line, group 1 of a bare one.
+      for (final m in WebLink.card.allMatches(text)) _webLinkSpan(m, m[2]!),
+      for (final m in WebLink.bare.allMatches(text)) _webLinkSpan(m, m[1]!),
     ];
   }
+
+  static MarkupSpan _webLinkSpan(RegExpMatch m, String url) => MarkupSpan(
+    kind: MarkupKind.webLink,
+    start: m.start,
+    contentStart: m.end,
+    contentEnd: m.end,
+    end: m.end,
+    target: url,
+  );
 
   /// The attachments [text] embeds, in order.
   static List<String> embeds(String text) => [

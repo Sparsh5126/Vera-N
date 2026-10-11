@@ -100,6 +100,15 @@ void main() {
       );
     });
 
+    test('a bare link line is a block span too', () {
+      const t = 'Later\nhttps://ex.com/a';
+      final span = NoteMarkup.find(t)
+          .singleWhere((s) => s.kind == MarkupKind.webLink);
+      expect(span.target, 'https://ex.com/a');
+      expect(span.start, 6);
+      expect(span.end, t.length);
+    });
+
     test('a link inside a sentence stays text', () {
       const t = 'read https://ex.com/a today';
       expect(

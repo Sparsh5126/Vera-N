@@ -4,6 +4,9 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+- **A bare link on its own line crashed the note's markup scan.** `NoteMarkup.find` asked a one-group match for group 2, which throws. Any note with a pasted address on its own line would fail to open in the editor. Found by the new screen-reader tests; added a regression test (1).
+
 ### Changed
 - **Empty notes are deleted on leaving** (UI spec §7; user request 2026-10-11). Clearing a note and leaving it (or typing in a new note, then deleting it all) used to leave an empty note behind. Now `NotesRepository.deleteIfEmpty` removes the file and the row for good when the editor closes.
   - **Why for good, not Trash:** there is nothing to restore, and the trash would fill with untitled entries.
