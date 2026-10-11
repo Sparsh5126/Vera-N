@@ -8,7 +8,8 @@ import 'checkbox_glyph.dart';
 /// The note editor's text: one plain Markdown text, shown as formatting.
 /// - The first line uses the title style (the first line *is* the title).
 /// - Links show only their title, underlined; bold shows bold; checklist
-///   lines show a real checkbox to tick; bullet lines show a bullet. The
+///   lines show a real checkbox to tick; bullet lines show a bullet; a
+///   web link on its own line shows as a card. The
 ///   Markdown symbols stay in the text but are hidden ([MarkupEditing]
 ///   keeps the cursor and deletions away from them).
 /// - The keyboard's composing underline is kept, which Hindi and other
@@ -26,6 +27,9 @@ class TitledTextController extends TextEditingController {
   /// Draws an attachment (photo, drawing, voice note) in place of its
   /// `![](Attachments/name)` line, given the file name.
   Widget Function(String name)? embedBuilder;
+
+  /// Draws a web link card in place of its line, given the line's text.
+  Widget Function(String line)? webLinkBuilder;
 
   @override
   set value(TextEditingValue newValue) {
@@ -110,6 +114,7 @@ class TitledTextController extends TextEditingController {
         case MarkupKind.bullet:
         case MarkupKind.numbered:
         case MarkupKind.embed:
+        case MarkupKind.webLink:
           break;
       }
     }
@@ -117,11 +122,15 @@ class TitledTextController extends TextEditingController {
   }
 
   InlineSpan _glyph(MarkupSpan span, TextStyle style) {
-    if (span.kind == MarkupKind.embed) {
-      final build = embedBuilder;
+    if (span.isBlock) {
+      final embed = embedBuilder;
+      final webLink = webLinkBuilder;
+      final card = span.kind == MarkupKind.embed
+          ? embed?.call(span.target!)
+          : webLink?.call(text.substring(span.start, span.end));
       return WidgetSpan(
         alignment: PlaceholderAlignment.middle,
-        child: build == null ? const SizedBox.shrink() : build(span.target!),
+        child: card ?? const SizedBox.shrink(),
       );
     }
     return WidgetSpan(

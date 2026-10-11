@@ -42,6 +42,21 @@
                  name this activity directly with an action; see
                  CaptureIntents.kt. No intent filter is needed for them. -->
         </activity>
+        <!-- "Share → Vera N" for text and links (UI spec §5): opens a new note
+             holding what was shared. No screen of its own; see ShareActivity.kt. -->
+        <activity
+            android:name=".ShareActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:label="Vera N"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
         <!-- Home-screen widgets (UI spec §5): each opens a blank note. -->
         <receiver
             android:name=".QuickNoteWidget"

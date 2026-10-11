@@ -7,6 +7,11 @@ abstract final class Routes {
   static const trash = '/trash';
   static const welcome = '/welcome';
   static const newNote = '/note/new';
+
+  /// Query values of a new note shared from another app (Android Share);
+  /// must match CaptureIntents.kt.
+  static const sharedTextParam = 'text';
+  static const sharedSubjectParam = 'subject';
   static const review = '/review';
   static const revisit = '/revisit';
   static const notePattern = '/note/:ref';

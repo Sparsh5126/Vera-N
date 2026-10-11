@@ -116,4 +116,34 @@ void main() {
     );
     expect(protect(at('a **big** idea', 9), composing), composing);
   });
+
+  group('web link cards', () {
+    const card = '[Dreams](https://ex.com/a)'; // 26 characters
+    const t = 'Read\n$card\nlater'; // card 5..31
+
+    test('backspace into the card removes the whole line', () {
+      final after = t.replaceRange(30, 31, '');
+      expect(protect(at(t, 31), at(after, 30)).text, 'Read\nlater');
+    });
+
+    test('backspace at the start of the next line removes it too', () {
+      final after = t.replaceRange(31, 32, '');
+      expect(protect(at(t, 32), at(after, 31)).text, 'Read\nlater');
+    });
+
+    test('the cursor never rests inside the card', () {
+      expect(caret(protect(at(t, 5), at(t, 6))), 31);
+      expect(caret(protect(at(t, 31), at(t, 30))), 5);
+    });
+
+    test('typing after a pasted link turns it back into text', () {
+      const pasted = 'https://ex.com/a';
+      final typed = protect(at(pasted, 16), at('$pasted x', 18));
+      expect(typed.text, '$pasted x');
+      expect(
+        NoteMarkup.find(typed.text).where((s) => s.kind == MarkupKind.webLink),
+        isEmpty,
+      );
+    });
+  });
 }

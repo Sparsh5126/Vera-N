@@ -166,6 +166,11 @@ Purpose: the fastest possible route to a blank note. All entry points open a new
 
 - **Built 2026-10-08:** the two widgets (Quick note bar, New note button), the Quick Settings tile, and the three app shortcuts (Review connections only while suggestions wait). Quick capture in Settings lists "Add quick note bar", "Add New note button" and "Add Quick Settings tile"; where Android can't show its add prompt, a short line explains how to add it by hand. Recent notes widget not built (later version).
 
+*Share to Vera N (built 2026-10-10)*
+- Vera N appears in Android's Share menu for text and links. Sharing opens a new note (the same one-second capture path as the widgets) holding a link card, with the cursor on the line under it for the user's words. The note is saved right away, so going back keeps just the link.
+- The card's title is what the sharing app sent as the subject (browsers send the page title), else the first line of the shared words; any other words become the description. Nothing is fetched: the app has no internet permission.
+- Shared text without a link becomes the note's text as it is.
+
 **Settings option:** "Open app to" → Home (default) or New note.
 
 ---
@@ -261,7 +266,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 └─────────────────────────┘
 ```
 
-**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (attach, archive, Move to Locked folder / Take out of Locked folder, delete; move to folder moved below the text, as the Folder row, 2026-10-04, backlog #5). A tiny "saved" tick fades in and out; there is no save button (autosave).
+**Top bar:** back, copy (copies the whole note as the user sees it: links as titles, ☐ / ☑, no Markdown; a link card copies as its title with the address on the next line, 2026-10-10; a brief "Copied" follows; added 2026-10-04, backlog #11), pin toggle, ⋮ menu (attach, archive, Move to Locked folder / Take out of Locked folder, delete; move to folder moved below the text, as the Folder row, 2026-10-04, backlog #5). A tiny "saved" tick fades in and out; there is no save button (autosave).
 
 **Writing**
 - Title is optional; if empty, the first line becomes the title.
@@ -285,6 +290,13 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
   - **Cursor:** after a photo or drawing is added at the end, or a tap below a note that ends with one, the cursor lands on a fresh line right under it.
   - **Missing file:** an attachment whose file isn't there (still syncing) reads "This attachment isn't here yet."
   - **Elsewhere:** titles, card previews, search snippets and copies leave attachments out.
+- **Link cards (built 2026-10-10, decided by the user: offline cards only, nothing fetched):**
+  - **What makes one:** a web link (`http`/`https`) on a line of its own, either as shared to the app (`[Title](https://…)`, optionally with `"Description"`) or a bare address pasted or typed. A link inside a sentence stays text.
+  - **Look:** a card (radius 24, hairline border) up to 360 wide: the title (two lines at most), the description when there is one (three lines, secondary colour), then a row with a link mark, the site (e.g. "youtube.com") and an open-outside mark.
+  - **Title with none given:** words from the address when they read as words ("…/how-octopuses-dream" → "How octopuses dream"), otherwise the site.
+  - **Tap:** opens the link in the browser. If nothing can open it: "Couldn't open this link." Screen readers hear "Open link: <title>".
+  - **Editing:** like an attachment, the card is one piece: the cursor sits before or after it, and deleting into it (or backspace at the start of the next line) removes the whole line. Typing right after a pasted bare address turns it back into text.
+  - **Elsewhere:** titles, card previews and search snippets show the link's title; copies show the title with the address on the next line, so a copied link still works.
 
 - **Locked folder (built 2026-10-08):**
   - **Locking:** ⋮ → **Move to Locked folder** leaves the note with "Moved to Locked folder" and Undo. A phone with no screen lock gets "Set a screen lock on your phone first, then the Locked folder works." and nothing moves.

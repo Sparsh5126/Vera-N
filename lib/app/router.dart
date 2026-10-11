@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../core/feedback/motion.dart';
 import '../core/navigation/routes.dart';
 import '../core/styles/app_styles.dart';
+import '../core/utils/shared_text.dart';
 import '../features/graph/graph_screen.dart';
 import '../features/note/note_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
@@ -44,7 +45,17 @@ GoRouter buildRouter({
           _tab(Routes.settings, const SettingsScreen()),
         ],
       ),
-      GoRoute(path: Routes.newNote, builder: (_, _) => const NoteScreen()),
+      GoRoute(
+        path: Routes.newNote,
+        // Text or a link shared from another app arrives as query values.
+        builder: (_, state) => NoteScreen(
+          key: state.pageKey,
+          sharedText: SharedText.toNoteBody(
+            text: state.uri.queryParameters[Routes.sharedTextParam],
+            subject: state.uri.queryParameters[Routes.sharedSubjectParam],
+          ),
+        ),
+      ),
       GoRoute(path: Routes.review, builder: (_, _) => const ReviewScreen()),
       GoRoute(path: Routes.trash, builder: (_, _) => const TrashScreen()),
       GoRoute(path: Routes.revisit, builder: (_, _) => const RevisitScreen()),

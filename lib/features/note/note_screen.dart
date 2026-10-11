@@ -39,10 +39,15 @@ import 'widgets/titled_text_controller.dart';
 /// Write and read one note. New notes open with the keyboard up; existing
 /// ones open showing the text, and a tap anywhere starts editing.
 class NoteScreen extends ConsumerStatefulWidget {
-  const NoteScreen({super.key, this.noteRef, this.onClose});
+  const NoteScreen({super.key, this.noteRef, this.onClose, this.sharedText});
 
   /// Null for a new note.
   final int? noteRef;
+
+  /// A new note's text when another app shared something (a link card
+  /// line); it is saved right away, so it stays even if the user just
+  /// goes back.
+  final String? sharedText;
 
   /// On a wide window the note sits beside the list: back, delete and
   /// archive close it there instead of leaving a screen.
@@ -99,7 +104,11 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     _lifecycle = AppLifecycleListener(onInactive: _editor.save);
     final noteRef = widget.noteRef;
     if (noteRef == null) {
-      _text = _newText('');
+      final shared = widget.sharedText ?? '';
+      _lastText = shared;
+      _text = _newText(shared)
+        ..selection = TextSelection.collapsed(offset: shared.length);
+      if (shared.isNotEmpty) _editor.onTextChanged(shared);
       // First frame with the focused editor: the cursor is ready to type.
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => unawaited(LaunchChannel.logTypingReady()),
@@ -123,6 +132,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     final text = TitledTextController(text: body);
     text.onCheckboxToggled = () => _onTextChanged(text.text);
     text.embedBuilder = (name) => _attachments.embed(context, name);
+    text.webLinkBuilder = (line) => _attachments.webLink(context, line);
     return text;
   }
 

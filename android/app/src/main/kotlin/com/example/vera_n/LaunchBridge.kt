@@ -2,9 +2,11 @@ package com.example.vera_n
 
 import android.app.Activity
 import android.app.StatusBarManager
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
 import android.graphics.drawable.Icon
+import android.net.Uri
 import android.os.Build
 import android.os.Process
 import android.os.SystemClock
@@ -13,8 +15,9 @@ import io.flutter.plugin.common.MethodChannel
 
 /**
  * The `vera_n/launch` channel: capture and shortcut entry points (app
- * shortcuts, widgets, Quick Settings tile), the add prompts for widgets and
- * the tile, startup timing, and the app version for Settings.
+ * shortcuts, widgets, Quick Settings tile, links shared to the app), the
+ * add prompts for widgets and the tile, opening a link card's address in
+ * the browser, startup timing, and the app version for Settings.
  */
 class LaunchBridge(
     private val activity: Activity,
@@ -24,7 +27,9 @@ class LaunchBridge(
         const val CHANNEL = "vera_n/launch"
 
         /** The Flutter route an entry point opens, or null for a normal start. */
-        fun routeFor(intent: Intent?): String? = CaptureIntents.routes[intent?.action]
+        fun routeFor(intent: Intent?): String? =
+            if (intent?.action == CaptureIntents.ACTION_SHARED) CaptureIntents.sharedRoute(intent)
+            else CaptureIntents.routes[intent?.action]
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -47,7 +52,25 @@ class LaunchBridge(
                 ),
             )
             "addTile" -> result.success(requestTile())
+            "openLink" -> result.success(openLink(call.arguments as String))
             else -> result.notImplemented()
+        }
+    }
+
+    /**
+     * Hands a web address to the browser (or the app that handles it).
+     * Vera N itself never goes online, so it needs no internet permission.
+     */
+    private fun openLink(url: String): Boolean {
+        val uri = Uri.parse(url)
+        if (uri.scheme != "http" && uri.scheme != "https") return false
+        return try {
+            activity.startActivity(
+                Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE),
+            )
+            true
+        } catch (e: ActivityNotFoundException) {
+            false
         }
     }
 

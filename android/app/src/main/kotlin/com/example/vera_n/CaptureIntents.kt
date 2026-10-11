@@ -3,6 +3,7 @@ package com.example.vera_n
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 
 /**
  * The intents that open the app at a capture or shortcut target. They name
@@ -13,6 +14,7 @@ object CaptureIntents {
     const val ACTION_NEW_NOTE = "com.example.vera_n.NEW_NOTE"
     const val ACTION_SEARCH = "com.example.vera_n.SEARCH"
     const val ACTION_REVIEW = "com.example.vera_n.REVIEW"
+    const val ACTION_SHARED = "com.example.vera_n.SHARED"
 
     /** Flutter route for each action; must match lib/core/navigation/routes.dart. */
     val routes = mapOf(
@@ -25,6 +27,17 @@ object CaptureIntents {
         Intent(context, MainActivity::class.java)
             .setAction(action)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+    /**
+     * A new note holding what another app shared ([ShareActivity]): the
+     * new-note route with the shared text and subject as query values.
+     * Must match lib/core/navigation/routes.dart.
+     */
+    fun sharedRoute(intent: Intent): String =
+        Uri.Builder().path("/note/new")
+            .appendQueryParameter("text", intent.getStringExtra(Intent.EXTRA_TEXT) ?: "")
+            .appendQueryParameter("subject", intent.getStringExtra(Intent.EXTRA_SUBJECT) ?: "")
+            .build().toString()
 
     /** For widgets and the tile: opens a blank note. */
     fun newNote(context: Context, requestCode: Int): PendingIntent =

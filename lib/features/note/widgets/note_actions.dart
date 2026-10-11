@@ -61,7 +61,9 @@ class NoteActions {
   /// checklists as ☐ / ☑, no Markdown symbols.
   Future<void> copy(BuildContext context, String body) async {
     final messenger = ScaffoldMessenger.of(context);
-    await Clipboard.setData(ClipboardData(text: NoteMarkup.display(body)));
+    await Clipboard.setData(
+      ClipboardData(text: NoteMarkup.display(body, keepUrls: true)),
+    );
     NoticeSnackBar.show(messenger, AppCopy.copied);
   }
 

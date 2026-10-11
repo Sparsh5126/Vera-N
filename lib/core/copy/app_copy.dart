@@ -167,6 +167,10 @@ abstract final class AppCopy {
   static const editDrawing = 'Tap to keep drawing';
   static const attachmentMissing = "This attachment isn't here yet.";
   static const attachFailed = "Couldn't attach that.";
+
+  // Link cards (UI spec §7).
+  static String openLink(String title) => 'Open link: $title';
+  static const linkOpenFailed = "Couldn't open this link.";
   static const microphoneNeeded =
       'Voice notes need the microphone. You can allow it in Settings.';
   static String duration(Duration d) =>

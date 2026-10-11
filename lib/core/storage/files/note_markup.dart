@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 
+import 'web_link.dart';
+
 /// Kinds of Markdown the app shows as formatting instead of symbols.
-enum MarkupKind { link, bold, checkbox, bullet, numbered, embed }
+enum MarkupKind { link, bold, checkbox, bullet, numbered, embed, webLink }
 
 /// One piece of Markdown in a note's text. The file keeps the Markdown; the
 /// editor shows [contentStart]..[contentEnd] formatted, hides the symbols,
@@ -27,6 +29,7 @@ class MarkupSpan {
 
   /// For links: what the link points at (`name` in `[[name|Title]]`).
   /// For embeds: the attachment's file name in `Attachments/`.
+  /// For web links: the address.
   final String? target;
 
   /// For checkboxes: ticked (`- [x] `).
@@ -41,12 +44,13 @@ class MarkupSpan {
       kind == MarkupKind.bullet ||
       kind == MarkupKind.numbered;
 
-  /// Checkboxes and bullets are drawn as glyphs, an embed as its preview;
+  /// An attachment or a web link: a whole line drawn as one card.
+  bool get isBlock => kind == MarkupKind.embed || kind == MarkupKind.webLink;
+
+  /// Checkboxes and bullets are drawn as glyphs, a block as its card;
   /// numbers stay as written.
   bool get hasGlyph =>
-      kind == MarkupKind.checkbox ||
-      kind == MarkupKind.bullet ||
-      kind == MarkupKind.embed;
+      kind == MarkupKind.checkbox || kind == MarkupKind.bullet || isBlock;
 
   /// The character drawn as a checkbox (the ` `/`x` in `- [ ] `), a
   /// bullet (the `-` in `- `) or an attachment (the `!` of `![](…)`).
@@ -55,9 +59,8 @@ class MarkupSpan {
   /// Whether the character at [offset] is a hidden Markdown symbol.
   bool hides(int offset) {
     if (kind == MarkupKind.numbered) return false;
-    // An embed shows only its preview, drawn in place of its first
-    // character.
-    if (kind == MarkupKind.embed) {
+    // A block shows only its card, drawn in place of its first character.
+    if (isBlock) {
       return offset > start && offset < end;
     }
     if (isLine) {
@@ -74,8 +77,8 @@ class MarkupSpan {
   bool blocksCaret(int offset) {
     // A number is ordinary visible text the user may edit.
     if (kind == MarkupKind.numbered) return false;
-    // An embed is one piece: the cursor sits before or after it.
-    if (kind == MarkupKind.embed) return offset > start && offset < end;
+    // A block is one piece: the cursor sits before or after it.
+    if (isBlock) return offset > start && offset < end;
     if (isLine) return offset >= start && offset < contentStart;
     return (offset > start && offset < contentStart) ||
         (offset > contentEnd && offset < end);
@@ -171,6 +174,18 @@ abstract final class NoteMarkup {
           end: m.end,
           target: m.group(1),
         ),
+      for (final m in [
+        ...WebLink.card.allMatches(text),
+        ...WebLink.bare.allMatches(text),
+      ])
+        MarkupSpan(
+          kind: MarkupKind.webLink,
+          start: m.start,
+          contentStart: m.end,
+          contentEnd: m.end,
+          end: m.end,
+          target: m.group(2) ?? m.group(1),
+        ),
     ];
   }
 
@@ -195,17 +210,31 @@ abstract final class NoteMarkup {
   /// [text] as a reader sees it, for cards and search results: links as
   /// their titles, bold without `**`, checklists as ☐ / ☑, bullets as •,
   /// and attachments left out (their file names mean nothing to a reader
-  /// or to the AI).
+  /// or to the AI). A web link line shows its title ([WebLink.label]);
+  /// with [keepUrls] (copying) its address follows on the next line, so a
+  /// copy still has a working link.
   ///
   /// [forScreen] draws checklists as □ / ✓ instead: the app's font (Inter)
   /// has no ☐ / ☑, and Android then falls back to its color emoji, a blue
   /// ☑️ that fights the palette. Text that leaves the screen (copy, the
   /// AI's chunks) keeps ☐ / ☑, so copies and analysis are unchanged.
-  static String display(String text, {bool forScreen = false}) {
+  static String display(
+    String text, {
+    bool forScreen = false,
+    bool keepUrls = false,
+  }) {
     final open = forScreen ? '□ ' : '☐ ';
     final done = forScreen ? '✓ ' : '☑ ';
+    String webLink(Match m) {
+      final link = WebLink.parse(m[0]!)!;
+      if (!keepUrls) return link.label;
+      return link.title == null ? link.url : '${link.title}\n${link.url}';
+    }
+
     return text
         .replaceAll(_embedLine, '')
+        .replaceAllMapped(WebLink.card, webLink)
+        .replaceAllMapped(WebLink.bare, webLink)
         .replaceAllMapped(_link, (m) {
           final label = m.group(2)?.trim();
           return label == null || label.isEmpty ? m.group(1)!.trim() : label;

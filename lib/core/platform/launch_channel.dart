@@ -6,7 +6,7 @@ enum CaptureWidgetKind { bar, button }
 
 /// Dart side of the Android `vera_n/launch` bridge (`LaunchBridge.kt`):
 /// capture and shortcut entry points, the add prompts for widgets and the
-/// tile, startup timing and the app version.
+/// tile, opening links, startup timing and the app version.
 abstract final class LaunchChannel {
   static const _channel = MethodChannel('vera_n/launch');
   static var _typingReadyLogged = false;
@@ -51,6 +51,10 @@ abstract final class LaunchChannel {
     final ms = await _call<int>('sinceProcessStart');
     if (ms != null) debugPrint('VeraN startup: $ms ms to typing cursor');
   }
+
+  /// Opens a web address in the browser. False if nothing could open it.
+  static Future<bool> openLink(String url) async =>
+      await _call<bool>('openLink', url) ?? false;
 
   /// The installed version (e.g. "0.1.0"), or null off Android.
   static Future<String?> version() => _call<String>('versionName');

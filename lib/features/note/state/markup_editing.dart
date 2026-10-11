@@ -5,7 +5,8 @@ import '../../../core/storage/files/note_markup.dart';
 /// Keeps hidden Markdown intact while editing, so the user only ever sees
 /// formatting, never symbols:
 /// - the cursor steps over hidden symbols in the direction it moved;
-/// - deleting into a link removes the link; into bold markers, the bold;
+/// - deleting into a link removes the link; into an attachment or a web
+///   link card, the whole card; into bold markers, the bold;
 ///   into a checkbox or bullet, that marker (the line stays); backspace
 ///   right after a list number removes the number;
 /// - Enter on a checklist, bullet or numbered line starts the next one
@@ -82,7 +83,7 @@ abstract final class MarkupEditing {
     final e = s + previous.text.length - next.text.length;
     final text = previous.text;
     for (final span in NoteMarkup.find(text)) {
-      if (span.kind == MarkupKind.embed) {
+      if (span.isBlock) {
         final removed = _removeEmbed(text, span, s, e);
         if (removed != null) return removed;
         continue;
@@ -120,15 +121,16 @@ abstract final class MarkupEditing {
             span.start,
           );
         case MarkupKind.embed:
+        case MarkupKind.webLink:
           return null;
       }
     }
     return null;
   }
 
-  /// Deleting into an attachment, or the line break right after it
-  /// (backspace at the start of the next line), removes the whole
-  /// attachment with its line, so its markup never shows half-deleted.
+  /// Deleting into an attachment or a web link card, or the line break
+  /// right after it (backspace at the start of the next line), removes the
+  /// whole card with its line, so its markup never shows half-deleted.
   static TextEditingValue? _removeEmbed(
     String text,
     MarkupSpan span,

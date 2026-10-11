@@ -5,6 +5,13 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Share to Vera N, and link cards** (UI spec §5 and §7, product spec §3; decided by the user 2026-10-10: offline cards only, option A of three).
+  - **Why offline:** fetching a page's title would need the internet permission (the release app has none, which anyone can check), and would tell the website which link was saved and when. Options B (the laptop fetches) and C (a per-link "Get preview" tap) were set aside.
+  - **Share in:** Vera N is in Android's Share menu for text and links (`ShareActivity`, no screen of its own). It forwards to the running app like the widgets do, so the database is only ever opened once. The new note holds the link card, with the cursor on the line below, and saves at once.
+  - **The card:** a link on its own line, `[Title](https://… "Description")` or a bare address, is drawn as a card with the title, the description, and the site. Tapping it opens the browser through an Android intent (`openLink` on the launch channel; on a laptop, the system browser). Title and description come only from what the sharing app sent; with neither, words from the address or the site name.
+  - **Editing:** the card is one piece, like an attachment (`MarkupSpan.isBlock`). Copies keep the address on the line under the title.
+  - No new dependency.
+  - Tests: link format, offline labels, and display (11); shared text to note (8); editing around a card (4).
 - **Laptop, phase L4: Settings for the laptop helper** (docs/LAPTOP_PLAN.md).
   - **Laptop, AI ON THIS COMPUTER:**
     - "Help from a local AI app" (on by default, described as optional);

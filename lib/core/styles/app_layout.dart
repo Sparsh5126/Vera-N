@@ -73,6 +73,13 @@ abstract final class AppSize {
   static const double embedSize = 220;
   static const double drawingStroke = 3;
 
+  /// Widest a link card grows inside a note (it fills narrower screens).
+  static const double linkCardWidth = 360;
+
+  /// Lines a link card's title and description show before "…".
+  static const int linkTitleLines = 2;
+  static const int linkDescriptionLines = 3;
+
   /// Widest a tag, folder or link chip grows before its label is cut
   /// with "…" (a note's title is its whole first line).
   static const double chipMaxWidth = 240;
