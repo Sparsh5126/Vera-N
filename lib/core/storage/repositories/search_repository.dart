@@ -120,6 +120,15 @@ class SearchRepository {
         .get();
   }
 
+  /// [marked] from its first line with a match: the card shows three
+  /// lines, and a match further down (a list item under the title) was
+  /// cut off, so it wasn't clear why the note was found (2026-10-09).
+  static String fromMatchLine(String marked) {
+    final lines = marked.split('\n');
+    final first = lines.indexWhere((l) => l.contains(searchMatchStart));
+    return first <= 0 ? marked : lines.skip(first).join('\n');
+  }
+
   SearchHit _hit(QueryRow r) {
     final rawBody = r.readNullable<String>('raw_body');
     return SearchHit(
@@ -128,7 +137,7 @@ class SearchRepository {
       snippet: rawBody == null
           ? MarkedText.parse(
               NoteMarkup.display(
-                r.read<String>('marked_snippet'),
+                fromMatchLine(r.read<String>('marked_snippet')),
                 forScreen: true,
               ),
             )

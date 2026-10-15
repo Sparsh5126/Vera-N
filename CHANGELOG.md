@@ -4,6 +4,9 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+- **Search showed a note without the line that matched** (backlog, found 2026-10-09). The card shows three lines of the snippet, and a match further down ("दाल" in a grocery list under its title) was cut off. The snippet now starts at the first line with a match. Test: 1.
+
 ### Added
 - **When suggestions are looked for, in Settings (2026-10-15).** Under SMART SUGGESTIONS: "Looks for connections while charging" and "Last looked: Today" (or "Not yet"). A user saw no connections and couldn't tell whether the phone was waiting for the charger or had found nothing. Each analysis run records its end time in the private settings table. Tests: 2.
 

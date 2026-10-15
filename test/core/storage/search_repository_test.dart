@@ -51,6 +51,24 @@ void main() {
     expect(snippet.text.substring(match.start, match.end), 'messages');
   });
 
+  test(
+    'the snippet starts at the line that matched, so the card shows it',
+    () async {
+      await h.repo.create(
+        'Grocery list\n\n- milk\n- bread\n- दाल और चावल\n- salt',
+      );
+      final snippet = (await search.search('दाल')).single.snippet;
+      expect(snippet.text, startsWith('• दाल'));
+      expect(
+        snippet.text.substring(
+          snippet.matches.single.start,
+          snippet.matches.single.end,
+        ),
+        'दाल',
+      );
+    },
+  );
+
   test('title matches are marked too', () async {
     await h.repo.create('Time Loop\nnothing else');
     final title = (await search.search('loop')).single.title;
