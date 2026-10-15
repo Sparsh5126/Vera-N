@@ -1,3 +1,4 @@
+import '../ai_settings.dart';
 import '../../storage/files/note_markup.dart';
 
 /// A piece of a note's text the model reads at once.
@@ -15,7 +16,23 @@ class TextChunk {
 /// Splits a note into chunks of at most `maxTokens` tokens, along sentence
 /// and line ends, so each chunk is one or more whole sentences where
 /// possible (product spec §4: chunk-level embeddings, needed for "why").
+///
+/// A new chunk also starts at each paragraph (after a blank line, or at a
+/// heading), so a long note's chunks each stay on one subject: packed
+/// across paragraphs, their meaning blurred and long notes found almost no
+/// matches (measured 2026-10-15: 4 of 13 related pairs found, 10 of 13 by
+/// paragraph, no unrelated pair over the bar either way). A title of four
+/// words or more is a chunk of its own, which helps: it says what the note
+/// is about. A shorter paragraph ("Tuesday") has too little meaning to
+/// judge, as with whole notes ([AiSettings.minWords]), and stays with the
+/// next.
 abstract final class NoteChunker {
+  /// Bumped whenever chunks are cut differently, so every note is
+  /// analysed again (it is part of the analysis model id).
+  static const version = 2;
+
+  static final _paragraphBreak = RegExp(r'\n[ \t]*\n|\n[ \t]*#');
+
   /// A sentence or line: text up to and including `.`, `!`, `?`, `।` or a
   /// line end.
   static final _sentence = RegExp(r'[^\n.!?।]+[.!?।]*');
@@ -40,7 +57,15 @@ abstract final class NoteChunker {
     }
 
     for (final piece in _pieces(body, countTokens, maxTokens)) {
-      if (start != null && tokens + piece.tokens > maxTokens) flush();
+      final newParagraph =
+          start != null &&
+          _word.allMatches(body.substring(start!, end)).length >=
+              AiSettings.minWords &&
+          _paragraphBreak.hasMatch(body.substring(end, piece.start + 1));
+      if (start != null &&
+          (newParagraph || tokens + piece.tokens > maxTokens)) {
+        flush();
+      }
       start ??= piece.start;
       end = piece.end;
       tokens += piece.tokens;

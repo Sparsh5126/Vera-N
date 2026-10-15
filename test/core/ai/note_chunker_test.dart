@@ -53,4 +53,40 @@ void main() {
     expect(NoteChunker.split('', words, maxTokens: 10), isEmpty);
     expect(NoteChunker.split('\n\n  \n', words, maxTokens: 10), isEmpty);
   });
+
+  group('paragraphs', () {
+    // Twelve words: enough to stand alone (minParagraphTokens).
+    const trek =
+        'We fixed the trek dates for December with five friends from the hostel.';
+    const money =
+        'The budget per person is nine thousand rupees plus train tickets and food.';
+
+    test('each paragraph starts its own chunk, even with room left', () {
+      const body = '$trek\n\n$money';
+      final chunks = NoteChunker.split(body, words, maxTokens: 126);
+      expect(chunks.map((c) => c.text), [trek, money]);
+    });
+
+    test('a short title or date stays with the paragraph after it', () {
+      const body = 'Tuesday\n\n$trek\n\n$money';
+      final chunks = NoteChunker.split(body, words, maxTokens: 126);
+      expect(chunks, hasLength(2));
+      expect(chunks.first.text, startsWith('Tuesday'));
+      expect(chunks.first.text, endsWith(trek));
+    });
+
+    test('a heading starts a new chunk', () {
+      const body = '$trek\n# Money\n$money';
+      final chunks = NoteChunker.split(body, words, maxTokens: 126);
+      expect(chunks, hasLength(2));
+      expect(chunks.first.text, trek);
+      expect(chunks.last.text, contains(money));
+    });
+
+    test('lines without blank lines between them are still packed', () {
+      final body = List.filled(6, '- buy milk eggs bread and rice').join('\n');
+      final chunks = NoteChunker.split(body, words, maxTokens: 126);
+      expect(chunks, hasLength(1));
+    });
+  });
 }

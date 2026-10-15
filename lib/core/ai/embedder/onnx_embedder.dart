@@ -4,6 +4,7 @@ import 'package:dart_sentencepiece_tokenizer/dart_sentencepiece_tokenizer.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_onnxruntime/flutter_onnxruntime.dart';
 
+import '../chunking/note_chunker.dart';
 import '../matching/vectors.dart';
 import 'embedder.dart';
 import 'model_files.dart';
@@ -11,8 +12,11 @@ import 'model_files.dart';
 /// The bundled multilingual MiniLM, run on the phone with ONNX Runtime
 /// (ARCHITECTURE.md §8). Tokenized in Dart; vectors are mean-pooled.
 class OnnxEmbedder implements Embedder {
+  /// The model and the way notes are cut into chunks: vectors made either
+  /// way differently can't be compared, so a change re-analyses notes.
   @override
-  String get model => '${ModelFiles.name}@${ModelFiles.version}';
+  String get model =>
+      '${ModelFiles.name}@${ModelFiles.version}/c${NoteChunker.version}';
 
   static const _maxTokens = 128;
   static const _bos = 0; // <s>

@@ -238,7 +238,7 @@ Raised by the storage stage — **built as proposed, easy to change; please conf
 - Evidence: `tool/embedding_bench/README.md` and `tool/model_trim/README.md`.
 
 **On-device analysis** (built 2026-10-04)
-- `core/ai/`: `embedder/` (the `Embedder` interface; `OnnxEmbedder`; `ModelFiles`, which copies the model out of the app once under a versioned name), `chunking/NoteChunker` (sentences and lines, ≤ 126 tokens per chunk, Devanagari `।` included), `matching/` (`Vectors`: int8 quantize and cosine; `NoteMatcher`: a pair of notes scores as its best chunk pair), `scheduler/` (`AnalysisRun`, `AnalysisScheduler`), and `ai_settings.dart` (every tunable value).
+- `core/ai/`: `embedder/` (the `Embedder` interface; `OnnxEmbedder`; `ModelFiles`, which copies the model out of the app once under a versioned name), `chunking/NoteChunker` (sentences and lines, ≤ 126 tokens per chunk, Devanagari `।` included; since 2026-10-15 a new chunk starts at each paragraph or heading, and a paragraph under 4 words stays with the next; `NoteChunker.version` is part of the analysis model id, so a change re-analyses every note), `matching/` (`Vectors`: int8 quantize and cosine; `NoteMatcher`: a pair of notes scores as its best chunk pair), `scheduler/` (`AnalysisRun`, `AnalysisScheduler`), and `ai_settings.dart` (every tunable value).
 - Schema 4 adds three tables, all rebuildable:
   - `note_analysis`: the content hash and model each note was last analyzed with. A note is embedded again only when either changes.
   - `chunks`: character range, chunk text hash, model, and a 384-byte int8 vector. Unchanged chunks keep their vector.
