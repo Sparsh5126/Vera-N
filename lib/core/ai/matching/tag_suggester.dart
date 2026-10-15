@@ -15,12 +15,17 @@ class TagCandidate {
 
 /// Tag suggestions on the phone, without a language model (decided
 /// 2026-10-08): a tag several notes very close in meaning already share,
-/// which this note lacks, is suggested. Only existing tags are reused, so
+/// which this note lacks, is suggested. Since 2026-10-15 (user) one note
+/// is enough when it is very close ([oneCloseNeighbour]): most people tag
+/// few notes, and two sharing a tag was rare. Only existing tags are reused, so
 /// no near-duplicates appear (product spec §11); new tag names come later
 /// from the laptop layer.
 abstract final class TagSuggester {
-  /// Neighbours that must share a tag before it is suggested.
+  /// Neighbours that must share a tag before it is suggested...
   static const minNeighbours = 2;
+
+  /// ...unless one of them is at least this close.
+  static const oneCloseNeighbour = 0.70;
 
   /// [neighbours] are the note's strong matches, best first; [tagsOf] the
   /// tags of each; [own] and [rejected] the tags never to suggest (any
@@ -47,7 +52,8 @@ abstract final class TagSuggester {
     }
     final candidates = [
       for (final MapEntry(key: key, value: notes) in byTag.entries)
-        if (notes.length >= minNeighbours)
+        if (notes.length >= minNeighbours ||
+            notes.first.score >= oneCloseNeighbour)
           TagCandidate(
             spelling[key]!,
             notes.map((n) => n.score).reduce((a, b) => a + b) / notes.length,

@@ -37,11 +37,28 @@ void main() {
       },
     );
 
-    test('one neighbour is not enough; own and rejected tags are skipped', () {
+    test('one neighbour is enough only when very close (2026-10-15)', () {
+      List<String> tags(double score) => [
+        for (final t in TagSuggester.forNote(
+          neighbours: [n(2, score)],
+          tagsOf: {
+            2: {'dbms'},
+          },
+          own: const {},
+          rejected: const {},
+          limit: 2,
+        ))
+          t.tag,
+      ];
+      expect(tags(.69), isEmpty);
+      expect(tags(.70), ['dbms']);
+    });
+
+    test('own and rejected tags are skipped', () {
       final c = TagSuggester.forNote(
         neighbours: [n(2, .9), n(3, .8)],
         tagsOf: {
-          2: {'solo', 'music', 'plans'},
+          2: {'music', 'plans'},
           3: {'music', 'plans'},
         },
         own: const {'Music'},

@@ -174,7 +174,7 @@ class AnalysisRun {
       limit: AiSettings.tagNeighbours,
       exclude: {ref},
     );
-    if (neighbours.length < TagSuggester.minNeighbours) return const [];
+    if (neighbours.isEmpty) return const [];
     final tags = await analysis.tagsOf([ref, ...neighbours.map((n) => n.note)]);
     final candidates = TagSuggester.forNote(
       neighbours: neighbours,

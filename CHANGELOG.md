@@ -4,6 +4,10 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Changed
+- **One very close note is enough to suggest its tag (user, 2026-10-15).** The phone suggested a tag only when at least 2 close notes shared it, which was rare: most people tag few notes, and the user saw no tag suggestions. Now a tag on a single note at similarity 0.70 or more (well above the 0.60 link bar) is suggested too. Still only existing tags, still dimmed until approved. Tests: 2.
+- **Merge keeps the larger note: confirmed** by the user (2026-10-15); no change.
+
 ### Removed
 - **Three permissions added by libraries, unused by Vera N** (minimum permissions, CLAUDE.md §9): `ACCESS_NETWORK_STATE` (analysis never waits for a network), `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_SHORT_SERVICE` (nothing starts a foreground service). Removed with `tools:node="remove"`, as `WAKE_LOCK` was. The release app now asks for: record audio (voice notes), notifications and exact alarms (reminders), boot completed (keeps reminders and scheduled analysis after a restart), biometrics (locked folder) and vibrate (haptics). It still has no internet permission.
   - **Checked on the phone (2026-10-15, test app only):** with these removed, leaving the app while charging requested analysis, and the run finished about 30 s later.

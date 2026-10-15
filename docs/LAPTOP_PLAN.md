@@ -81,7 +81,7 @@ Each phase is one change: tests, phone check where it touches the phone, changel
   - Each result is offered once (`imported_results`, schema 7): an expired or rejected one never returns. "Not copies" is the pair (id, `=other id`) in the rejections file.
   - Laptop suggestions don't move this device's learned match bars (`fromLaptop`): they never passed them. **This differs from the line above ("learned from per kind").**
   - The sentence uses the secondary text colour rather than a 55% fade, which could drop below 4.5:1 contrast.
-- **Chosen without asking, to confirm with the user:** Merge keeps the note with more text (the older one if equal), and the card says which; "Remove one" lets the user pick either note.
+- **Merge keeps the note with more text** (the older one if equal), and the card says which; "Remove one" lets the user pick either note. Confirmed by the user 2026-10-15 ("keep the larger note").
 - Analysis on the phone needs no change.
 
 ### L4. Settings on both devices: built 2026-10-09 (tested; not yet tried with a real AI app)

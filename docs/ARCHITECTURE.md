@@ -292,7 +292,7 @@ Raised by the storage stage — **built as proposed, easy to change; please conf
 
 ## Tag suggestions (2026-10-08)
 
-Stored in `suggestions` with `kind = 'tag'`, `noteA` = the note to tag, `noteB` = the closest note that already has the tag (the reason), `tag` = the tag (schema 6). Rejected tags reuse the rejections table and file as the pair (note id, `#tag`). Only existing tags are suggested on the phone (`TagSuggester`).
+Stored in `suggestions` with `kind = 'tag'`, `noteA` = the note to tag, `noteB` = the closest note that already has the tag (the reason), `tag` = the tag (schema 6). Rejected tags reuse the rejections table and file as the pair (note id, `#tag`). Only existing tags are suggested on the phone (`TagSuggester`): one that at least 2 close notes share, or (since 2026-10-15, user) that 1 very close note has (similarity 0.70 or more).
 
 ## Laptop results (schema 7, 2026-10-09)
 
