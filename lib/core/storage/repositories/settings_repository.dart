@@ -20,6 +20,7 @@ class SettingsRepository {
   static const _unusedSince = 'attachments.unusedSince';
   static const _notificationsAsked = 'reminders.notificationsAsked';
   static const _booster = 'booster';
+  static const _lastAnalysis = 'analysis.lastRun';
 
   /// Recent searches kept, newest first.
   static const recentSearchLimit = 8;
@@ -71,6 +72,16 @@ class SettingsRepository {
     await _set(_deviceId, id);
     return id;
   }
+
+  /// When this device last finished looking for connections, for the
+  /// status line in Settings; null if it never has.
+  Future<DateTime?> lastAnalysis() async {
+    final raw = await _get(_lastAnalysis);
+    return raw == null ? null : DateTime.tryParse(raw);
+  }
+
+  Future<void> setLastAnalysis(DateTime at) =>
+      _set(_lastAnalysis, at.toUtc().toIso8601String());
 
   /// The Review screen's one-time gesture hint was shown (UI spec §6).
   Future<bool> reviewHintSeen() async => await _get(_reviewHintSeen) == 'true';

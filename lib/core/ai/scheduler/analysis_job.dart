@@ -12,7 +12,7 @@ Future<bool> runAnalysisOnce(
 }) async {
   final links = await storage.settings.learning('link');
   final tags = await storage.settings.learning('tag');
-  return AnalysisRun(
+  final done = await AnalysisRun(
     analysis: storage.analysis,
     suggestions: storage.suggestions,
     embedder: OnnxEmbedder(),
@@ -26,4 +26,7 @@ Future<bool> runAnalysisOnce(
       SuggestionLearning.baseFor('tag'),
     ),
   ).run();
+  // "Last looked" in Settings, so waiting and finding nothing differ.
+  await storage.settings.setLastAnalysis(DateTime.now());
+  return done;
 }

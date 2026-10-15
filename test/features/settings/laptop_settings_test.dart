@@ -24,6 +24,21 @@ void main() {
   }
 
   group('phone', () {
+    testWidgets('the status line says when it looks and when it last did', (
+      tester,
+    ) async {
+      await openAt(tester, find.text(AppCopy.looksWhileCharging));
+      expect(find.text(AppCopy.notLookedYet), findsOneWidget);
+      await app.finish(tester);
+    });
+
+    testWidgets('after a run: "Last looked: Today"', (tester) async {
+      await app.storage.settings.setLastAnalysis(DateTime.now());
+      await openAt(tester, find.text(AppCopy.looksWhileCharging));
+      expect(find.text(AppCopy.lastLooked(AppCopy.today)), findsOneWidget);
+      await app.finish(tester);
+    });
+
     testWidgets('no laptop: "Not set up", and a tap explains it', (
       tester,
     ) async {

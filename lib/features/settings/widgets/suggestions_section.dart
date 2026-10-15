@@ -10,6 +10,7 @@ import '../../../core/settings/app_prefs_controller.dart';
 import '../../../shared/widgets/setting_row.dart';
 import '../../../shared/widgets/undo_snack_bar.dart';
 import '../state/settings_controller.dart';
+import 'analysis_status_row.dart';
 import 'laptop_row.dart';
 import 'reminder_settings.dart';
 import 'settings_group.dart';
@@ -51,6 +52,7 @@ class _SuggestionsSectionState extends ConsumerState<SuggestionsSection> {
                     )
                   : null,
             ),
+            if (prefs.suggestions) const AnalysisStatusRow(),
             const ReminderSettings(),
             // A phone shows when a laptop last helped (LAPTOP_PLAN L4).
             if (DeviceKind.isPhone) const LaptopRow(),

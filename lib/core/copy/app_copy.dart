@@ -282,6 +282,15 @@ abstract final class AppCopy {
   static const syncStatus = 'Status';
   static const suggestConnections = 'Suggest connections';
   static const analyzeOnlyWhenCharging = 'Analyze only when charging';
+
+  /// The quiet status line under the switches: when it looks, and when it
+  /// last did. Never a count, never a nudge.
+  static const looksWhileCharging = 'Looks for connections while charging';
+  static const looksWhileIdle = 'Looks for connections while charging or idle';
+  static const looksOnLaptop =
+      'Looks for connections when you’re away and it’s plugged in';
+  static String lastLooked(String day) => 'Last looked: $day';
+  static const notLookedYet = 'Not yet';
   static const laptopConnection = 'Laptop connection';
   static const connected = 'Connected';
   static const notConnected = 'Not connected';

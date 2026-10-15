@@ -21,6 +21,11 @@ final notesFolderNameProvider = FutureProvider.autoDispose<String?>(
   (ref) => ref.watch(storageProvider).notesFolderName(),
 );
 
+/// When this device last looked for connections (status line).
+final lastAnalysisProvider = FutureProvider.autoDispose<DateTime?>(
+  (ref) => ref.watch(storageProvider).settings.lastAnalysis(),
+);
+
 /// The installed version, or null where it can't be read.
 final appVersionProvider = FutureProvider<String?>(
   (ref) => LaunchChannel.version(),
