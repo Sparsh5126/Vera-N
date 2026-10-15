@@ -4,6 +4,16 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Removed
+- **Three permissions added by libraries, unused by Vera N** (minimum permissions, CLAUDE.md §9): `ACCESS_NETWORK_STATE` (analysis never waits for a network), `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_SHORT_SERVICE` (nothing starts a foreground service). Removed with `tools:node="remove"`, as `WAKE_LOCK` was. The release app now asks for: record audio (voice notes), notifications and exact alarms (reminders), boot completed (keeps reminders and scheduled analysis after a restart), biometrics (locked folder) and vibrate (haptics). It still has no internet permission.
+  - **Checked on the phone (2026-10-15, test app only):** with these removed, leaving the app while charging requested analysis, and the run finished about 30 s later.
+
+### Changed
+- **Release APKs are built per CPU type** (`flutter build apk --release --split-per-abi`): arm64 70.2 MB, armeabi-v7a 62.8 MB, x86_64 75.3 MB, against 104.6 MB for one APK holding all three (measured 2026-10-15). Install the arm64 one on a modern phone.
+
+### Checked
+- **Long notes on the phone (2026-10-15, test app, the 15 notes of the matching set in a test folder):** after one background run, the long notes (DBMS notes, trek plan, journal) had suggestions, all five in the first Review batch were right (matched on the paragraph or title that fits), "similar in meaning" search found the related DBMS note, and Settings read "Last looked: Today". No tag was suggested: the rule needs two close notes sharing a tag, and only one did (open question for the user).
+
 ### Fixed
 - **Search showed a note without the line that matched** (backlog, found 2026-10-09). The card shows three lines of the snippet, and a match further down ("दाल" in a grocery list under its title) was cut off. The snippet now starts at the first line with a match. Test: 1.
 
