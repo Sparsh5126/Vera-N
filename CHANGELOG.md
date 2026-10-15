@@ -5,12 +5,14 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Fixed
-- **Long notes got almost no suggestions (user, 2026-10-15).** Chunks were packed up to 126 tokens across paragraphs, so a long note's chunks mixed several subjects and their meaning blurred below the match bar. A new chunk now starts at each paragraph (blank line) or heading. A paragraph under 4 words (a date, "Tuesday") stays with the next, and a longer title stands alone, which helps: it says what the note is about.
+- **Long notes got almost no suggestions (user, 2026-10-15).** Chunks were packed up to 126 tokens across paragraphs, so a long note's chunks mixed several subjects and their meaning blurred below the match bar. A new chunk now starts at each new line: on a phone a thought often ends with one Enter, not a blank line (measured: with blank-line paragraphs only, notes typed that way still found 4 of 13). The items of a list (bullets, checkboxes, numbers) stay together, since a list is one subject. Text under 4 words (a date, "Tuesday") stays with the next line, and a longer title stands alone, which helps: it says what the note is about.
   - **Measured with the real model on Windows** (`integration_test/long_note_matching_test.dart`, a hand-written set of 13 related and 78 unrelated pairs, long notes in English and Hindi; indicative only):
     - before: 4 of 13 related pairs found;
     - after: 10 of 13;
     - unrelated pairs over the bar: 0 of 78 both times, but the closest unrelated pair is at 0.58, close to the 0.60 bar.
-    - Whole-note averages were tried and found less (3 of 13), so they are not used.
+    - the same notes typed with one Enter between thoughts: also 10 of 13;
+    - packing smaller (64 / 48 / 32 tokens) found 6 / 7 / 9, and 32 let one unrelated pair over the bar;
+    - whole-note averages found less (5 of 13), so they are not used.
   - **Cost:** about 2.4 times as many chunks to embed for long notes (25 → 59 on this set), only while charging. Short notes are unchanged.
   - **Every note is analysed once more** after the update: `NoteChunker.version` is now part of the analysis model id. Until a note is re-analysed it has no suggestions and isn't found by "similar in meaning" search. Batches of 200 notes, only while charging.
   - The phone's tag suggestions use the same matching (a tag already on at least 2 close notes), so they benefit too.

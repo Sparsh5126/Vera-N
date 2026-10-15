@@ -36,23 +36,11 @@ void main() {
         ))
           c.text,
       ];
-      List<String> paragraphs(String body, int maxTokens) => [
-        for (final p in body.split(RegExp(r'\n\s*\n')))
-          ...sentences(p, maxTokens),
-      ];
-
       final cutters = <String, Cutter>{
-        // Before 2026-10-15: packed across paragraphs.
-        'old: packed 126': (b) => sentences(
-          b.replaceAll(RegExp(r'\n\s*\n'), '\n'),
-          AiSettings.chunkTokens,
-        ),
-        'NoteChunker (shipped)': (b) => sentences(b, AiSettings.chunkTokens),
-        'packed 64': (b) => sentences(b, 64),
-        'packed 48': (b) => sentences(b, 48),
-        'packed 32': (b) => sentences(b, 32),
-        'paragraphs <=126': (b) => paragraphs(b, AiSettings.chunkTokens),
-        'paragraphs <=64': (b) => paragraphs(b, 64),
+        'NoteChunker': (b) => sentences(b, AiSettings.chunkTokens),
+        // The same notes typed with one Enter between thoughts.
+        'NoteChunker, one-Enter notes': (b) =>
+            sentences(_oneEnter(b), AiSettings.chunkTokens),
       };
       final texts = {...MatchingEvalSet.notes, ...MatchingEvalSet.short};
       final unrelated = <(String, String)>[
@@ -79,7 +67,7 @@ void main() {
           for (final x in pieces[a]!)
             for (final y in pieces[b]!) Vectors.cosine(x, y),
         ].reduce(max);
-        if (cut.key.startsWith('NoteChunker')) {
+        if (cut.key == 'NoteChunker') {
           for (final (a, b) in MatchingEvalSet.related) {
             out.writeln('  $a ~ $b: ${best(a, b).toStringAsFixed(2)}');
           }
@@ -98,11 +86,12 @@ void main() {
           ),
         );
       }
-      // Whole notes: the mean of a note's pieces (paragraphs <= 64).
+      // Whole notes: the mean of a note's chunks.
       final means = <String, Float32List>{};
       for (final t in texts.entries) {
         means[t.key] = _mean([
-          for (final p in paragraphs(t.value, 64)) await vector(p),
+          for (final p in sentences(t.value, AiSettings.chunkTokens))
+            await vector(p),
         ]);
       }
       double whole(String a, String b) => _dot(means[a]!, means[b]!);
@@ -130,6 +119,8 @@ String _row(String name, List<double> related, List<double> unrelated, int n) {
       '| ${unrelated.where((s) => s >= bar).length}/${unrelated.length} '
       '| ${f(unrelated.reduce(max))} | $n';
 }
+
+String _oneEnter(String body) => body.replaceAll(RegExp(r'\n\s*\n'), '\n');
 
 Float32List _mean(List<Uint8List> vectors) {
   final out = Float32List(vectors.first.length);

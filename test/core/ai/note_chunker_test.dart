@@ -83,10 +83,28 @@ void main() {
       expect(chunks.last.text, contains(money));
     });
 
-    test('lines without blank lines between them are still packed', () {
-      final body = List.filled(6, '- buy milk eggs bread and rice').join('\n');
+    test('one Enter is enough: each line starts its own chunk', () {
+      const body = '$trek\n$money';
       final chunks = NoteChunker.split(body, words, maxTokens: 126);
-      expect(chunks, hasLength(1));
+      expect(chunks.map((c) => c.text), [trek, money]);
+    });
+
+    test('the items of a list stay together', () {
+      for (final item in ['- ', '- [ ] ', '1. ']) {
+        final body = List.filled(
+          6,
+          '${item}buy milk eggs bread rice',
+        ).join('\n');
+        final chunks = NoteChunker.split(body, words, maxTokens: 126);
+        expect(chunks, hasLength(1), reason: item);
+      }
+    });
+
+    test('a list after a line of text is a chunk of its own', () {
+      final list = List.filled(3, '- buy milk eggs bread rice').join('\n');
+      final chunks = NoteChunker.split('$trek\n$list', words, maxTokens: 126);
+      expect(chunks, hasLength(2));
+      expect(chunks.first.text, trek);
     });
   });
 }
