@@ -519,4 +519,4 @@ Version
 - ~~Exact behavior of the Folders and Tags switch on Home~~: decided 2026-10-04, see section 5.
 - ~~Where accepted links are stored~~: decided 2026-10-04, inline in a "Linked notes" footer (main spec §5).
 - Whether the later "Recent notes" widget is worth it, given privacy of titles on the home screen.
-- Whether a cold Flutter start meets the one-second capture target, or a minimal capture entry point is needed.
+- ~~Whether a cold Flutter start meets the one-second capture target, or a minimal capture entry point is needed.~~ Measured 2026-10-15 (test app, profile build, new-note shortcut from a stopped app): 683–735 ms to the typing cursor, 1,249 ms on the very first start after install. Android's own start time: 777–827 ms (1,454 ms first). No separate entry point needed.

@@ -12,6 +12,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - **Release APKs are built per CPU type** (`flutter build apk --release --split-per-abi`): arm64 70.2 MB, armeabi-v7a 62.8 MB, x86_64 75.3 MB, against 104.6 MB for one APK holding all three (measured 2026-10-15). Install the arm64 one on a modern phone.
 
 ### Checked
+- **Cold start meets the one-second capture target (2026-10-15, phone, test app):** from a stopped app to the typing cursor of a new note, 735 and 683 ms; 1,249 ms on the first start after installing. Android's own measure (`am start -W`): 827, 777 and 1,454 ms.
 - **Long notes on the phone (2026-10-15, test app, the 15 notes of the matching set in a test folder):** after one background run, the long notes (DBMS notes, trek plan, journal) had suggestions, all five in the first Review batch were right (matched on the paragraph or title that fits), "similar in meaning" search found the related DBMS note, and Settings read "Last looked: Today". No tag was suggested: the rule needs two close notes sharing a tag, and only one did (open question for the user).
 
 ### Fixed
