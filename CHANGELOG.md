@@ -9,6 +9,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 - **New tag names copied the prompt's example.** The tag and topic prompts gave "trek-planning" as an example, and the model put it, and unrelated existing tags, on unrelated notes (a soil-sensor note got "trek-planning, dbms"; a mutual-funds note "trek, fitness"). The prompts now have no example name and use an existing tag only when the note is clearly about it.
 
 ### Checked
+- **Syncthing between the phone and the laptop (2026-10-16, test folders only).** Syncthing 2.1.6 on Windows (official release, checksum verified) and Syncthing-Fork 2.1.6.0 on the phone, paired and sharing one folder: the phone's `Documents/VeraPerfTest` and the laptop's `VeraSyncTest`. The phone was on mobile data, so the two were connected over the USB cable (`adb reverse`), not the internet. All 15 test notes reached the laptop, and a note written on the laptop reached the phone within seconds. Not yet checked: the laptop app's AI results reaching the phone through the folder (the AI app was closed).
 - **The four laptop jobs with a real model (2026-10-15, Qwen 3.5 9B, LM Studio, the matching set's test notes):**
   - "Why?": 5 of 5 sentences right, 1.0–1.6 s each (for example "Both notes discuss using a capacitive sensor for a long-lasting soil moisture monitoring project.").
   - Copies: the near copy found, with a sentence; two notes only on the same topic correctly not copies. 0.5–1.9 s.
