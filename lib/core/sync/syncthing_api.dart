@@ -40,6 +40,18 @@ class SyncthingApi {
   Future<Map<String, Object?>> getOptions() =>
       _map('GET', '/rest/config/options');
 
+  /// The TCP port it accepts other devices on (for the pairing reply).
+  Future<int?> listenPort() async {
+    final status = await _map('GET', '/rest/system/status');
+    final services = status['connectionServiceStatus'];
+    if (services is! Map) return null;
+    for (final key in services.keys) {
+      final m = RegExp(r'^tcp://[^ ]*:(\d+)$').firstMatch('$key');
+      if (m != null) return int.parse(m.group(1)!);
+    }
+    return null;
+  }
+
   /// Changes the engine's options (only the given keys).
   Future<void> setOptions(Map<String, Object?> options) =>
       _call('PATCH', '/rest/config/options', options);

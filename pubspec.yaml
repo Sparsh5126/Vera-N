@@ -84,6 +84,8 @@ flutter:
     - assets/models/minilm-l12-en-hi/model_int8.onnx
     - assets/models/minilm-l12-en-hi/tokenizer.json
     - assets/models/minilm-l12-en-hi/LICENSE
+    # Pairing words (BIP-39 English list; docs/LAPTOP_PLAN.md, S2).
+    - assets/pairing/words_en.txt
 
   # Bundled, never fetched: the app must not go online (CLAUDE.md §9).
   fonts:
