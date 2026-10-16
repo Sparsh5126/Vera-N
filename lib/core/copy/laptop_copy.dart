@@ -45,7 +45,7 @@ abstract final class LaptopCopy {
   static const explainTitle = 'Help from a laptop';
   static const explain =
       'Vera N on a laptop can add deeper suggestions with an AI app there. '
-      'Share your notes folder with it using Syncthing, and its suggestions '
-      'appear here. This phone works fine on its own.';
+      'Pair them under Sync with your laptop, and its suggestions appear '
+      'here. This phone works fine on its own.';
   static const gotIt = 'Got it';
 }

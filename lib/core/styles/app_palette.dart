@@ -9,6 +9,14 @@ part of 'app_styles.dart';
 /// glows, shadows or texture. Dark is the same section printed on black
 /// stock, composed rather than inverted.
 ///
+/// The pairing QR code (docs/LAPTOP_PLAN.md, S2): pure black on white in
+/// both themes, the one exception to "never pure black or white", because
+/// scanners read inverted or tinted codes badly.
+abstract final class AppQrColors {
+  static const ink = Color(0xFF000000);
+  static const paper = Color(0xFFFFFFFF);
+}
+
 /// Read in widgets with `context.colors`.
 @immutable
 class AppPalette extends ThemeExtension<AppPalette> {

@@ -5,6 +5,17 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
+- **Built-in sync, part 2: the mirror, the service and the screens (built; device test next)** (docs/LAPTOP_PLAN.md, S).
+  - **Settings, SYNC:** "Sync with your phone" (laptop) / "Sync with your laptop" (phone): "Not paired", "In sync with …", "Last synced: …", and Unpair. Hidden in builds without the engine.
+  - **Laptop pairing window:** the QR code (black on white in both themes, for scanners) and the six words, open 5 minutes; "Waiting for your phone…", then "Paired".
+  - **Phone:** "Scan the code" (camera, decoded on the phone by zxing-cpp) or "Type the six words"; clear messages when the laptop isn't found or the words don't match.
+  - **The service** (`SyncService`): runs the engine only while paired (or pairing). On the phone it stops a minute after leaving the app; on the laptop it runs while Vera N runs and quits with it.
+  - **Phone mirror** (`MirrorBridge`): the engine shares a private copy; every 20 s while open (and on leaving) changes are copied both ways between it and the user's folder. A note changed on both sides keeps the folder's version and saves the other as a conflict copy for Compare / Keep. What arrives is indexed at once and laptop results are offered.
+  - **Words:** onboarding (laptop) and the phone's Laptop row now say "pair them in Settings" instead of naming Syncthing.
+  - **Permissions (Android):** network (INTERNET), needed for any connection, even on one's own Wi-Fi; the engine's internet relays and discovery are off. Camera, asked only when scanning. Windows asks once to allow Vera N through the firewall.
+  - **New packages:** `qr_flutter` 4.1.0 (draws the code; pure Dart), `flutter_zxing` 3.1.0 (scans; zxing-cpp, no Google services; 2.0 MB packed per CPU on Android, 5.9 MB on Windows). `archive` raised to 4.5.2 (the new `image` needs it).
+  - **Size:** the engine adds about 12 MB packed per CPU type to the APK (27.5 MB installed on arm64) and 27.4 MB to Windows.
+  - Tests: the mirror (6), two real engines paired and syncing both ways (1).
 - **Built-in sync, part 1: the engine and pairing core (in progress; not yet in the app's screens)** (docs/LAPTOP_PLAN.md, S; user, 2026-10-16: "for him it should be just the vera n app settings not another app"; chose Syncthing inside Vera N, QR code and word code, and a mirror copy on the phone).
   - **The engine** (`core/sync/sync_engine.dart`): Vera N starts Syncthing (MPL-2.0) itself, in its own folder, with a random API key and its page on 127.0.0.1 only. Internet relays, global discovery, NAT port opening, usage and crash reports and upgrades are off; only local discovery stays on. It picks free ports, so another Syncthing on the same computer is left alone. `SyncthingApi` drives it through that local API.
   - **Shipping it:** `tool/fetch_sync_engine.ps1` downloads the official Windows build and the Android build from Syncthing-Fork 2.1.6.0 and checks pinned SHA-256 hashes; the binaries stay out of git. Windows installs `syncthing.exe` next to the app; Android packs `libsyncthingnative.so` as a native library, unpacked at install so it can run (`useLegacyPackaging`).

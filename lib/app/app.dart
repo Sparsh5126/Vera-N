@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show AppExitResponse;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../core/ai/scheduler/analysis_scheduler.dart';
 import '../core/ai/scheduler/desktop_analysis.dart';
 import '../core/booster/laptop_booster.dart';
+import '../core/sync/sync_providers.dart';
 import '../core/ai/suggestions/suggestion_providers.dart';
 import '../core/copy/app_copy.dart';
 import '../core/models/app_prefs.dart';
@@ -55,6 +57,7 @@ class _AppState extends ConsumerState<App> {
       onPause: () {
         FrameStats.report();
         storage.onPause();
+        ref.read(syncServiceProvider)?.pause();
         final prefs = ref.read(appPrefsProvider);
         if (prefs.suggestions) {
           unawaited(
@@ -62,8 +65,14 @@ class _AppState extends ConsumerState<App> {
           );
         }
       },
+      // The sync engine is a separate program: it quits with Vera N.
+      onExitRequested: () async {
+        await ref.read(syncServiceProvider)?.shutdown();
+        return AppExitResponse.exit;
+      },
       onResume: () {
         storage.onResume();
+        unawaited(ref.read(syncServiceProvider)?.resume());
         // Notifications may have been allowed meanwhile (prompt, settings).
         ref.read(notificationsRecheckProvider.notifier).recheck();
       },

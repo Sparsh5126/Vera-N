@@ -1,4 +1,5 @@
 export 'laptop_copy.dart';
+export 'sync_copy.dart';
 export 'onboarding_copy.dart';
 
 /// Every user-facing string in Vera N (UI spec §4–§12), so wording changes

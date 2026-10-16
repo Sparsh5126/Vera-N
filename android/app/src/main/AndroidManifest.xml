@@ -7,6 +7,15 @@
          Settings; otherwise a reminder may come a few minutes late. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- Built-in sync (docs/LAPTOP_PLAN.md, S; user, 2026-10-16): the
+         paired phone and laptop talk straight to each other on the user's
+         own Wi-Fi. Internet relays and internet discovery are switched off
+         in the engine, so nothing goes through anyone else's server. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Scanning the pairing code; asked only when the user taps "Scan the
+         code". The words need no permission. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <!-- Added by WorkManager but not needed (minimum permissions, CLAUDE.md
          §9): from Android 7 on the system's job scheduler holds the wake
          lock for background work. -->

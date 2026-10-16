@@ -65,7 +65,9 @@ class SyncService {
   }
 
   /// App left: stop after [stopAfter] (a quick return keeps it running).
+  /// A laptop keeps syncing while Vera N runs, minimised or not.
   void pause() {
+    if (DeviceKind.isDesktop) return;
     _stopTimer?.cancel();
     _stopTimer = Timer(stopAfter, () => unawaited(_stop()));
   }
@@ -109,6 +111,9 @@ class SyncService {
     await resume();
     return laptop;
   }
+
+  /// Vera N is quitting: the engine it started quits too.
+  Future<void> shutdown() => _stop();
 
   Future<void> unpair() async {
     final engine = _engine;

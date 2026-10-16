@@ -38,13 +38,12 @@ abstract final class OnboardingCopy {
       'The thinking happens on this computer.';
   static const onboardingHowBodyDesktop =
       'Suggestions are worked out here, never sent anywhere. If you also use '
-      'Vera N on your phone, your notes travel between them only through '
-      'your own sync (such as Syncthing). We have no servers that see your '
-      'notes.';
+      'Vera N on your phone, pair them in Settings: your notes then travel '
+      'straight between them over your own Wi-Fi. We have no servers that '
+      'see your notes.';
   static const onboardingFolderBodyDesktop =
-      'Pick a folder for your notes, such as a new “Vera N” in Documents. If '
-      'you also use Vera N on your phone, pick the folder Syncthing shares '
-      'with it. Notes are plain files you can open in other apps. Nothing is '
+      'Pick a folder for your notes, such as a new “Vera N” in Documents. '
+      'Notes are plain files you can open in other apps. Nothing is '
       'uploaded.';
   static const onboardingNameBodyDesktop =
       'Only for the greeting. It stays on your devices.';

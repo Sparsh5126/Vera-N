@@ -8,28 +8,29 @@ import '../../../core/storage/storage_providers.dart';
 import '../../../shared/widgets/setting_row.dart';
 import '../state/settings_controller.dart';
 import 'settings_group.dart';
+import 'sync_row.dart';
 
-/// SYNC: where notes live. Tapping opens the folder picker; notes move to
-/// the chosen folder. Hidden where folders can't be picked (desktop).
+/// SYNC: where notes live (tapping opens the folder picker; notes move to
+/// the chosen folder), and built-in sync with the other device.
 class FolderSection extends ConsumerWidget {
   const FolderSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (!ref.watch(storageProvider).canChooseFolder) {
-      return const SizedBox.shrink();
-    }
+    final canChoose = ref.watch(storageProvider).canChooseFolder;
     final name = ref.watch(notesFolderNameProvider).value;
     final settings = ref.read(settingsControllerProvider);
     return SettingsGroup(
       label: AppCopy.sectionSync,
       children: [
-        SettingRow(
-          label: AppCopy.notesFolder,
-          value: name ?? AppCopy.notesFolderNone,
-          hint: name == null ? AppCopy.notesFolderNoneHint : null,
-          onTap: () => unawaited(settings.chooseFolder()),
-        ),
+        if (canChoose)
+          SettingRow(
+            label: AppCopy.notesFolder,
+            value: name ?? AppCopy.notesFolderNone,
+            hint: name == null ? AppCopy.notesFolderNoneHint : null,
+            onTap: () => unawaited(settings.chooseFolder()),
+          ),
+        const SyncRow(),
       ],
     );
   }

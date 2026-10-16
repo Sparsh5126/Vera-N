@@ -137,6 +137,9 @@ abstract final class AppSize {
 
   /// Widest a column of text grows on large screens.
   static const double readableWidth = 680;
+
+  /// The pairing QR code on the laptop, big enough to scan from arm's length.
+  static const double pairingQr = 240;
 }
 
 /// Borders: flat surfaces with a thin line, no shadows.
