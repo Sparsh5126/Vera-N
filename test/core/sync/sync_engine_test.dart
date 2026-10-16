@@ -45,4 +45,26 @@ void main() {
     skip: available ? false : 'sync engine not fetched',
     timeout: const Timeout(Duration(minutes: 2)),
   );
+
+  test(
+    'two starts at the same moment share one engine',
+    () async {
+      final home = await Directory.systemTemp.createTemp('vera_n_engine2');
+      final engine = SyncEngine(
+        binary: File(binary).absolute.path,
+        home: home.path,
+      );
+      try {
+        final both = await Future.wait([engine.start(), engine.start()]);
+        expect(identical(both[0], both[1]), isTrue);
+        expect(await both[0].healthy(), isTrue);
+        expect(identical(await engine.start(), both[0]), isTrue);
+      } finally {
+        await engine.stop();
+        await home.delete(recursive: true);
+      }
+    },
+    skip: available ? false : 'sync engine not fetched',
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
 }

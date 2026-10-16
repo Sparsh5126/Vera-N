@@ -264,11 +264,23 @@ abstract final class PairingGuest {
       }
     });
     final ask = utf8.encode(jsonEncode({'veran': 1, 'find': code.findTag}));
-    final to = broadcast ?? InternetAddress('255.255.255.255');
-    final timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      socket.send(ask, to, findPort);
-    });
-    socket.send(ask, to, findPort);
+    // Many Android builds drop sends to 255.255.255.255, so the search also
+    // goes to each home network's own broadcast address (x.y.z.255).
+    final targets = broadcast != null
+        ? [broadcast]
+        : [InternetAddress('255.255.255.255'), ...await _subnetBroadcasts()];
+    void send() {
+      for (final to in targets) {
+        try {
+          socket.send(ask, to, findPort);
+        } on SocketException {
+          // That network can't be reached; the others still can.
+        }
+      }
+    }
+
+    final timer = Timer.periodic(const Duration(seconds: 1), (_) => send());
+    send();
     try {
       return await found.future.timeout(searchFor);
     } on TimeoutException {
@@ -278,6 +290,13 @@ abstract final class PairingGuest {
       socket.close();
     }
   }
+
+  /// x.y.z.255 for each of this device's home-network addresses (home
+  /// networks are almost always /24).
+  static Future<List<InternetAddress>> _subnetBroadcasts() async => [
+    for (final a in await PairingHost.homeAddresses())
+      InternetAddress('${a.substring(0, a.lastIndexOf('.'))}.255'),
+  ];
 
   static Future<Map<String, Object?>> _post(
     String address,

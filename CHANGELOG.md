@@ -5,7 +5,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Added
-- **Built-in sync, part 2: the mirror, the service and the screens (built; device test next)** (docs/LAPTOP_PLAN.md, S).
+- **Built-in sync, part 2: the mirror, the service and the screens (built; checked on the devices, see Checked)** (docs/LAPTOP_PLAN.md, S).
   - **Settings, SYNC:** "Sync with your phone" (laptop) / "Sync with your laptop" (phone): "Not paired", "In sync with …", "Last synced: …", and Unpair. Hidden in builds without the engine.
   - **Laptop pairing window:** the QR code (black on white in both themes, for scanners) and the six words, open 5 minutes; "Waiting for your phone…", then "Paired".
   - **Phone:** "Scan the code" (camera, decoded on the phone by zxing-cpp) or "Type the six words"; clear messages when the laptop isn't found or the words don't match.
@@ -24,10 +24,17 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
   - Tests: the real engine on Windows (1, skipped where it isn't fetched), the code and invite (4), pairing over loopback (4).
 
 ### Fixed
+- **Built-in sync, found on the devices (2026-10-16):**
+  - **"Couldn't find your laptop" on the phone.** The phone's search went only to 255.255.255.255, which many Android builds drop. It now also goes to each home network's own broadcast address (x.y.z.255).
+  - **The engine could start twice** (pairing and the app resuming at the same moment), and the second copy failed on the first one's lock. Starts are now shared, an old process ending no longer clears the new one's state, and the engine stays up while a pairing window is open, even before a device is paired.
+  - **The laptop closing the connection** during pairing made the phone stop instead of trying its next address.
+  - **The QR code broke the pairing window's layout** ("LayoutBuilder does not support intrinsic dimensions"). It now sits in a fixed 240-point box in a scrolling dialog. Test: 2.
+  - **A closed engine connection** could still be called; it now fails at once with a clear error. Test: 1 (two starts share one engine).
 - **The laptop helper got empty answers from thinking models (found 2026-10-15 with Qwen 3.5 9B in LM Studio).** The model spent the whole 200-token reply budget on hidden reasoning (`finish_reason: length`, all tokens reasoning) and answered nothing after about 20 s. Requests now ask for no reasoning (`reasoning_effort: "none"`): answers in about 1 s. A server that rejects the field gets the request again without it, and never sees it again. (`/no_think` and the chat-template switch were tried and had no effect in LM Studio.) Test: 1.
 - **New tag names copied the prompt's example.** The tag and topic prompts gave "trek-planning" as an example, and the model put it, and unrelated existing tags, on unrelated notes (a soil-sensor note got "trek-planning, dbms"; a mutual-funds note "trek, fitness"). The prompts now have no example name and use an existing tag only when the note is clearly about it.
 
 ### Checked
+- **Built-in sync between the phone and the laptop (2026-10-16, test folders only, test app `com.example.vera_n.perf`).** Both on the same home Wi-Fi, no other sync app running. Paired by typing the six words on the phone: "Paired with SparshLaptop". A note written on the laptop reached the phone's private copy in 5 s and its notes folder and Home 18 s later; a note written in the phone app reached the laptop folder and its Home in about 30 s. Both Settings rows then read "In sync with …". Not yet checked: scanning the QR code with the phone's camera, and laptop AI results reaching the phone this way.
 - **Syncthing between the phone and the laptop (2026-10-16, test folders only).** Syncthing 2.1.6 on Windows (official release, checksum verified) and Syncthing-Fork 2.1.6.0 on the phone, paired and sharing one folder: the phone's `Documents/VeraPerfTest` and the laptop's `VeraSyncTest`. The phone was on mobile data, so the two were connected over the USB cable (`adb reverse`), not the internet. All 15 test notes reached the laptop, and a note written on the laptop reached the phone within seconds. Not yet checked: the laptop app's AI results reaching the phone through the folder (the AI app was closed).
 - **The four laptop jobs with a real model (2026-10-15, Qwen 3.5 9B, LM Studio, the matching set's test notes):**
   - "Why?": 5 of 5 sentences right, 1.0–1.6 s each (for example "Both notes discuss using a capacitive sensor for a long-lasting soil moisture monitoring project.").

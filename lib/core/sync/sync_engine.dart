@@ -66,8 +66,15 @@ class SyncEngine {
   /// The last lines the engine printed, for diagnosing a failed start.
   List<String> get log => List.unmodifiable(_log);
 
+  Future<SyncthingApi>? _starting;
+
   /// Starts it (if not running) and returns its API once it answers.
-  Future<SyncthingApi> start() async {
+  /// Callers at the same moment share one start: a second engine on the
+  /// same folder would fail on its lock and stop the first.
+  Future<SyncthingApi> start() =>
+      _starting ??= _start().whenComplete(() => _starting = null);
+
+  Future<SyncthingApi> _start() async {
     final running = _api;
     if (running != null && await running.healthy()) return running;
     await Directory(home).create(recursive: true);
@@ -85,8 +92,15 @@ class SyncEngine {
     ], environment: _environment);
     _process = process;
     _drain(process);
-    unawaited(process.exitCode.then((_) => _process = null));
     final api = SyncthingApi(port: port, apiKey: key);
+    unawaited(
+      process.exitCode.then((_) {
+        // Only this run's state: a later start may already be under way.
+        if (!identical(_process, process)) return;
+        _process = null;
+        if (identical(_api, api)) _api = null;
+      }),
+    );
     _api = api;
     await _waitUntilUp(api);
     await api.setOptions(options);

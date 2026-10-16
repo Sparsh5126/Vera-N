@@ -101,7 +101,12 @@ class SyncthingApi {
 
   Future<void> shutdown() => _call('POST', '/rest/system/shutdown');
 
-  void close() => _http.close(force: true);
+  var _closed = false;
+
+  void close() {
+    _closed = true;
+    _http.close(force: true);
+  }
 
   Future<List<Map<String, Object?>>> _list(String path) async => [
     for (final e in await _call('GET', path) as List)
@@ -117,6 +122,7 @@ class SyncthingApi {
     Object? body,
     Duration timeout = _timeout,
   ]) async {
+    if (_closed) throw const SyncEngineError('closed');
     try {
       final request = await _http
           .openUrl(method, Uri.parse('http://127.0.0.1:$port$path'))

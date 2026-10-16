@@ -15,6 +15,7 @@ import 'pairing_exchange.dart';
 import 'sync_engine.dart';
 import 'sync_setup.dart';
 import 'sync_status.dart';
+import 'syncthing_api.dart';
 
 /// Built-in sync (docs/LAPTOP_PLAN.md, S): runs the engine while paired
 /// (or pairing) and Vera N is open, stopping a minute after it is left.
@@ -41,6 +42,9 @@ class SyncService {
   List<String>? _words;
   bool _bridging = false;
 
+  /// Pairing in progress: the engine stays up even while not paired yet.
+  var _pairing = 0;
+
   Stream<SyncStatus> get status => _status.stream;
   SyncStatus get current => _last;
 
@@ -53,7 +57,7 @@ class SyncService {
       final api = await engine.start();
       final peer = await SyncSetup(api).peer();
       if (peer == null) {
-        await engine.stop();
+        if (_pairing == 0) await engine.stop();
         return _emit(const SyncStatus(SyncState.notPaired));
       }
       _startTicking();
@@ -67,7 +71,7 @@ class SyncService {
   /// App left: stop after [stopAfter] (a quick return keeps it running).
   /// A laptop keeps syncing while Vera N runs, minimised or not.
   void pause() {
-    if (DeviceKind.isDesktop) return;
+    if (DeviceKind.isDesktop || _pairing > 0) return;
     _stopTimer?.cancel();
     _stopTimer = Timer(stopAfter, () => unawaited(_stop()));
   }
@@ -75,7 +79,14 @@ class SyncService {
   /// Laptop: opens a pairing window and returns what to show. The phone is
   /// added when it answers; [PairingSession.result] completes then.
   Future<PairingSession> hostPairing() async {
-    final api = await _engine!.start();
+    _pairing++;
+    final SyncthingApi api;
+    try {
+      api = await _engine!.start();
+    } on Object {
+      _pairing--;
+      rethrow;
+    }
     final setup = SyncSetup(api);
     final host = PairingHost(
       code: PairingCode.random(await _wordList()),
@@ -89,7 +100,8 @@ class SyncService {
     );
     final invite = await host.open();
     final result = host.result.then((phone) async {
-      if (phone != null) await resume();
+      _pairing--;
+      await resume();
       return phone;
     });
     return PairingSession(invite: invite, result: result, cancel: host.close);
@@ -97,19 +109,24 @@ class SyncService {
 
   /// Phone: joins the laptop shown by a scanned QR code or typed words.
   Future<PairedDevice> join({PairingCode? code, PairingInvite? invite}) async {
-    final api = await _engine!.start();
-    final laptop = await PairingGuest.join(
-      code: invite?.code ?? code!,
-      invite: invite,
-      phoneId: await api.myId(),
-      name: 'Phone',
-      syncPort: await api.listenPort() ?? 22000,
-    );
-    final setup = SyncSetup(api);
-    await setup.unpair();
-    await setup.pair(laptop, folderPath: await _sharedPath());
-    await resume();
-    return laptop;
+    _pairing++;
+    try {
+      final api = await _engine!.start();
+      final laptop = await PairingGuest.join(
+        code: invite?.code ?? code!,
+        invite: invite,
+        phoneId: await api.myId(),
+        name: 'Phone',
+        syncPort: await api.listenPort() ?? 22000,
+      );
+      final setup = SyncSetup(api);
+      await setup.unpair();
+      await setup.pair(laptop, folderPath: await _sharedPath());
+      return laptop;
+    } finally {
+      _pairing--;
+      await resume();
+    }
   }
 
   /// Vera N is quitting: the engine it started quits too.

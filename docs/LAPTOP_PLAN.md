@@ -101,7 +101,7 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 - The model ships inside, as on the phone. Release size is measured and logged.
 - No auto-update service: updates come from GitHub releases.
 
-### S. Built-in sync (decided 2026-10-16, user)
+### S. Built-in sync (decided 2026-10-16, user): built and checked on the phone and the laptop 2026-10-16 (paired by typed words; notes synced both ways; QR scanning not yet tried on the phone)
 
 "for him it should be just the vera n app settings not another app". Decisions: **A, Syncthing runs inside Vera N** (not Vera N's own sync protocol); pairing by **QR code and a word code**; on the phone a **mirror copy** (no "All files access").
 
@@ -121,8 +121,8 @@ What the user does: laptop Settings → "Sync with your phone" shows a QR code a
   - Laptop: Syncthing shares the picked notes folder directly (`Notes/`, `Attachments/`, `.app/`).
   - Phone (mirror copy): Syncthing shares a private copy inside Vera N; Vera N copies changes both ways between that copy and the user's chosen folder, remembering what each side last had. A file changed on both sides keeps the folder's version and saves the other as a conflict copy, which the existing Compare / Keep screen handles.
 - **S4. Settings and words:** "Sync with your laptop / phone", status ("Last synced: today, 5:40 pm" / "Waiting for your laptop on this Wi-Fi"), Unpair. Onboarding, the Laptop row and the helper's text stop mentioning Syncthing.
-- **Permissions:** the Android app gains the network permission (any sync needs it; the engine only talks within the user's own network), and the ones for receiving the pairing broadcast on Wi-Fi. Windows asks once to allow Vera N through the firewall.
-- **Size:** about +12 MB to the phone APK and +25 MB to the Windows install (to be measured).
+- **Permissions:** the Android app gains the network permission (any sync needs it; the engine only talks within the user's own network) and the camera (asked only when scanning). No extra permission was needed to receive the pairing reply on Wi-Fi. Windows asks once to allow Vera N through the firewall.
+- **Size (measured):** about +12 MB packed per CPU type to the phone APK (27.5 MB installed on arm64) and +27.4 MB to the Windows install.
 
 ### Later
 - Syncing away from home without the cloud (for example over Tailscale, which works already if the user has it).
