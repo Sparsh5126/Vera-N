@@ -116,6 +116,11 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 4. **AI-written text** (topic names, "Why?" sentences) travelling in the user's own synced folder is fine.
 5. **Model:** the user has **Gemma 4** in LM Studio on an external SSD, to plug in when L2 starts testing.
 
+## Running a local model (measured 2026-10-15)
+
+- Qwen 3.5 9B in LM Studio does all four jobs well at about 1 s per answer, once reasoning is turned off per request (the app does this).
+- Load the model with a **context length of 4,096**: LM Studio's default reserved 18.9 GB on a 16 GB laptop and starved every other program; 4,096 reserved 7.0 GB. The app's prompts need at most about 1,500 tokens.
+
 ## Every kind of user (user, 2026-10-09)
 
 "we also have to account the app for users who will have no local llm model on their laptop or their laptop isnt capable to run a llm model locally. also for users who will only use laptop or only use mobile app."

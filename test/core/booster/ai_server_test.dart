@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/core/booster/ai_server_address.dart';
 import 'package:vera_n/core/booster/ai_server_client.dart';
@@ -101,6 +103,24 @@ void main() {
       expect(path, '/v1/chat/completions');
       expect(body!['model'], 'gemma-4');
       expect((body['messages'] as List).last['content'], 'Note text');
+    });
+
+    test('asks the model not to think first; a server that rejects that '
+        'gets the request again without it, from then on', () async {
+      server.chatWith((_, _) => 'Both plan a trek.');
+      server.statusFor = (body) =>
+          body?['reasoning_effort'] == null ? 200 : HttpStatus.badRequest;
+      for (var i = 0; i < 2; i++) {
+        expect(
+          await client.chat(model: 'm', system: 's', user: 'u'),
+          'Both plan a trek.',
+        );
+      }
+      final efforts = [
+        for (final (_, _, body, _) in server.requests)
+          body!['reasoning_effort'],
+      ];
+      expect(efforts, ['none', null, null]);
     });
 
     test('a redirect is not followed', () async {

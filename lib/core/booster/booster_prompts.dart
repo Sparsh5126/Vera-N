@@ -16,17 +16,21 @@ abstract final class BoosterPrompts {
       'linked. Describe the notes, for example: "Both plan a spring trek to '
       'Triund." $_voice Reply with the sentence only.';
 
+  // No example tag names: a model copies them onto unrelated notes
+  // (measured 2026-10-15 with Qwen 3.5 9B: a soil-sensor note got
+  // "trek-planning" and "dbms").
   static const tags =
-      'Suggest up to two short tags for this note: topics a person would '
-      'file it under. Each tag is one to three words in lower case, joined '
-      'with hyphens, like "trek-planning". Prefer one of the existing tags '
-      'when it fits. If no tag fits well, reply with []. $_voice Reply with '
-      'a JSON array of strings only.';
+      'Suggest up to two short tags for this note, naming what the note '
+      'itself is mainly about. Each tag is one to three words in lower case, '
+      'joined with hyphens. Use an existing tag only if the note is clearly '
+      'about that subject; never use one just because it is in the list. '
+      'If nothing fits well, reply with []. $_voice Reply with a JSON array '
+      'of strings only.';
 
   static const topic =
       'These notes from one person are about the same topic. Name the topic '
-      'in one to three words, lower case, joined with hyphens, like '
-      '"trek-planning". If an existing tag fits, use it. $_voice Reply with '
+      'in one to three words, lower case, joined with hyphens. Use an '
+      'existing tag only if it names this exact topic. $_voice Reply with '
       'the name only.';
 
   static const duplicate =

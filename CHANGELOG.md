@@ -4,6 +4,18 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+- **The laptop helper got empty answers from thinking models (found 2026-10-15 with Qwen 3.5 9B in LM Studio).** The model spent the whole 200-token reply budget on hidden reasoning (`finish_reason: length`, all tokens reasoning) and answered nothing after about 20 s. Requests now ask for no reasoning (`reasoning_effort: "none"`): answers in about 1 s. A server that rejects the field gets the request again without it, and never sees it again. (`/no_think` and the chat-template switch were tried and had no effect in LM Studio.) Test: 1.
+- **New tag names copied the prompt's example.** The tag and topic prompts gave "trek-planning" as an example, and the model put it, and unrelated existing tags, on unrelated notes (a soil-sensor note got "trek-planning, dbms"; a mutual-funds note "trek, fitness"). The prompts now have no example name and use an existing tag only when the note is clearly about it.
+
+### Checked
+- **The four laptop jobs with a real model (2026-10-15, Qwen 3.5 9B, LM Studio, the matching set's test notes):**
+  - "Why?": 5 of 5 sentences right, 1.0–1.6 s each (for example "Both notes discuss using a capacitive sensor for a long-lasting soil moisture monitoring project.").
+  - Copies: the near copy found, with a sentence; two notes only on the same topic correctly not copies. 0.5–1.9 s.
+  - Topics: "kedarkantha-trek", "gym-routine-diet".
+  - New tags, after the prompt fix: 5 of 5 fit ("soil-moisture, esp32-sensors", "mutual-funds, index-funds", "winter-trek, fitness").
+  - **Memory:** LM Studio loaded the model with a very large context and reserved 18.9 GB, leaving the 16 GB laptop almost no memory (other programs crashed). Reloaded with a 4,096-token context it reserved 7.0 GB. Vera N's prompts need at most about 1,500 tokens.
+
 ### Changed
 - **One very close note is enough to suggest its tag (user, 2026-10-15).** The phone suggested a tag only when at least 2 close notes shared it, which was rare: most people tag few notes, and the user saw no tag suggestions. Now a tag on a single note at similarity 0.70 or more (well above the 0.60 link bar) is suggested too. Still only existing tags, still dimmed until approved. Tests: 2.
 - **Merge keeps the larger note: confirmed** by the user (2026-10-15); no change.

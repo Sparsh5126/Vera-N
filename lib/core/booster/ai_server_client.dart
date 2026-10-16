@@ -49,6 +49,13 @@ class AiServerClient {
     ];
   }
 
+  /// Whether to ask the model not to think first. Thinking models (Qwen
+  /// 3.5, measured 2026-10-15) otherwise spend the whole reply budget on
+  /// hidden reasoning and answer nothing after about 20 s; with it they
+  /// answer in about 1 s. A server that rejects the field gets the request
+  /// again without it, and never sees it again.
+  bool _noThinking = true;
+
   /// One chat turn: [system] sets the job, [user] carries the note text.
   /// Returns the reply text, without any `<think>` reasoning.
   Future<String> chat({
@@ -57,7 +64,7 @@ class AiServerClient {
     required String user,
     int maxTokens = 200,
   }) async {
-    final json = await _send('POST', '/chat/completions', {
+    Map<String, Object?> request() => {
       'model': model,
       'messages': [
         {'role': 'system', 'content': system},
@@ -66,7 +73,18 @@ class AiServerClient {
       'temperature': 0.2,
       'max_tokens': maxTokens,
       'stream': false,
-    }, answerTimeout);
+      if (_noThinking) 'reasoning_effort': 'none',
+    };
+    Map<String, Object?> json;
+    try {
+      json = await _send('POST', '/chat/completions', request(), answerTimeout);
+    } on AiServerUnavailable catch (e) {
+      if (!_noThinking || e.reason != 'status ${HttpStatus.badRequest}') {
+        rethrow;
+      }
+      _noThinking = false;
+      json = await _send('POST', '/chat/completions', request(), answerTimeout);
+    }
     final choices = json['choices'];
     final message = choices is List && choices.isNotEmpty
         ? choices.first['message']

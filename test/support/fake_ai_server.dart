@@ -7,6 +7,9 @@ class FakeServer {
   final requests = <(String, String, Map<String, Object?>?, String?)>[];
   Object? Function(String path, Map<String, Object?>? body)? reply;
   int status = 200;
+
+  /// A status per request, when set (e.g. 400 for a field it rejects).
+  int Function(Map<String, Object?>? body)? statusFor;
   String? redirectTo;
 
   int get port => _server.port;
@@ -23,7 +26,7 @@ class FakeServer {
         r.response.statusCode = HttpStatus.found;
         r.response.headers.set('location', redirectTo!);
       } else {
-        r.response.statusCode = status;
+        r.response.statusCode = statusFor?.call(body) ?? status;
         r.response.write(jsonEncode(reply?.call(r.uri.path, body) ?? {}));
       }
       await r.response.close();
