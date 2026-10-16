@@ -81,6 +81,15 @@ install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}
 install(FILES "${FLUTTER_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
+# Vera N: the sync engine (Syncthing, MPL-2.0; docs/LAPTOP_PLAN.md, S1),
+# next to the app. Fetched by tool/fetch_sync_engine.ps1; builds without it
+# simply have no sync.
+set(SYNC_ENGINE "${CMAKE_CURRENT_SOURCE_DIR}/sync_engine/syncthing.exe")
+if(EXISTS "${SYNC_ENGINE}")
+  install(FILES "${SYNC_ENGINE}" DESTINATION "${CMAKE_INSTALL_PREFIX}"
+    COMPONENT Runtime)
+endif()
+
 if(PLUGIN_BUNDLED_LIBRARIES)
   install(FILES "${PLUGIN_BUNDLED_LIBRARIES}"
     DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"

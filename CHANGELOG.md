@@ -4,6 +4,14 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Added
+- **Built-in sync, part 1: the engine and pairing core (in progress; not yet in the app's screens)** (docs/LAPTOP_PLAN.md, S; user, 2026-10-16: "for him it should be just the vera n app settings not another app"; chose Syncthing inside Vera N, QR code and word code, and a mirror copy on the phone).
+  - **The engine** (`core/sync/sync_engine.dart`): Vera N starts Syncthing (MPL-2.0) itself, in its own folder, with a random API key and its page on 127.0.0.1 only. Internet relays, global discovery, NAT port opening, usage and crash reports and upgrades are off; only local discovery stays on. It picks free ports, so another Syncthing on the same computer is left alone. `SyncthingApi` drives it through that local API.
+  - **Shipping it:** `tool/fetch_sync_engine.ps1` downloads the official Windows build and the Android build from Syncthing-Fork 2.1.6.0 and checks pinned SHA-256 hashes; the binaries stay out of git. Windows installs `syncthing.exe` next to the app; Android packs `libsyncthingnative.so` as a native library, unpacked at install so it can run (`useLegacyPackaging`).
+  - **Pairing** (`pairing_code.dart`, `pairing_exchange.dart`): six words from the BIP-39 English list (66 bits; any case, four-letter starts accepted) and a QR invite carrying the laptop's id, its home-network addresses and a port. The phone finds the laptop with a home-network broadcast that only a device with the words can answer; both prove they have the words (HMAC-SHA256, bound to their ids) before either adds the other. Five wrong tries close the 5-minute window.
+  - **Word list:** `assets/pairing/words_en.txt`, the BIP-39 English list (2,048 words, SHA-256 2f5eed53…, from the bitcoin/bips repository, BSD-2-Clause).
+  - Tests: the real engine on Windows (1, skipped where it isn't fetched), the code and invite (4), pairing over loopback (4).
+
 ### Fixed
 - **The laptop helper got empty answers from thinking models (found 2026-10-15 with Qwen 3.5 9B in LM Studio).** The model spent the whole 200-token reply budget on hidden reasoning (`finish_reason: length`, all tokens reasoning) and answered nothing after about 20 s. Requests now ask for no reasoning (`reasoning_effort: "none"`): answers in about 1 s. A server that rejects the field gets the request again without it, and never sees it again. (`/no_think` and the chat-template switch were tried and had no effect in LM Studio.) Test: 1.
 - **New tag names copied the prompt's example.** The tag and topic prompts gave "trek-planning" as an example, and the model put it, and unrelated existing tags, on unrelated notes (a soil-sensor note got "trek-planning, dbms"; a mutual-funds note "trek, fitness"). The prompts now have no example name and use an existing tag only when the note is clearly about it.

@@ -101,8 +101,31 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 - The model ships inside, as on the phone. Release size is measured and logged.
 - No auto-update service: updates come from GitHub releases.
 
+### S. Built-in sync (decided 2026-10-16, user)
+
+"for him it should be just the vera n app settings not another app". Decisions: **A, Syncthing runs inside Vera N** (not Vera N's own sync protocol); pairing by **QR code and a word code**; on the phone a **mirror copy** (no "All files access").
+
+What the user does: laptop Settings → "Sync with your phone" shows a QR code and six words; phone Settings → "Sync with your laptop" → scan or type them. After that nothing: notes, rejections and laptop results travel when both are on the same Wi-Fi and Vera N is open. Settings shows "Last synced" and Unpair.
+
+- **S1. The engine** (`core/sync/`):
+  - Ships Syncthing (MPL-2.0) inside the app: on Windows the official `syncthing.exe`; on Android the Android build from Syncthing-Fork (`libsyncthingnative.so`, made for Android's network and file rules), packed as a native library so it can run.
+  - Vera N starts it only while open (and stops it a minute after leaving), with its own private home folder, a random API key, and the web page bound to 127.0.0.1 only.
+  - Switched off: internet relays, global (internet) discovery, NAT port opening, usage reports, crash reports, automatic upgrades. Only local discovery on the user's own network stays on, so nothing goes through anyone else's server.
+  - Vera N talks to it through its local API only; the user never sees it.
+- **S2. Pairing:**
+  - The laptop opens a pairing window of 5 minutes and shows a QR code (its device id, its local addresses and a one-time secret) and the same secret as six words (from a 2,048-word list: 66 bits).
+  - With the words, the phone finds the laptop by a local broadcast that only someone knowing the secret can recognise.
+  - The phone sends its device id to the laptop with a proof made from the secret (HMAC); the laptop answers with its own id and proof. Each adds the other and shares the notes folder. A wrong or expired code adds nothing.
+  - QR scanning needs the camera, asked only when the user taps "Scan"; the words need no extra permission.
+- **S3. The folder:**
+  - Laptop: Syncthing shares the picked notes folder directly (`Notes/`, `Attachments/`, `.app/`).
+  - Phone (mirror copy): Syncthing shares a private copy inside Vera N; Vera N copies changes both ways between that copy and the user's chosen folder, remembering what each side last had. A file changed on both sides keeps the folder's version and saves the other as a conflict copy, which the existing Compare / Keep screen handles.
+- **S4. Settings and words:** "Sync with your laptop / phone", status ("Last synced: today, 5:40 pm" / "Waiting for your laptop on this Wi-Fi"), Unpair. Onboarding, the Laptop row and the helper's text stop mentioning Syncthing.
+- **Permissions:** the Android app gains the network permission (any sync needs it; the engine only talks within the user's own network), and the ones for receiving the pairing broadcast on Wi-Fi. Windows asks once to allow Vera N through the firewall.
+- **Size:** about +12 MB to the phone APK and +25 MB to the Windows install (to be measured).
+
 ### Later
-- Built-in pairing (QR code, local network) as an alternative to Syncthing.
+- Syncing away from home without the cloud (for example over Tailscale, which works already if the user has it).
 - macOS and Linux builds.
 - Summaries and knowledge-health data (spec §5).
 

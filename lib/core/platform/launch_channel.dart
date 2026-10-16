@@ -56,6 +56,11 @@ abstract final class LaunchChannel {
   static Future<bool> openLink(String url) async =>
       await _call<bool>('openLink', url) ?? false;
 
+  /// Where Android installed the app's native libraries (the sync
+  /// engine), or null off Android.
+  static Future<String?> nativeLibraryDir() =>
+      _call<String>('nativeLibraryDir');
+
   /// The installed version (e.g. "0.1.0"), or null off Android.
   static Future<String?> version() => _call<String>('versionName');
 

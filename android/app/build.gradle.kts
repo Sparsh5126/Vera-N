@@ -17,6 +17,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    // The sync engine (libsyncthingnative.so; docs/LAPTOP_PLAN.md, S1) is
+    // run as a program, so native libraries are unpacked to disk at install.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.vera_n"

@@ -37,6 +37,8 @@ class LaunchBridge(
             // Milliseconds since this process started, for the startup log.
             "sinceProcessStart" ->
                 result.success(SystemClock.uptimeMillis() - Process.getStartUptimeMillis())
+            // Where the sync engine (libsyncthingnative.so) was installed.
+            "nativeLibraryDir" -> result.success(activity.applicationInfo.nativeLibraryDir)
             "versionName" -> result.success(
                 activity.packageManager.getPackageInfo(activity.packageName, 0).versionName,
             )
