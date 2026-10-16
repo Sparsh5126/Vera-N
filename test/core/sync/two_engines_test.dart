@@ -50,7 +50,6 @@ void main() {
         final invite = await host.open();
         final local = PairingInvite(
           code: invite.code,
-          laptopId: invite.laptopId,
           addresses: ['127.0.0.1'],
           port: invite.port,
         );

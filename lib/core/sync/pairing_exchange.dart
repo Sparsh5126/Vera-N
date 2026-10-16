@@ -87,7 +87,6 @@ class PairingHost {
     _timer = Timer(window, () => unawaited(close()));
     return PairingInvite(
       code: code,
-      laptopId: laptopId,
       addresses: await homeAddresses(),
       port: http.port,
     );
@@ -199,7 +198,10 @@ abstract final class PairingGuest {
     Duration searchFor = const Duration(seconds: 15),
   }) async {
     final targets = invite != null
-        ? [for (final a in invite.addresses) (a, invite.port)]
+        ? [
+            for (final a in await _nearestFirst(invite.addresses))
+              (a, invite.port),
+          ]
         : [await _find(code, findPort, broadcast, searchFor)];
     var problem = PairingProblem.notFound;
     for (final (address, port) in targets) {
@@ -215,9 +217,7 @@ abstract final class PairingGuest {
         if (id is! String || proof is! String || laptopPort is! int) {
           throw const PairingFailed(PairingProblem.refused);
         }
-        final expected = code.laptopProof(id, phoneId);
-        if (!PairingCode.same(proof, expected) ||
-            (invite != null && invite.laptopId != id)) {
+        if (!PairingCode.same(proof, code.laptopProof(id, phoneId))) {
           throw const PairingFailed(PairingProblem.refused);
         }
         final laptopName = reply['name'];
@@ -289,6 +289,18 @@ abstract final class PairingGuest {
       timer.cancel();
       socket.close();
     }
+  }
+
+  /// The laptop's addresses on this phone's own network (same x.y.z) first,
+  /// so one on another adapter (a virtual machine's, a VPN's) doesn't cost
+  /// a timeout before the right one is tried.
+  static Future<List<String>> _nearestFirst(List<String> addresses) async {
+    String net(String a) => a.substring(0, a.lastIndexOf('.'));
+    final mine = {for (final a in await PairingHost.homeAddresses()) net(a)};
+    return [
+      ...addresses.where((a) => mine.contains(net(a))),
+      ...addresses.where((a) => !mine.contains(net(a))),
+    ];
   }
 
   /// x.y.z.255 for each of this device's home-network addresses (home

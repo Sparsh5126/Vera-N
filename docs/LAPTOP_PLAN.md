@@ -113,7 +113,7 @@ What the user does: laptop Settings → "Sync with your phone" shows a QR code a
   - Switched off: internet relays, global (internet) discovery, NAT port opening, usage reports, crash reports, automatic upgrades. Only local discovery on the user's own network stays on, so nothing goes through anyone else's server.
   - Vera N talks to it through its local API only; the user never sees it.
 - **S2. Pairing:**
-  - The laptop opens a pairing window of 5 minutes and shows a QR code (its device id, its local addresses and a one-time secret) and the same secret as six words (from a 2,048-word list: 66 bits).
+  - The laptop opens a pairing window of 5 minutes and shows a QR code (its local addresses, the pairing port and a one-time secret) and the same secret as six words (from a 2,048-word list: 66 bits). The QR code writes each word as its first four letters and carries no device id (the laptop's proof already shows it has the secret), so it stays short and coarse enough for a phone camera to read off a screen (changed 2026-10-16: the first form, with the id, was too dense to scan).
   - With the words, the phone finds the laptop by a local broadcast that only someone knowing the secret can recognise.
   - The phone sends its device id to the laptop with a proof made from the secret (HMAC); the laptop answers with its own id and proof. Each adds the other and shares the notes folder. A wrong or expired code adds nothing.
   - QR scanning needs the camera, asked only when the user taps "Scan"; the words need no extra permission.

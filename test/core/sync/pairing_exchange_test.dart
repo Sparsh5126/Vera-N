@@ -36,12 +36,8 @@ void main() {
   });
   tearDown(() => host.close());
 
-  PairingInvite onLoopback(PairingInvite i) => PairingInvite(
-    code: i.code,
-    laptopId: i.laptopId,
-    addresses: ['127.0.0.1'],
-    port: i.port,
-  );
+  PairingInvite onLoopback(PairingInvite i) =>
+      PairingInvite(code: i.code, addresses: ['127.0.0.1'], port: i.port);
 
   test('with the QR code: each side gets the other, proved', () async {
     final invite = onLoopback(await host.open());
@@ -104,7 +100,6 @@ void main() {
     final invite = onLoopback(await host.open());
     final wrong = PairingInvite(
       code: PairingCode.random(list),
-      laptopId: laptopId,
       addresses: invite.addresses,
       port: invite.port,
     );

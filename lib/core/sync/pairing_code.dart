@@ -5,9 +5,9 @@ import 'package:crypto/crypto.dart';
 
 /// What the laptop shows when pairing (docs/LAPTOP_PLAN.md, S2): six words
 /// (66 bits, from the 2,048-word BIP-39 English list), and a QR code that
-/// also carries the laptop's id and local addresses. Only someone who has
-/// the words can make the proofs both sides check, so a device on the
-/// same network can't pair itself in.
+/// also carries the laptop's local addresses. Only someone who has the
+/// words can make the proofs both sides check, so a device on the same
+/// network can't pair itself in.
 class PairingCode {
   PairingCode(this.words)
     : assert(words.length == length, 'six words'),
@@ -78,48 +78,50 @@ class PairingCode {
   String toString() => words.join(' ');
 }
 
-/// The laptop's invitation as carried by the QR code.
+/// The laptop's invitation as carried by the QR code. Kept short so the
+/// code stays coarse enough for a phone camera to read off a screen: each
+/// word as its first four letters (unique in the list), and no device id
+/// (the laptop's proof already shows it has the words).
 class PairingInvite {
   const PairingInvite({
     required this.code,
-    required this.laptopId,
     required this.addresses,
     required this.port,
   });
 
-  static const _scheme = 'veran-pair:1:';
+  static const _scheme = 'veran-pair:2:';
+
+  /// How the phone's scanner reads it off a screen: most of the camera
+  /// picture, about three times a second (only while scanning).
+  static const scanShare = 0.8;
+  static const scanEvery = Duration(milliseconds: 300);
 
   final PairingCode code;
-  final String laptopId;
 
   /// The laptop's local IPv4 addresses, and the pairing port on them.
   final List<String> addresses;
   final int port;
 
-  String encode() =>
-      '$_scheme${code.words.join('-')}:$laptopId:${addresses.join(',')}:$port';
+  String encode() {
+    final words = [
+      for (final w in code.words) w.length > 4 ? w.substring(0, 4) : w,
+    ];
+    return '$_scheme${words.join('-')}:${addresses.join(',')}:$port';
+  }
 
   /// The invite in a scanned QR code, or null if it isn't one.
   static PairingInvite? decode(String text, List<String> list) {
     if (!text.startsWith(_scheme)) return null;
     final parts = text.substring(_scheme.length).split(':');
-    if (parts.length != 4) return null;
+    if (parts.length != 3) return null;
     final code = PairingCode.parse(parts[0], list);
-    final port = int.tryParse(parts[3]);
+    final port = int.tryParse(parts[2]);
     if (code == null || port == null || port <= 0 || port > 65535) return null;
-    if (!RegExp(r'^[A-Z0-9]{7}(-[A-Z0-9]{7}){7}$').hasMatch(parts[1])) {
-      return null;
-    }
     final addresses = [
-      for (final a in parts[2].split(','))
+      for (final a in parts[1].split(','))
         if (RegExp(r'^\d{1,3}(\.\d{1,3}){3}$').hasMatch(a)) a,
     ];
     if (addresses.isEmpty) return null;
-    return PairingInvite(
-      code: code,
-      laptopId: parts[1],
-      addresses: addresses,
-      port: port,
-    );
+    return PairingInvite(code: code, addresses: addresses, port: port);
   }
 }

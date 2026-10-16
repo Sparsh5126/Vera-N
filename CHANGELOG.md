@@ -24,6 +24,11 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
   - Tests: the real engine on Windows (1, skipped where it isn't fetched), the code and invite (4), pairing over loopback (4).
 
 ### Fixed
+- **The phone couldn't read the pairing QR code (user, 2026-10-16: "qr isnt working").** The camera opened, but nothing was ever read. The code held about 150 characters (the laptop's 63-character id, the six full words, two addresses), so it was a dense 45×45 grid in a 240-point box, and the scanner looked only at the middle half of the picture, once a second.
+  - **Shorter code:** no laptop id (the laptop's proof already shows it has the words) and each word as its first four letters: about 75 characters, a 33×33 grid. The QR text is now `veran-pair:2:…`; the old form is refused.
+  - **Scanner:** most of the camera picture, zxing's "try harder", about three times a second (only while the scan page is open), and it closes once even if the code is read twice.
+  - **The right address first:** the phone tries the laptop's address on its own Wi-Fi before others (a virtual machine's adapter cost a 5-second wait).
+  - Test: 1 (the code stays short). Not yet re-checked with the phone's camera.
 - **Built-in sync, found on the devices (2026-10-16):**
   - **"Couldn't find your laptop" on the phone.** The phone's search went only to 255.255.255.255, which many Android builds drop. It now also goes to each home network's own broadcast address (x.y.z.255).
   - **The engine could start twice** (pairing and the app resuming at the same moment), and the second copy failed on the first one's lock. Starts are now shared, an old process ending no longer clears the new one's state, and the engine stays up while a pairing window is open, even before a device is paired.

@@ -27,7 +27,6 @@ void main() {
             open: () async => PairingSession(
               invite: PairingInvite(
                 code: PairingCode(words),
-                laptopId: id,
                 addresses: const ['192.168.1.5'],
                 port: 51000,
               ),

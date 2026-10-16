@@ -74,19 +74,19 @@ void main() {
   test('the QR invite round-trips; anything else is refused', () {
     final invite = PairingInvite(
       code: PairingCode.random(list, random: Random(2)),
-      laptopId: laptop,
       addresses: ['192.168.1.5', '10.0.0.2'],
       port: 51234,
     );
     final back = PairingInvite.decode(invite.encode(), list)!;
     expect(back.code.words, invite.code.words);
-    expect(back.laptopId, laptop);
     expect(back.addresses, ['192.168.1.5', '10.0.0.2']);
     expect(back.port, 51234);
     expect(PairingInvite.decode('https://example.com', list), isNull);
+    expect(PairingInvite.decode('veran-pair:2:a-b:1.2.3.4:80', list), isNull);
     expect(
       PairingInvite.decode('veran-pair:1:a-b:$laptop:1.2.3.4:80', list),
       isNull,
+      reason: 'the old, longer form',
     );
     expect(
       PairingInvite.decode(
@@ -95,5 +95,20 @@ void main() {
       ),
       isNull,
     );
+  });
+
+  test('the QR text stays short, so the code stays coarse', () {
+    // The longest words and a laptop on three networks.
+    final longest = [...list]..sort((a, b) => b.length - a.length);
+    final invite = PairingInvite(
+      code: PairingCode(longest.take(PairingCode.length).toList()),
+      addresses: ['192.168.100.200', '172.16.100.200', '10.100.100.200'],
+      port: 65535,
+    );
+    final text = invite.encode();
+    // 106 bytes or fewer fit a version-5 QR code (37×37) at level L; the
+    // old form needed version 7 (45×45) with only two addresses.
+    expect(text.length, lessThanOrEqualTo(106), reason: text);
+    expect(PairingInvite.decode(text, list)!.code.words, invite.code.words);
   });
 }
