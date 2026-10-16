@@ -11,7 +11,8 @@ import 'widgets/laptop_ai_section.dart';
 import 'widgets/suggestions_section.dart';
 
 /// Settings: one scrollable page (UI spec §11). A laptop adds AI ON THIS
-/// COMPUTER; a phone shows a Laptop row (docs/LAPTOP_PLAN.md, L4).
+/// COMPUTER (docs/LAPTOP_PLAN.md, L4); a phone shows the laptop's help in
+/// its sync row.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 

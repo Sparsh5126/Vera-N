@@ -5,13 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ai/suggestions/suggestion_actions.dart';
 import '../../../core/copy/app_copy.dart';
-import '../../../core/platform/device_kind.dart';
 import '../../../core/settings/app_prefs_controller.dart';
 import '../../../shared/widgets/setting_row.dart';
 import '../../../shared/widgets/undo_snack_bar.dart';
 import '../state/settings_controller.dart';
 import 'analysis_status_row.dart';
-import 'laptop_row.dart';
 import 'reminder_settings.dart';
 import 'settings_group.dart';
 
@@ -54,8 +52,6 @@ class _SuggestionsSectionState extends ConsumerState<SuggestionsSection> {
             ),
             if (prefs.suggestions) const AnalysisStatusRow(),
             const ReminderSettings(),
-            // A phone shows when a laptop last helped (LAPTOP_PLAN L4).
-            if (DeviceKind.isPhone) const LaptopRow(),
           ],
         ),
         SettingsGroup(

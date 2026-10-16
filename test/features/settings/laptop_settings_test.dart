@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/core/copy/app_copy.dart';
 import 'package:vera_n/core/models/booster_prefs.dart';
 import 'package:vera_n/core/models/booster_result.dart';
+import 'package:vera_n/core/sync/sync_status.dart';
 
 import '../../support/app_harness.dart';
 
@@ -15,8 +16,12 @@ void main() {
     (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
   );
 
-  Future<void> openAt(WidgetTester tester, Finder row) async {
-    await app.pump(tester);
+  Future<void> openAt(
+    WidgetTester tester,
+    Finder row, {
+    SyncStatus? sync,
+  }) async {
+    await app.pump(tester, sync: sync);
     await tester.tap(find.bySemanticsLabel(AppCopy.navSettings).last);
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(row, 200, scrollable: page.first);
@@ -39,21 +44,10 @@ void main() {
       await app.finish(tester);
     });
 
-    testWidgets('no laptop: "Not set up", and a tap explains it', (
-      tester,
-    ) async {
-      await openAt(tester, find.text(LaptopCopy.laptop));
-      expect(find.text(LaptopCopy.notSetUp), findsOneWidget);
-      expect(find.text(LaptopCopy.section), findsNothing);
-      await tester.tap(find.text(LaptopCopy.laptop));
-      await tester.pumpAndSettle();
-      expect(find.text(LaptopCopy.explain), findsOneWidget);
-      await tester.tap(find.text(LaptopCopy.gotIt));
-      await tester.pumpAndSettle();
-      await app.finish(tester);
-    });
+    const paired = SyncStatus(SyncState.connected, peerName: 'Laptop');
+    final helped = SyncCopy.laptopHelped(AppCopy.today);
 
-    testWidgets('a laptop helped today: the row says so', (tester) async {
+    Future<void> laptopHelpedToday() async {
       final note = await app.storage.notes.create('Trek\nSpring.');
       final id = (await app.storage.notes.ensureId(note))!;
       await app.storage.booster.add('laptop1', [
@@ -66,8 +60,39 @@ void main() {
           deviceId: 'laptop1',
         ),
       ]);
-      await openAt(tester, find.text(LaptopCopy.laptop));
-      expect(find.text(LaptopCopy.lastHelpedOn(AppCopy.today)), findsOneWidget);
+    }
+
+    testWidgets('no laptop AI section, and no separate Laptop row', (
+      tester,
+    ) async {
+      await openAt(tester, find.text(SyncCopy.withLaptop), sync: paired);
+      expect(find.text(LaptopCopy.section), findsNothing);
+      expect(find.text('Laptop'), findsNothing);
+      expect(find.textContaining(helped), findsNothing, reason: 'not yet');
+      await app.finish(tester);
+    });
+
+    testWidgets('paired and the laptop helped today: the sync row says so', (
+      tester,
+    ) async {
+      await laptopHelpedToday();
+      await openAt(tester, find.text(SyncCopy.withLaptop), sync: paired);
+      expect(find.text(SyncCopy.inSync('Laptop')), findsOneWidget);
+      expect(find.text('$helped\n${SyncCopy.onlyWifi}'), findsOneWidget);
+      await app.finish(tester);
+    });
+
+    testWidgets('not paired: only "Not paired", even after earlier help', (
+      tester,
+    ) async {
+      await laptopHelpedToday();
+      await openAt(
+        tester,
+        find.text(SyncCopy.withLaptop),
+        sync: const SyncStatus(SyncState.notPaired),
+      );
+      expect(find.text(SyncCopy.notPaired), findsOneWidget);
+      expect(find.textContaining(helped), findsNothing);
       await app.finish(tester);
     });
   });
@@ -82,7 +107,6 @@ void main() {
         const BoosterPrefs(address: 'http://127.0.0.1:9/v1'),
       );
       await openAt(tester, find.text(LaptopCopy.jobCopies));
-      expect(find.text(LaptopCopy.laptop), findsNothing);
 
       await tester.tap(find.text(LaptopCopy.jobCopies));
       await tester.pumpAndSettle();

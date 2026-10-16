@@ -9,6 +9,8 @@ abstract final class SyncCopy {
   static String inSync(String name) => 'In sync with $name';
   static String lastSynced(String day) => 'Last synced: $day';
   static const problem = 'Sync couldn’t start. Try again later.';
+  // Phone, paired, once the laptop's AI has added suggestions.
+  static String laptopHelped(String day) => 'Your laptop last helped: $day';
   static const onlyWifi =
       'Only over your own Wi-Fi, straight between your devices. Nothing goes '
       'through the internet.';

@@ -10,13 +10,15 @@ import '../../../core/sync/sync_status.dart';
 import '../../../core/utils/date_label.dart';
 import '../../../shared/widgets/setting_row.dart';
 import '../../../shared/widgets/notice_snack_bar.dart';
+import '../state/booster_settings_state.dart';
 import 'pair_laptop_sheet.dart';
 import 'pair_phone_dialog.dart';
 
 /// SYNC: "Sync with your phone" (laptop) or "with your laptop" (phone)
 /// (docs/LAPTOP_PLAN.md, S4). Not paired: a tap starts pairing. Paired: it
-/// says where sync stands, and a tap offers Unpair. Hidden in builds
-/// without the engine.
+/// says where sync stands, and a tap offers Unpair; on the phone it also
+/// says when the laptop last helped, once it has (UI spec §11). Hidden in
+/// builds without the engine.
 class SyncRow extends ConsumerWidget {
   const SyncRow({super.key});
 
@@ -26,13 +28,21 @@ class SyncRow extends ConsumerWidget {
         ref.watch(syncStatusProvider).value ??
         const SyncStatus(SyncState.notPaired);
     if (status.state == SyncState.unavailable) return const SizedBox.shrink();
+    final helped = DeviceKind.isPhone && status.paired
+        ? ref.watch(lastHelpedProvider).value
+        : null;
     return SettingRow(
       label: DeviceKind.isDesktop ? SyncCopy.withPhone : SyncCopy.withLaptop,
       value: _value(status),
-      hint: status.paired ? SyncCopy.onlyWifi : null,
+      hint: status.paired ? _hint(helped) : null,
       onTap: () => unawaited(_tap(context, ref, status)),
     );
   }
+
+  static String _hint(DateTime? helped) => helped == null
+      ? SyncCopy.onlyWifi
+      : '${SyncCopy.laptopHelped(DateLabel.of(helped.toLocal(), DateTime.now()))}'
+            '\n${SyncCopy.onlyWifi}';
 
   static String _value(SyncStatus s) {
     final name = s.peerName ?? '';

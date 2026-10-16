@@ -85,7 +85,7 @@ Each phase is one change: tests, phone check where it touches the phone, changel
 - Analysis on the phone needs no change.
 
 ### L4. Settings on both devices: built 2026-10-09 (tested; not yet tried with a real AI app)
-- **Phone, "Laptop" row** (UI spec §11 said "pair, test, forget", which belongs to built-in pairing later). With Syncthing it reads "Last helped 2 h ago", or "Not connected", which is a normal state. Tapping it explains Syncthing in two lines.
+- **Phone, "Laptop" row:** built here; removed 2026-10-16 (user) once built-in sync existed. "Your laptop last helped: Today" now shows in the "Sync with your laptop" row while paired (UI spec §11).
 - **Laptop:** an "AI on this computer" group with the server address (local), a connection test, the model, and the four jobs, each with its own switch.
 - **Onboarding page 3** says "If you have a laptop, it can help with deeper analysis…". This phase makes that true.
 
@@ -120,7 +120,7 @@ What the user does: laptop Settings → "Sync with your phone" shows a QR code a
 - **S3. The folder:**
   - Laptop: Syncthing shares the picked notes folder directly (`Notes/`, `Attachments/`, `.app/`).
   - Phone (mirror copy): Syncthing shares a private copy inside Vera N; Vera N copies changes both ways between that copy and the user's chosen folder, remembering what each side last had. A file changed on both sides keeps the folder's version and saves the other as a conflict copy, which the existing Compare / Keep screen handles.
-- **S4. Settings and words:** "Sync with your laptop / phone", status ("Last synced: today, 5:40 pm" / "Waiting for your laptop on this Wi-Fi"), Unpair. Onboarding, the Laptop row and the helper's text stop mentioning Syncthing.
+- **S4. Settings and words:** "Sync with your laptop / phone", status ("Last synced: today, 5:40 pm" / "Waiting for your laptop on this Wi-Fi"), Unpair. Onboarding and the helper's text stop mentioning Syncthing; the phone's Laptop row was later folded into the sync row.
 - **Permissions:** the Android app gains the network permission (any sync needs it; the engine only talks within the user's own network) and the camera (asked only when scanning). No extra permission was needed to receive the pairing reply on Wi-Fi. Windows asks once to allow Vera N through the firewall.
 - **Size (measured):** about +12 MB packed per CPU type to the phone APK (27.5 MB installed on arm64) and +27.4 MB to the Windows install.
 

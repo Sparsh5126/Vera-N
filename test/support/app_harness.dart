@@ -14,6 +14,8 @@ import 'package:vera_n/core/storage/db/app_database.dart';
 import 'package:vera_n/core/storage/files/folder_access.dart';
 import 'package:vera_n/core/storage/storage_providers.dart';
 import 'package:vera_n/core/storage/storage_services.dart';
+import 'package:vera_n/core/sync/sync_providers.dart';
+import 'package:vera_n/core/sync/sync_status.dart';
 
 import 'fake_attachment_capture.dart';
 import 'fake_device_lock.dart';
@@ -50,10 +52,14 @@ class AppHarness {
     WidgetTester tester, {
     bool startWithOnboarding = false,
     AppPrefs prefs = const AppPrefs(),
+    SyncStatus? sync,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          // Built-in sync is off in tests unless a status is given.
+          if (sync != null)
+            syncStatusProvider.overrideWith((ref) => Stream.value(sync)),
           storageProvider.overrideWithValue(storage),
           initialPrefsProvider.overrideWithValue(prefs),
           // Meaning search uses the fake model, never the real one.

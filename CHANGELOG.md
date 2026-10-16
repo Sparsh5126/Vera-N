@@ -44,6 +44,7 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
   - **Memory:** LM Studio loaded the model with a very large context and reserved 18.9 GB, leaving the 16 GB laptop almost no memory (other programs crashed). Reloaded with a 4,096-token context it reserved 7.0 GB. Vera N's prompts need at most about 1,500 tokens.
 
 ### Changed
+- **The phone's separate "Laptop" row is gone (user, 2026-10-16).** It came from before built-in sync, repeated the "Sync with your laptop" row, and could read "Not set up" while the two were in sync. Once paired and the laptop's AI has added suggestions, the sync row's grey text now starts with "Your laptop last helped: Today". The laptop's own Settings are unchanged. Tests: 3 (replacing 2).
 - **One very close note is enough to suggest its tag (user, 2026-10-15).** The phone suggested a tag only when at least 2 close notes shared it, which was rare: most people tag few notes, and the user saw no tag suggestions. Now a tag on a single note at similarity 0.70 or more (well above the 0.60 link bar) is suggested too. Still only existing tags, still dimmed until approved. Tests: 2.
 - **Merge keeps the larger note: confirmed** by the user (2026-10-15); no change.
 
