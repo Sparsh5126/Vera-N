@@ -5,9 +5,24 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 ## [Unreleased]
 
 ### Changed
+- **The V mark is now the app icon** (user, 2026-10-17: "make it the logo"; chose the light icon as previewed over the spec's dark square with an amber dot). It replaces Flutter's default icon.
+  - **Android 8+:** an adaptive icon (`mipmap-anydpi-v26/ic_launcher.xml`) with a stock background, the icon cut as a vector foreground (written by the generator), and a monochrome layer for themed icons. Its colours (`ic_launcher_background`, `ic_launcher_mark`) have no night twin, so the icon is the same in both themes.
+  - **Android 7:** the mipmap PNGs (48–192 px), a rounded tile with a hairline.
+  - **Windows:** `app_icon.ico` (16–256 px), used by the window, the taskbar and the installer.
+  - **The Android 12+ launch screen stays plain** (`windowSplashScreenAnimatedIcon` transparent). Android 12 and later would otherwise draw the launcher icon there, which the Flutter logo already did. The ink V would also be nearly invisible on the dark launch screen, and `launch_background.xml` already says "no logo, so capture feels instant".
+  - **New script:** `tool/brand/render_icons.ps1` draws the PNGs and the `.ico` with Edge and Windows' own image code. No new dependency.
+  - **Size, measured:** the five Android PNGs grow from 4.2 KB to 24.2 KB in all (Flutter's were flat shapes that compress well), plus a 1 KB vector foreground: about 21 KB on a 70 MB APK. The Windows `.ico` shrinks from 33.8 KB to 21.4 KB. No battery change.
+  - **Checked:** the debug APK packs the adaptive icon with all three layers (`aapt2 dump`). The Windows release `.exe` carries the new icon. Every PNG was looked at on light and dark backgrounds. **Not yet checked on the phone**, which wasn't connected.
+  - Spec §21–22 and DESIGN.md (new Mark section, the Ink Mark Rule) record the decision.
 - **README lists every feature** (user, 2026-10-17): capture, writing, organizing, finding, smart suggestions, data, laptop, sync and accessibility, plus status, building and licenses. Taken from what this changelog records as built; no behavior change.
 
 ### Added
+- **A mark for Vera N, drawn from rules (not in the app yet)** (user, 2026-10-17, from an AI-made brand board: a V of two strokes meeting in a drop of ink). The launcher icon is still Flutter's default.
+  - **The rules:** the outer contour is an inverted equilateral triangle (strokes at 60°), terminals are cut flat on its top edge, the left stroke is heavier (4 : 3), each stroke keeps its weight and then narrows to a neck, and the drop's diameter is the light stroke's width.
+  - **Two cuts:** a primary one for about 96 px and up, and a heavier icon cut (neck 4.5 against 1.4) whose neck still shows at 24 px.
+  - **Adaptive icon:** the icon cut is 48 dp wide on the 108 dp canvas, on stock `#F5F4F6`, and reaches 30.7 dp from the centre (the safe circle is 33 dp). There is also a monochrome layer for themed icons.
+  - **Files:** `tool/brand/make_brand_marks.dart` (plain Dart, no new package) writes `docs/brand/` (`mark-primary.svg`, `mark-icon.svg`, `icon-foreground.svg`, `icon-monochrome.svg`, `preview.html`). The preview shows the construction, both cuts from 96 to 16 px, the lockup in the real Instrument Serif, and the icon in circle, squircle and rounded-square masks on light, dark and photo wallpapers, plus themed tints. It was checked in Edge in light and dark mode.
+  - Not checked on the phone yet. Nothing in `android/` changed, and no app size or battery change.
 - **Built-in sync, part 2: the mirror, the service and the screens (built; checked on the devices, see Checked)** (docs/LAPTOP_PLAN.md, S).
   - **Settings, SYNC:** "Sync with your phone" (laptop) / "Sync with your laptop" (phone): "Not paired", "In sync with …", "Last synced: …", and Unpair. Hidden in builds without the engine.
   - **Laptop pairing window:** the QR code (black on white in both themes, for scanners) and the six words, open 5 minutes; "Waiting for your phone…", then "Paired".

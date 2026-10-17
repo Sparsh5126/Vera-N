@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vera N mark</title>
+<style>@font-face { font-family: "Instrument Serif"; src: url("../../assets/fonts/InstrumentSerif-Regular.ttf"); }
+@font-face { font-family: "Inter"; src: url("../../assets/fonts/Inter-Variable.ttf"); font-weight: 100 900; }
+:root {
+  --stock: #F5F4F6; --plate: #FAF9F7; --ink: #16181A; --ink2: #5C5E66; --hair: #C9C7C4;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --stock: #121315; --plate: #1C1B19; --ink: #ECEBE8; --ink2: #A2A2AA; --hair: #393834; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--stock); color: var(--ink); font: 15px/1.5 Inter, system-ui, sans-serif; }
+main { max-width: 1080px; margin: 0 auto; padding: 48px 16px 96px; }
+h1 { font: 400 48px/1.1 "Instrument Serif", serif; margin: 0 0 8px; }
+h2 { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink2); margin: 48px 0 16px; }
+p, li { max-width: 62ch; }
+.lede, .cap { color: var(--ink2); }
+.cap { font-size: 12px; margin: 12px 0 0; }
+code { font-size: 13px; }
+.row { display: flex; flex-wrap: wrap; gap: 16px; }
+.row > * { flex: 1 1 320px; min-width: 0; }
+.plate { background: var(--plate); border: 1px solid var(--hair); border-radius: 24px; padding: 24px; }
+.plate > svg { display: block; width: 100%; height: auto; }
+.mark { color: var(--ink); }
+.lockup .mark { color: inherit; }
+.big { display: flex; justify-content: center; padding: 24px 0; }
+.big svg { height: 200px; width: auto; }
+.ladder { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 24px; }
+.ladder + .ladder { margin-top: 24px; }
+.ladder figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ladder figcaption { font-size: 11px; color: var(--ink2); }
+.lockup { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 32px 0; border-radius: 16px; }
+.lockup svg { height: 72px; width: auto; }
+.lockup span { font: 400 44px/1 "Instrument Serif", serif; }
+.lockup.light { background: #FAF9F7; color: #16181A; }
+.lockup.dark { background: #1C1B19; color: #ECEBE8; }
+.canvas { display: flex; justify-content: center; }
+.canvas svg { width: 324px; max-width: 100%; height: auto; }
+.wall { border-radius: 24px; padding: 24px; display: flex; flex-wrap: wrap; gap: 20px 24px; align-items: flex-end; }
+.wall + .wall { margin-top: 16px; }
+.wall figure { margin: 0; width: 72px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.wall figcaption { font-size: 11px; line-height: 1.3; text-align: center; }
+.wall .gap { flex-basis: 100%; height: 0; }
+.wall-light { background: #E4E1DC; color: #16181A; }
+.wall-dark { background: #0E0F11; color: #ECEBE8; }
+.wall-busy {
+  color: #FFFFFF; text-shadow: 0 1px 2px rgba(0, 0, 0, .7);
+  background: radial-gradient(circle at 18% 30%, #D98E4A, transparent 45%),
+    radial-gradient(circle at 82% 22%, #3F6FA8, transparent 50%),
+    radial-gradient(circle at 55% 95%, #2F6B4F, transparent 55%), #6B5A7A;
+}
+.wall-themed-light { background: #EEF1F6; color: #1A1C1E; }
+.wall-themed-dark { background: #111418; color: #E2E2E6; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<g id="mark-primary"><path d="M13.81,20 L27.67,20 Q47.92,57.64 61.21,99.3 L60,100 Z"/><path d="M106.19,20 L95.8,20 Q74.59,58.09 58.79,99.3 L60,100 Z"/><circle cx="60" cy="102" r="4.5"/></g>
+<g id="mark-icon"><path d="M13.81,20 L32.29,20 Q51.64,56.83 63.9,97.75 L60,100 Z"/><path d="M106.19,20 L92.33,20 Q71.36,57.23 56.1,97.75 L60,100 Z"/><circle cx="60" cy="101.5" r="6"/></g>
+<g id="fg-primary" transform="translate(22.82 24.73) scale(0.5196)"><use href="#mark-primary"/></g>
+<g id="fg-icon" transform="translate(22.82 24.51) scale(0.5196)"><use href="#mark-icon"/></g>
+<clipPath id="clip-circle"><circle cx="54" cy="54" r="36"/></clipPath>
+<clipPath id="clip-rounded"><rect x="18" y="18" width="72" height="72" rx="16"/></clipPath>
+<clipPath id="clip-squircle"><path d="M90,54 L89.98,62.24 L89.9,65.64 L89.78,68.24 L89.6,70.42 L89.38,72.31 L89.11,74.01 L88.78,75.55 L88.41,76.96 L87.98,78.26 L87.5,79.46 L86.97,80.57 L86.38,81.6 L85.74,82.56 L85.03,83.45 L84.27,84.27 L83.45,85.03 L82.56,85.74 L81.6,86.38 L80.57,86.97 L79.46,87.5 L78.26,87.98 L76.96,88.41 L75.55,88.78 L74.01,89.11 L72.31,89.38 L70.42,89.6 L68.24,89.78 L65.64,89.9 L62.24,89.98 L54,90 L45.76,89.98 L42.36,89.9 L39.76,89.78 L37.58,89.6 L35.69,89.38 L33.99,89.11 L32.45,88.78 L31.04,88.41 L29.74,87.98 L28.54,87.5 L27.43,86.97 L26.4,86.38 L25.44,85.74 L24.55,85.03 L23.73,84.27 L22.97,83.45 L22.26,82.56 L21.62,81.6 L21.03,80.57 L20.5,79.46 L20.02,78.26 L19.59,76.96 L19.22,75.55 L18.89,74.01 L18.62,72.31 L18.4,70.42 L18.22,68.24 L18.1,65.64 L18.02,62.24 L18,54 L18.02,45.76 L18.1,42.36 L18.22,39.76 L18.4,37.58 L18.62,35.69 L18.89,33.99 L19.22,32.45 L19.59,31.04 L20.02,29.74 L20.5,28.54 L21.03,27.43 L21.62,26.4 L22.26,25.44 L22.97,24.55 L23.73,23.73 L24.55,22.97 L25.44,22.26 L26.4,21.62 L27.43,21.03 L28.54,20.5 L29.74,20.02 L31.04,19.59 L32.45,19.22 L33.99,18.89 L35.69,18.62 L37.58,18.4 L39.76,18.22 L42.36,18.1 L45.76,18.02 L54,18 L62.24,18.02 L65.64,18.1 L68.24,18.22 L70.42,18.4 L72.31,18.62 L74.01,18.89 L75.55,19.22 L76.96,19.59 L78.26,20.02 L79.46,20.5 L80.57,21.03 L81.6,21.62 L82.56,22.26 L83.45,22.97 L84.27,23.73 L85.03,24.55 L85.74,25.44 L86.38,26.4 L86.97,27.43 L87.5,28.54 L87.98,29.74 L88.41,31.04 L88.78,32.45 L89.11,33.99 L89.38,35.69 L89.6,37.58 L89.78,39.76 L89.9,42.36 L89.98,45.76 Z"/></clipPath>
+</defs>
+</svg>
+<main>
+<h1>Vera N mark</h1>
+<p class="lede">Two strokes, two notes, meeting in one drop of ink. Drawn from
+the rules below by <code>tool/brand/make_brand_marks.dart</code>, so it can be
+redrawn exactly. It is the app icon on Android and Windows.</p>
+<h2>Construction</h2>
+<div class="row">
+<div class="plate"><svg viewBox="0 4 124 114" class="mark" role="img" aria-label="The mark with its construction lines">
+<use href="#mark-primary" fill="currentColor"/>
+<g fill="none" stroke="#5C5E66" stroke-width="0.35" stroke-dasharray="1.6 1.2">
+<line x1="4" y1="20" x2="118" y2="20"/>
+<line x1="63" y1="105.2" x2="8.81" y2="11.34"/><line x1="57" y1="105.2" x2="111.19" y2="11.34"/>
+<line x1="60" y1="8" x2="60" y2="116"/>
+<path d="M115.19,20 A9 9 0 0 0 110.69,12.21"/>
+</g>
+<g stroke="#5C5E66" stroke-width="0.35">
+<line x1="55.5" y1="108.5" x2="64.5" y2="108.5"/>
+<line x1="55.5" y1="107.5" x2="55.5" y2="109.5"/>
+<line x1="64.5" y1="107.5" x2="64.5" y2="109.5"/>
+</g>
+<g fill="#5C5E66" font-size="3.6" font-family="Inter, sans-serif" text-anchor="middle">
+<text x="117.49" y="15">60°</text>
+<text x="20.74" y="16">12</text>
+<text x="100.99" y="16">9</text>
+<text x="60" y="113.5">⌀ 9</text>
+</g>
+</svg></div>
+<div class="plate">
+<ol class="rules">
+<li>The outer contour is an inverted <strong>equilateral triangle</strong>, so both strokes run at 60° to the baseline.</li>
+<li>Terminals are cut flat, on the triangle's top edge.</li>
+<li>The left stroke is the heavy one, <strong>4 : 3</strong> against the right, like a pen's down-stroke and up-stroke.</li>
+<li>Each stroke keeps its weight down most of its length, then narrows to a neck where the two meet.</li>
+<li>The <strong>drop's diameter is the light stroke's width</strong>. It hangs just below the apex.</li>
+</ol>
+<p class="cap">Widths are measured across the stroke, in units of a mark 80 tall from terminals to apex.</p>
+</div>
+</div>
+<h2>Two cuts</h2>
+<div class="row">
+<div class="plate"><div class="big"><svg class="mark" viewBox="13.81 20 92.38 86.5" width="213.59" height="200" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-primary"/></svg></div><p><strong>Primary.</strong> For about 96 px and up: the wordmark, print, the splash screen.</p><p class="cap">Heavy 12 · light 9 · neck 1.4 · fullness 0.3 · drop ⌀ 9</p></div>
+<div class="plate"><div class="big"><svg class="mark" viewBox="13.81 20 92.38 87.5" width="211.15" height="200" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-icon"/></svg></div><p><strong>Icon cut.</strong> For the launcher icon and anything smaller: heavier, with a neck wide enough for 24 px.</p><p class="cap">Heavy 16 · light 12 · neck 4.5 · fullness 0.2 · drop ⌀ 12</p></div>
+</div>
+<div class="plate" style="margin-top:16px">
+<div class="ladder"><figure><figcaption>Primary</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 86.5" width="102.52" height="96" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-primary"/></svg><figcaption>96</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 86.5" width="68.35" height="64" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-primary"/></svg><figcaption>64</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 86.5" width="51.26" height="48" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-primary"/></svg><figcaption>48</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 86.5" width="34.17" height="32" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-primary"/></svg><figcaption>32</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 86.5" width="25.63" height="24" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-primary"/></svg><figcaption>24</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 86.5" width="17.09" height="16" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-primary"/></svg><figcaption>16</figcaption></figure></div>
+<div class="ladder"><figure><figcaption>Icon cut</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 87.5" width="101.35" height="96" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-icon"/></svg><figcaption>96</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 87.5" width="67.57" height="64" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-icon"/></svg><figcaption>64</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 87.5" width="50.67" height="48" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-icon"/></svg><figcaption>48</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 87.5" width="33.78" height="32" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-icon"/></svg><figcaption>32</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 87.5" width="25.34" height="24" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-icon"/></svg><figcaption>24</figcaption></figure><figure><svg class="mark" viewBox="13.81 20 92.38 87.5" width="16.89" height="16" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-icon"/></svg><figcaption>16</figcaption></figure></div>
+<p class="cap">Watch the neck above the drop as the size falls.</p>
+</div>
+<h2>Lockup</h2>
+<div class="row">
+<div class="lockup light"><svg class="mark" viewBox="13.81 20 92.38 86.5" width="76.89" height="72" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-primary"/></svg><span>Vera N</span></div>
+<div class="lockup dark"><svg class="mark" viewBox="13.81 20 92.38 86.5" width="76.89" height="72" fill="currentColor" role="img" aria-label="Vera N mark"><use href="#mark-primary"/></svg><span>Vera N</span></div>
+</div>
+<p class="cap">The wordmark is the real Instrument Serif from <code>assets/fonts/</code>. A final lockup file needs the text turned into outlines.</p>
+<h2>Adaptive icon</h2>
+<div class="plate">
+<div class="canvas"><svg viewBox="0 0 108 108" role="img" aria-label="The icon cut on the 108 dp adaptive-icon canvas">
+<rect width="108" height="108" fill="#F5F4F6"/>
+<g stroke="#16181A" stroke-opacity="0.07" stroke-width="0.2"><line x1="6" y1="0" x2="6" y2="108"/><line x1="0" y1="6" x2="108" y2="6"/><line x1="12" y1="0" x2="12" y2="108"/><line x1="0" y1="12" x2="108" y2="12"/><line x1="18" y1="0" x2="18" y2="108"/><line x1="0" y1="18" x2="108" y2="18"/><line x1="24" y1="0" x2="24" y2="108"/><line x1="0" y1="24" x2="108" y2="24"/><line x1="30" y1="0" x2="30" y2="108"/><line x1="0" y1="30" x2="108" y2="30"/><line x1="36" y1="0" x2="36" y2="108"/><line x1="0" y1="36" x2="108" y2="36"/><line x1="42" y1="0" x2="42" y2="108"/><line x1="0" y1="42" x2="108" y2="42"/><line x1="48" y1="0" x2="48" y2="108"/><line x1="0" y1="48" x2="108" y2="48"/><line x1="54" y1="0" x2="54" y2="108"/><line x1="0" y1="54" x2="108" y2="54"/><line x1="60" y1="0" x2="60" y2="108"/><line x1="0" y1="60" x2="108" y2="60"/><line x1="66" y1="0" x2="66" y2="108"/><line x1="0" y1="66" x2="108" y2="66"/><line x1="72" y1="0" x2="72" y2="108"/><line x1="0" y1="72" x2="108" y2="72"/><line x1="78" y1="0" x2="78" y2="108"/><line x1="0" y1="78" x2="108" y2="78"/><line x1="84" y1="0" x2="84" y2="108"/><line x1="0" y1="84" x2="108" y2="84"/><line x1="90" y1="0" x2="90" y2="108"/><line x1="0" y1="90" x2="108" y2="90"/><line x1="96" y1="0" x2="96" y2="108"/><line x1="0" y1="96" x2="108" y2="96"/><line x1="102" y1="0" x2="102" y2="108"/><line x1="0" y1="102" x2="108" y2="102"/></g>
+<g fill="none" stroke="#5C5E66" stroke-width="0.3" stroke-dasharray="1.2 1">
+<rect x="18" y="18" width="72" height="72"/><circle cx="54" cy="54" r="33"/>
+</g>
+<use href="#fg-icon" fill="#16181A"/>
+<g fill="#5C5E66" font-size="3" font-family="Inter, sans-serif">
+<text x="3" y="6">108 dp canvas</text><text x="18" y="16">72 dp shown</text>
+<text x="54" y="96" text-anchor="middle">66 dp safe circle</text>
+</g>
+</svg></div>
+<p class="cap">Icon cut, 48 dp wide, on stock #F5F4F6. It reaches 30.67 dp from the centre (the limit is 33). The point 42% down the mark sits on the centre, since a V carries its weight high.</p>
+</div>
+<h2>On a home screen</h2>
+<div class="wall wall-light" aria-label="Light wallpaper">
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Primary · 48"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-primary" fill="#16181A"/></g></svg><figcaption>Primary · 48</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Icon cut · 48"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Icon cut · 48</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="24" height="24" role="img" aria-label="Primary · 24"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-primary" fill="#16181A"/></g></svg><figcaption>Primary · 24</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="24" height="24" role="img" aria-label="Icon cut · 24"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Icon cut · 24</figcaption></figure>
+<span class="gap"></span>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Circle"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Circle</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Squircle"><g clip-path="url(#clip-squircle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Squircle</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Rounded square"><g clip-path="url(#clip-rounded)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Rounded square</figcaption></figure>
+</div>
+<div class="wall wall-dark" aria-label="Dark wallpaper">
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Primary · 48"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-primary" fill="#16181A"/></g></svg><figcaption>Primary · 48</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Icon cut · 48"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Icon cut · 48</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="24" height="24" role="img" aria-label="Primary · 24"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-primary" fill="#16181A"/></g></svg><figcaption>Primary · 24</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="24" height="24" role="img" aria-label="Icon cut · 24"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Icon cut · 24</figcaption></figure>
+<span class="gap"></span>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Circle"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Circle</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Squircle"><g clip-path="url(#clip-squircle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Squircle</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Rounded square"><g clip-path="url(#clip-rounded)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Rounded square</figcaption></figure>
+</div>
+<div class="wall wall-busy" aria-label="Photo wallpaper">
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Primary · 48"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-primary" fill="#16181A"/></g></svg><figcaption>Primary · 48</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Icon cut · 48"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Icon cut · 48</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="24" height="24" role="img" aria-label="Primary · 24"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-primary" fill="#16181A"/></g></svg><figcaption>Primary · 24</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="24" height="24" role="img" aria-label="Icon cut · 24"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Icon cut · 24</figcaption></figure>
+<span class="gap"></span>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Circle"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Circle</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Squircle"><g clip-path="url(#clip-squircle)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Squircle</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Rounded square"><g clip-path="url(#clip-rounded)"><rect width="108" height="108" fill="#F5F4F6"/><use href="#fg-icon" fill="#16181A"/></g></svg><figcaption>Rounded square</figcaption></figure>
+</div>
+<p class="cap">Sizes are CSS pixels. A laptop at 100% shows about a third of the pixels a phone gives a 48 dp icon, so this is a harsher test than the phone.</p>
+<h2>Themed icon (Android 13 and later)</h2>
+<div class="wall wall-themed-light">
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Light · 48"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#D3E4F5"/><use href="#fg-icon" fill="#0E3A5C"/></g></svg><figcaption>Light · 48</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="24" height="24" role="img" aria-label="Light · 24"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#D3E4F5"/><use href="#fg-icon" fill="#0E3A5C"/></g></svg><figcaption>Light · 24</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Squircle"><g clip-path="url(#clip-squircle)"><rect width="108" height="108" fill="#D3E4F5"/><use href="#fg-icon" fill="#0E3A5C"/></g></svg><figcaption>Squircle</figcaption></figure>
+</div>
+<div class="wall wall-themed-dark">
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Dark · 48"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#1F3242"/><use href="#fg-icon" fill="#B8D3EE"/></g></svg><figcaption>Dark · 48</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="24" height="24" role="img" aria-label="Dark · 24"><g clip-path="url(#clip-circle)"><rect width="108" height="108" fill="#1F3242"/><use href="#fg-icon" fill="#B8D3EE"/></g></svg><figcaption>Dark · 24</figcaption></figure>
+<figure><svg viewBox="18 18 72 72" width="48" height="48" role="img" aria-label="Squircle"><g clip-path="url(#clip-squircle)"><rect width="108" height="108" fill="#1F3242"/><use href="#fg-icon" fill="#B8D3EE"/></g></svg><figcaption>Squircle</figcaption></figure>
+</div>
+<p class="cap">The system tints the monochrome layer (<code>icon-monochrome.svg</code>) with the wallpaper's colours. These two tints are examples.</p>
+<h2>What to look for</h2>
+<div class="plate"><ul>
+<li>At 24, does the primary's neck vanish while the icon cut's holds?</li>
+<li>Does the V look centred in the circle, or does it sit low?</li>
+<li>On the photo wallpaper, does the pale plate keep it clear?</li>
+<li>Then install it on the phone: the real test is a 48 dp icon among your other apps.</li>
+</ul></div>
+</main>
+</body>
+</html>

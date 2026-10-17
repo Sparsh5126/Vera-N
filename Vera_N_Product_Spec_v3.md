@@ -316,7 +316,7 @@ The phone detects a strong match and shows a dimmed suggestion. In the review ba
 
 ## 21. Open Decisions
 
-- Logo and app icon final artwork (direction: dark rounded square, serif V, one amber dot).
+- ~~Logo and app icon final artwork.~~ Decided 2026-10-17 (user): the V mark on light stock (section 22).
 - ~~Where accepted links are stored.~~ Decided 2026-10-04: inline, in one append-only "Linked notes" footer block at the end of the note (section 5).
 - ~~Which on-device embedding model to start with.~~ Decided 2026-10-04: paraphrase-multilingual-MiniLM-L12-v2 (int8), trimmed to English + Hindi and bundled; benchmarked on a mid-range phone (Snapdragon 778G). Details in docs/ARCHITECTURE.md §8.
 - ~~Similarity thresholds for "strong" at launch.~~ Decided 2026-10-04: cosine ≥ 0.60, tuned later from accept rates (section 8).
@@ -369,7 +369,7 @@ The phone detects a strong match and shows a dimmed suggestion. In the review ba
 - 200 ms ease-out transitions; springy card swipe in Review; no decorative animation.
 - Respects the system "reduce motion" setting.
 
-**App icon direction:** dark rounded square with a serif **V** and one small amber dot (the lone node, the "isolated" meaning).
+**Mark and app icon (decided 2026-10-17, user):** a **V** of two strokes, two notes, meeting in one **drop of ink**, in ink on light stock (`#F5F4F6`). This replaces the earlier direction (dark rounded square, amber dot): the user chose the light icon as previewed, and amber is now kept for folders. The mark is drawn from rules by `tool/brand/make_brand_marks.dart` in two cuts: a primary for 96 px and up, and a heavier icon cut below that. `docs/brand/preview.html` shows the rules and the sizes. The icon is the same in light and dark mode, and the Android 12+ launch screen stays plain, like the earlier launch screens.
 
 **Accessibility:** text contrast at least 4.5:1, support for system text size, dimmed items always marked by more than color.
 

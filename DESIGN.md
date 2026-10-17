@@ -240,6 +240,16 @@ Two functional fades predate this world and stay: card previews fade out from 60
 
 Two shapes only. Plates (cards, the connections card, suggestion cards, sheet tops) have softly generous 24px corners. Everything you press or pick (buttons, filter pills, tabs, chips, the nav bar, the snackbar) is a fully rounded stadium; text fields are pills at half the 48px tap height. Every outline is 1px. Suggested chips are dashed (4px dash, 3px gap); graph suggestion lines use the same dashes doubled.
 
+## Mark
+
+A **V** of two strokes, two notes, meeting in one **drop of ink** (decided 2026-10-17). It is drawn from rules, not by hand: the outer contour is an inverted equilateral triangle, the left stroke is the heavier one (4 : 3), and the drop is as wide as the light stroke. `tool/brand/make_brand_marks.dart` writes every file, and `docs/brand/preview.html` shows the rules and the sizes.
+
+- **Two cuts:** the primary for about 96 px and up, and the heavier **icon cut** below that, whose neck still shows at 24 px.
+- **App icon:** the icon cut in ink on stock (`#F5F4F6`), the same in light and dark mode. Android 13+ tints it as a themed icon.
+
+### Named Rules
+**The Ink Mark Rule.** The mark is always ink (or ivory ink on a dark plate), never seal: periwinkle belongs to the AI, not the brand.
+
 ## Components
 
 ### Buttons

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Vera N mark (icon cut) on the 108 dp adaptive-icon canvas. Written by
+     tool/brand/make_brand_marks.dart: change the rules there, not this file. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.5196"
+        android:scaleY="0.5196"
+        android:translateX="22.82"
+        android:translateY="24.51">
+        <path android:fillColor="@color/ic_launcher_mark" android:pathData="M13.81,20 L32.29,20 Q51.64,56.83 63.9,97.75 L60,100 Z" />
+        <path android:fillColor="@color/ic_launcher_mark" android:pathData="M106.19,20 L92.33,20 Q71.36,57.23 56.1,97.75 L60,100 Z" />
+        <path android:fillColor="@color/ic_launcher_mark" android:pathData="M54,101.5 A6,6 0 1,0 66,101.5 A6,6 0 1,0 54,101.5 Z" />
+    </group>
+</vector>

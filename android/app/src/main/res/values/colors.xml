@@ -10,4 +10,8 @@
     <color name="widget_text">#16181A</color>
     <color name="widget_text_secondary">#5C5E66</color>
     <color name="widget_accent">#16181A</color>
+    <!-- Launcher icon: stock and ink in both themes, so these have no
+         values-night twin (an icon looks the same on any wallpaper). -->
+    <color name="ic_launcher_background">#F5F4F6</color>
+    <color name="ic_launcher_mark">#16181A</color>
 </resources>
