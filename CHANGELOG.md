@@ -4,6 +4,9 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Changed
+- **README lists every feature** (user, 2026-10-17): capture, writing, organizing, finding, smart suggestions, data, laptop, sync and accessibility, plus status, building and licenses. Taken from what this changelog records as built; no behavior change.
+
 ### Added
 - **Built-in sync, part 2: the mirror, the service and the screens (built; checked on the devices, see Checked)** (docs/LAPTOP_PLAN.md, S).
   - **Settings, SYNC:** "Sync with your phone" (laptop) / "Sync with your laptop" (phone): "Not paired", "In sync with …", "Last synced: …", and Unpair. Hidden in builds without the engine.
