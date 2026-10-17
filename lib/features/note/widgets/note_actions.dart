@@ -12,6 +12,7 @@ import '../../../core/storage/repositories/links_repository.dart';
 import '../../../core/storage/repositories/notes_repository.dart';
 import '../../../core/storage/repositories/search_repository.dart';
 import '../../../core/utils/names.dart';
+import '../../../shared/widgets/folder_picker.dart';
 import '../../../shared/widgets/notice_snack_bar.dart';
 import '../../../shared/widgets/option_sheet.dart';
 import '../../../shared/widgets/text_entry_sheet.dart';
@@ -23,9 +24,6 @@ import 'note_picker_sheet.dart';
 /// move to a folder. Changes offer Undo instead of asking for confirmation first.
 class NoteActions {
   NoteActions(this._editor, this._library, this._links, this._notes);
-
-  /// Picked in the folder sheet to type a new folder name.
-  static const _newFolder = '\u0000new';
 
   final NoteEditorController _editor;
 
@@ -98,23 +96,12 @@ class NoteActions {
     final messenger = ScaffoldMessenger.of(context);
     final folders = await _library.folders();
     if (!context.mounted) return;
-    final picked = await OptionSheet.show<String>(
+    final folder = await FolderPicker.pick(
       context,
-      selected: note.folder,
-      options: [
-        const SheetOption('', AppCopy.noFolder),
-        for (final f in folders) SheetOption(f, f),
-        const SheetOption(_newFolder, AppCopy.newFolder),
-      ],
+      folders: folders,
+      cleanName: Names.folder,
+      current: note.folder,
     );
-    var folder = picked?.value;
-    if (folder == _newFolder && context.mounted) {
-      final typed = await TextEntrySheet.show(
-        context,
-        hint: AppCopy.folderNameHint,
-      );
-      folder = typed == null ? null : Names.folder(typed);
-    }
     if (folder == null || folder == note.folder) return;
     final old = await _editor.moveToFolder(folder);
     if (old == null) return;

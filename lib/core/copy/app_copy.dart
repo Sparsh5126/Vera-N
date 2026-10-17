@@ -1,3 +1,4 @@
+export 'home_copy.dart';
 export 'laptop_copy.dart';
 export 'sync_copy.dart';
 export 'onboarding_copy.dart';

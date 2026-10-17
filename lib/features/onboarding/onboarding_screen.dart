@@ -11,6 +11,7 @@ import '../../core/styles/app_styles.dart';
 import '../../shared/widgets/progress_dots.dart';
 import 'state/onboarding_controller.dart';
 import 'widgets/onboarding_actions.dart';
+import 'widgets/onboarding_art_kind.dart';
 import 'widgets/onboarding_page.dart';
 
 /// Onboarding (UI spec §4) as one set of pages with dots: private by
@@ -28,15 +29,18 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 
   static const _desktopIntro = [
     OnboardingPage(
+      art: OnboardingArtKind.privateNote,
       wordmark: AppCopy.appName,
       title: OnboardingCopy.onboardingPrivateTitle,
       body: OnboardingCopy.onboardingPrivateBodyDesktop,
     ),
     OnboardingPage(
+      art: OnboardingArtKind.connections,
       title: OnboardingCopy.onboardingWhatTitle,
       body: OnboardingCopy.onboardingWhatBodyDesktop,
     ),
     OnboardingPage(
+      art: OnboardingArtKind.onComputer,
       title: OnboardingCopy.onboardingHowTitleDesktop,
       body: OnboardingCopy.onboardingHowBodyDesktop,
     ),
@@ -44,19 +48,23 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 
   static const _phoneIntro = [
     OnboardingPage(
+      art: OnboardingArtKind.privateNote,
       wordmark: AppCopy.appName,
       title: OnboardingCopy.onboardingPrivateTitle,
       body: OnboardingCopy.onboardingPrivateBody,
     ),
     OnboardingPage(
+      art: OnboardingArtKind.connections,
       title: OnboardingCopy.onboardingWhatTitle,
       body: OnboardingCopy.onboardingWhatBody,
     ),
     OnboardingPage(
+      art: OnboardingArtKind.onPhone,
       title: OnboardingCopy.onboardingHowTitle,
       body: OnboardingCopy.onboardingHowBody,
     ),
     OnboardingPage(
+      art: OnboardingArtKind.reminder,
       title: OnboardingCopy.onboardingRemindTitle,
       body: OnboardingCopy.onboardingRemindBody,
     ),
@@ -197,6 +205,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               if (_folderPage != null)
                 Center(
                   child: OnboardingPage(
+                    art: OnboardingArtKind.folder,
                     title: OnboardingCopy.onboardingFolderTitle,
                     body: DeviceKind.isDesktop
                         ? OnboardingCopy.onboardingFolderBodyDesktop
@@ -220,6 +229,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Widget _namePageContent() => OnboardingPage(
+    art: OnboardingArtKind.name,
     title: OnboardingCopy.onboardingNameTitle,
     body: DeviceKind.isDesktop
         ? OnboardingCopy.onboardingNameBodyDesktop

@@ -45,6 +45,7 @@ class GraphPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    _halo(canvas, size);
     final line = Paint()
       ..color = colors.border
       ..strokeWidth = AppSize.graphLine / zoom.value;
@@ -67,20 +68,33 @@ class GraphPainter extends CustomPainter {
     for (final ref in picture.nodes.keys) {
       final at = _at(ref, size);
       final links = picture.degrees[ref] ?? 0;
-      final r = radiusFor(links);
+      final picked = ref == selected;
+      final r = radiusFor(links) * (picked ? AppSize.graphPickedScale : 1);
       canvas.drawCircle(at, r, links == 0 ? dim : dot);
-      if (ref == selected) {
+      if (picked) {
         canvas.drawCircle(
           at,
           r + AppSpace.xs,
           Paint()
             ..style = PaintingStyle.stroke
             ..color = colors.text
-            ..strokeWidth = AppSize.graphLine,
+            ..strokeWidth = AppSize.graphLine * 2 / zoom.value,
         );
       }
       if (showTitles) _title(canvas, picture.nodes[ref]!.title, at, r);
     }
+  }
+
+  /// A faint ink wash under the picked dot, as behind a selected card,
+  /// drawn first so its links and neighbours stay on top.
+  void _halo(Canvas canvas, Size size) {
+    final ref = selected;
+    if (ref == null || !picture.positions.containsKey(ref)) return;
+    canvas.drawCircle(
+      _at(ref, size),
+      radiusFor(picture.degrees[ref] ?? 0) * AppSize.graphHaloScale,
+      Paint()..color = colors.text.withValues(alpha: AppOpacity.selectedWash),
+    );
   }
 
   /// Waiting suggestions: seal-coloured and dashed, so they never read as

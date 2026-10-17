@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'repositories/attachments_repository.dart';
 import 'repositories/graph_repository.dart';
 import 'repositories/links_repository.dart';
+import 'repositories/note_batch.dart';
 import 'repositories/notes_repository.dart';
 import 'repositories/search_repository.dart';
 import 'repositories/settings_repository.dart';
@@ -18,6 +19,14 @@ final storageProvider = Provider<StorageServices>(
 
 final notesRepositoryProvider = Provider<NotesRepository>(
   (ref) => ref.watch(storageProvider).notes,
+);
+
+/// Actions on several notes at once (Home's selection, drag and drop).
+final noteBatchProvider = Provider<NoteBatch>(
+  (ref) => NoteBatch(
+    ref.watch(storageProvider).notes,
+    ref.watch(storageProvider).analysis,
+  ),
 );
 
 final searchRepositoryProvider = Provider<SearchRepository>(

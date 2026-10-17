@@ -22,7 +22,7 @@ void main() {
     await app.finish(tester);
   });
 
-  testWidgets('Folders: pick a folder to see its notes, again to clear', (
+  testWidgets('Folders: a card per folder; opening one shows its notes', (
     tester,
   ) async {
     await app.storage.notes.create('Loose thought');
@@ -32,16 +32,38 @@ void main() {
 
     await tapText(tester, 'Folders');
     expect(find.text('Ideas'), findsOneWidget);
-    expect(find.text('Ideas/Story'), findsOneWidget);
+    expect(find.text('Story'), findsOneWidget);
+    expect(find.text('in Ideas'), findsOneWidget);
+    expect(find.text('2 notes'), findsOneWidget);
+    expect(find.text('1 note'), findsOneWidget);
     expect(find.text('Top idea'), findsNothing);
 
     await tapText(tester, 'Ideas');
     expect(find.text('Top idea'), findsOneWidget);
     expect(find.text('Deep idea'), findsOneWidget);
     expect(find.text('Loose thought'), findsNothing);
+    expect(find.text('Story'), findsNothing);
 
-    await tapText(tester, 'Ideas');
+    await tester.tap(find.byTooltip('All folders'));
+    await tester.pumpAndSettle();
     expect(find.text('Top idea'), findsNothing);
+    expect(find.text('Story'), findsOneWidget);
+    await app.finish(tester);
+  });
+
+  testWidgets("the phone's back gesture closes an opened folder", (
+    tester,
+  ) async {
+    await app.storage.notes.create('Top idea', folder: 'Ideas');
+    await app.pump(tester);
+    await tapText(tester, 'Folders');
+    await tapText(tester, 'Ideas');
+    expect(find.text('Top idea'), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Top idea'), findsNothing);
+    expect(find.text('1 note'), findsOneWidget);
     await app.finish(tester);
   });
 

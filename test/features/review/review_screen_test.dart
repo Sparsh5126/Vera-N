@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/core/copy/app_copy.dart';
@@ -108,11 +110,61 @@ void main() {
     await app.finish(tester);
   });
 
-  testWidgets('the gesture hint shows once', (tester) async {
+  /// Where the card's first title sits, every 50 ms for three seconds
+  /// after Review opens: enough to see the whole first-time nudge.
+  Future<List<double>> cardTrack(WidgetTester tester) async {
+    await app.pump(tester);
+    await tester.tap(find.text(AppCopy.newConnections));
+    final xs = <double>[];
+    for (var i = 0; i < 60; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      final title = find.text('Newer 0');
+      if (title.evaluate().isNotEmpty) xs.add(tester.getTopLeft(title).dx);
+    }
+    await tester.pumpAndSettle();
+    return xs;
+  }
+
+  testWidgets('the first time, the card nudges right, then left, once', (
+    tester,
+  ) async {
     await suggest(hintSeen: false);
-    await openReview(tester);
+    final xs = await cardTrack(tester);
+    final rest = tester.getTopLeft(find.text('Newer 0')).dx;
+    expect(xs.reduce(math.max), greaterThan(rest + 20));
+    expect(xs.reduce(math.min), lessThan(rest - 20));
+    // Right first, then left.
+    expect(
+      xs.indexWhere((x) => x > rest + 20),
+      lessThan(xs.indexWhere((x) => x < rest - 20)),
+    );
+    expect(find.byIcon(Icons.touch_app_outlined), findsNothing);
     expect(find.text('Swipe to decide'), findsOneWidget);
     await tapAndSettle(tester, find.text('Got it'));
+    expect(find.text('Swipe to decide'), findsNothing);
+    expect(await app.storage.settings.reviewHintSeen(), isTrue);
+    await app.finish(tester);
+  });
+
+  testWidgets('with reduce motion the card stays still; labels still show', (
+    tester,
+  ) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    await suggest(hintSeen: false);
+    final xs = await cardTrack(tester);
+    expect(xs.toSet(), hasLength(1));
+    expect(find.text('Swipe to decide'), findsOneWidget);
+    await app.finish(tester);
+  });
+
+  testWidgets('the first decision puts the gesture labels away', (
+    tester,
+  ) async {
+    await suggest(count: 2, hintSeen: false);
+    await openReview(tester);
+    await tapAndSettle(tester, find.text('Not sure'));
     expect(find.text('Swipe to decide'), findsNothing);
     expect(await app.storage.settings.reviewHintSeen(), isTrue);
     await app.finish(tester);

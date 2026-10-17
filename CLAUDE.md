@@ -87,7 +87,7 @@ Rules:
 
 ## 7. Haptics and animations
 
-- All haptics go through one wrapper (`core/feedback/haptics.dart`) with named events, never raw calls in widgets. Mapping: accept = light tap, reject = none, not sure = soft, undo = soft. Add events only when the UI spec calls for them.
+- All haptics go through one wrapper (`core/feedback/haptics.dart`) with named events, never raw calls in widgets. Mapping: accept = light tap, reject = none, not sure = soft, undo = soft, select = selection tick (a note card on Home, once per hold or tap; a new dot in the Graph). Add events only when the UI spec calls for them.
 - Respect the system: no haptics if the user disabled them; honor "reduce motion" (use instant or simple fades).
 - Animations are short and purposeful: 200 ms ease-out by default, a springy card swipe in Review with a tilt and a faint ✓ or ✕ while dragging. No decorative or looping animation.
 - Animate only transform and opacity where possible, not layout. Dispose every controller. Keep scrolling and swiping at a steady 60 fps.

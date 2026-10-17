@@ -33,4 +33,21 @@ abstract final class AppMotion {
 
   /// Card tilt in radians at a full-width drag.
   static const double cardTiltMax = 0.14;
+
+  /// The first-time nudge of a Review card (UI spec §6), once: it leans
+  /// this share of its width right, settles, leans left, settles.
+  static const double nudgeLean = 0.22;
+
+  /// One lean or settle of the nudge.
+  static const Duration nudgeStep = Duration(milliseconds: 450);
+
+  /// The pause at the far point of each lean, so the ✓ or ✕ can be read.
+  static const Duration nudgeHold = Duration(milliseconds: 250);
+
+  /// How long a dragged note rests on a folder chip before that folder
+  /// opens under it (UI spec §5), as in a desktop file manager.
+  static const Duration springOpen = Duration(milliseconds: 700);
+
+  /// Settling back to the middle eases in and out, like a hand letting go.
+  static const Curve nudgeSettleCurve = Curves.easeInOut;
 }

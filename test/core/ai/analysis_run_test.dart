@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/core/ai/scheduler/analysis_run.dart';
 import 'package:vera_n/core/ai/suggestions/suggestion_actions.dart';
+import 'package:vera_n/core/storage/files/note_footer.dart';
 import 'package:vera_n/core/storage/repositories/analysis_repository.dart';
 import 'package:vera_n/core/storage/repositories/links_repository.dart';
 import 'package:vera_n/core/storage/repositories/rejections_repository.dart';
@@ -85,6 +86,37 @@ void main() {
     await run().run();
     expect(await suggestions.pending(), isEmpty);
   });
+
+  test(
+    'notes linked to the same notes are not matched on the footer',
+    () async {
+      // Found 2026-10-17: every note with a "Linked notes" footer was
+      // suggested with every other, since the footers listed the same titles.
+      final links = LinksRepository(h.db);
+      final habits = await h.repo.create(
+        'Atomic habits notes\nSmall habits compound into big results.',
+      );
+      final routine = await h.repo.create(
+        'Morning routine plan\nWake early, stretch, then read twenty pages.',
+      );
+      var withLinks = piano;
+      var gardenLinks = garden;
+      for (final ref in [habits, routine]) {
+        final link = (await links.linkTextFor(ref))!;
+        withLinks = NoteFooter.append(withLinks, link);
+        gardenLinks = NoteFooter.append(gardenLinks, link);
+      }
+      final a = await h.repo.create(withLinks);
+      final g = await h.repo.create(gardenLinks);
+
+      await run().run();
+
+      final pairs = (await suggestions.pending()).map(
+        (s) => {s.noteA, s.noteB},
+      );
+      expect(pairs, isNot(contains(equals({a, g}))));
+    },
+  );
 
   test('very short notes are not matched', () async {
     await h.repo.create('Piano daily');

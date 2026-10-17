@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/models/folder_summary.dart';
 import '../../../core/models/note_summary.dart';
 import '../../../core/models/search_filters.dart';
 import '../../../core/storage/storage_providers.dart';
@@ -35,6 +36,16 @@ class HomeViewController extends Notifier<HomeViewState> {
     tag: state.tag,
   );
 
+  /// Shows [folder] opened in the Folders view: a drag resting on its chip.
+  void openFolder(String folder) => state = HomeViewState(
+    view: HomeView.folders,
+    folder: folder,
+    tag: state.tag,
+  );
+
+  /// Back to the folder cards from an opened folder.
+  void closeFolder() => state = HomeViewState(view: state.view, tag: state.tag);
+
   /// Picks [tag]; picking it again clears the choice.
   void pickTag(String tag) => state = HomeViewState(
     view: state.view,
@@ -47,9 +58,11 @@ final homeViewProvider = NotifierProvider<HomeViewController, HomeViewState>(
   HomeViewController.new,
 );
 
-final homeFoldersProvider = StreamProvider.autoDispose<List<String>>(
-  (ref) => ref.watch(searchRepositoryProvider).watchFolders(),
-);
+/// The folder cards: every folder with how many notes it holds.
+final homeFolderSummariesProvider =
+    StreamProvider.autoDispose<List<FolderSummary>>(
+      (ref) => ref.watch(searchRepositoryProvider).watchFolderSummaries(),
+    );
 
 final hasLockedNotesProvider = StreamProvider.autoDispose<bool>(
   (ref) => ref.watch(notesRepositoryProvider).watchHasLocked(),

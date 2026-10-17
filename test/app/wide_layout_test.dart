@@ -78,13 +78,14 @@ void main() {
     await app.finish(tester);
   });
 
-  testWidgets('right-click on a card offers what a long press offers', (
+  testWidgets('right-click on a card selects it, as holding does', (
     tester,
   ) async {
     await app.storage.notes.create('Groceries\nMilk and eggs.');
     await wide(tester);
     await tester.tap(find.text('Groceries'), buttons: kSecondaryButton);
     await tester.pumpAndSettle();
+    expect(find.text('1 selected'), findsOneWidget);
     expect(find.text(AppCopy.delete), findsOneWidget);
     await app.finish(tester);
   });

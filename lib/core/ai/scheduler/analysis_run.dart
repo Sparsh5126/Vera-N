@@ -7,6 +7,7 @@ import '../../models/chunk_vector.dart';
 import '../../models/note_to_analyze.dart';
 import '../../models/suggestion.dart';
 import '../../models/suggestion_draft.dart';
+import '../../storage/files/note_footer.dart';
 import '../../storage/repositories/analysis_repository.dart';
 import '../../storage/repositories/suggestions_repository.dart';
 import '../ai_settings.dart';
@@ -89,7 +90,8 @@ class AnalysisRun {
       for (final c in await analysis.chunksOf(note.ref, model))
         c.hash: c.vector,
     };
-    final pieces = _wordCount(note.body) < AiSettings.minWords
+    final words = NoteFooter.strip(note.body);
+    final pieces = _wordCount(words) < AiSettings.minWords
         ? const <TextChunk>[]
         : NoteChunker.split(
             note.body,
@@ -112,6 +114,7 @@ class AnalysisRun {
         ),
       );
     }
+    await suggestions.dropFooterMatches(note.ref, words.length);
     await analysis.save(note.ref, note.contentHash, model, chunks, _clock());
     return chunks.isNotEmpty;
   }

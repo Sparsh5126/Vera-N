@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/ai/suggestions/suggestion_providers.dart';
 import '../../core/copy/app_copy.dart';
+import '../../core/feedback/haptics.dart';
 import '../../core/navigation/routes.dart';
 import '../../core/settings/app_prefs_controller.dart';
 import '../../core/storage/storage_providers.dart';
@@ -162,7 +163,14 @@ class _GraphScreenState extends ConsumerState<GraphScreen> {
             picture: picture,
             selected: node?.ref,
             centerRequest: view.centerRequest,
-            onSelect: _controls.select,
+            onSelect: (ref) {
+              // A light tick for picking a dot (CLAUDE.md §7), not for
+              // tapping away or tapping the same one again.
+              if (ref != null && ref != view.selected) {
+                unawaited(Haptics.play(HapticEvent.select));
+              }
+              _controls.select(ref);
+            },
             onSuggestion: (s) => unawaited(_suggestions.open(context, s)),
           ),
         ),

@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
 
+import '../../models/archive_folder.dart';
+import '../../models/folder_summary.dart';
 import '../../models/locked_folder.dart';
 import '../../models/search_filters.dart';
 import '../../models/search_hit.dart';
@@ -53,6 +55,42 @@ class SearchRepository {
   /// [folders], kept up to date.
   Stream<List<String>> watchFolders() =>
       _folderRows().watch().map(_expandFolders);
+
+  /// [folders] with how many notes each holds, kept up to date, for Home's
+  /// folder cards. A count is what opening the folder lists: its notes and
+  /// its subfolders', folders compared without case, archived notes only
+  /// inside the archive itself (as [NoteFilterSql]).
+  Stream<List<FolderSummary>> watchFolderSummaries() => _db
+      .customSelect(
+        "SELECT folder, COUNT(*) AS notes FROM notes n WHERE folder != '' "
+        'AND trashed_at IS NULL AND ${LockedFolder.notLockedSql()} '
+        'GROUP BY folder',
+        readsFrom: {_db.notes},
+      )
+      .watch()
+      .map(_summaries);
+
+  static List<FolderSummary> _summaries(List<QueryRow> rows) {
+    final counts = {
+      for (final r in rows) r.read<String>('folder'): r.read<int>('notes'),
+    };
+    return [
+      for (final path in _expandFolders(rows))
+        FolderSummary(path, _countIn(path, counts)),
+    ];
+  }
+
+  static int _countIn(String path, Map<String, int> counts) {
+    final folder = path.toLowerCase();
+    final archive = ArchiveFolder.contains(path);
+    var total = 0;
+    counts.forEach((name, n) {
+      final lower = name.toLowerCase();
+      final inside = lower == folder || lower.startsWith('$folder/');
+      if (inside && (archive || !ArchiveFolder.contains(name))) total += n;
+    });
+    return total;
+  }
 
   /// Every confirmed tag on a note that isn't in the trash, sorted.
   Future<List<String>> tags() async => _tagNames(await _tagRows().get());

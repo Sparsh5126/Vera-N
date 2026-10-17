@@ -11,6 +11,7 @@ import 'package:vera_n/features/graph/state/graph_layout.dart';
 import 'package:vera_n/features/graph/state/graph_view.dart';
 
 import '../../support/app_harness.dart';
+import '../../support/haptics_spy.dart';
 import '../../support/storage_harness.dart';
 
 void main() {
@@ -126,6 +127,32 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text(AppCopy.emptyGraph), findsNothing);
       expect(find.textContaining('First note.'), findsWidgets);
+      semantics.dispose();
+      await app.finish(tester);
+    });
+
+    testWidgets('picking a dot ticks; picking it again does not', (
+      tester,
+    ) async {
+      final spy = HapticsSpy()..attach(tester);
+      await app.storage.notes.create('Alpha\nFirst note.');
+      await app.storage.notes.create('Beta\nSecond note.');
+      final semantics = tester.ensureSemantics();
+      await openGraph(tester);
+
+      tester.semantics.tap(
+        find.semantics.byLabel(AppCopy.graphDot('Alpha', 0)),
+      );
+      await tester.pumpAndSettle();
+      expect(spy.played, [HapticsSpy.selectionClick]);
+      tester.semantics.tap(
+        find.semantics.byLabel(AppCopy.graphDot('Alpha', 0)),
+      );
+      await tester.pumpAndSettle();
+      expect(spy.played, hasLength(1));
+      tester.semantics.tap(find.semantics.byLabel(AppCopy.graphDot('Beta', 0)));
+      await tester.pumpAndSettle();
+      expect(spy.played, hasLength(2));
       semantics.dispose();
       await app.finish(tester);
     });

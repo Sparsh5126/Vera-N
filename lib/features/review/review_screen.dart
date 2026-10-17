@@ -52,6 +52,8 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   }
 
   Future<void> _choose(ReviewChoice choice) async {
+    // A first decision means the gestures are learned.
+    if (_showHint) _dismissHint();
     final messenger = ScaffoldMessenger.of(context);
     final review = ref.read(reviewProvider.notifier);
     // Haptics: light on accept, soft on not sure, none on reject.
@@ -133,6 +135,8 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             children: [
               _topBar(state),
               Expanded(child: _body(state, current)),
+              if (current != null && _showHint)
+                ReviewHint(onDismiss: _dismissHint),
               if (current != null) _buttons(state, current),
               const SizedBox(height: AppSpace.m),
             ],
@@ -189,19 +193,14 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
         onMore: state.moreWaiting ? () => unawaited(review.nextBatch()) : null,
       );
     }
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        AnimatedSwitcher(
-          duration: Motion.of(context),
-          child: SwipeCard(
-            key: ValueKey(current.suggestion.id),
-            onSwipe: _onSwipe,
-            child: _card(current),
-          ),
-        ),
-        if (_showHint) ReviewHint(onDismiss: _dismissHint),
-      ],
+    return AnimatedSwitcher(
+      duration: Motion.of(context),
+      child: SwipeCard(
+        key: ValueKey(current.suggestion.id),
+        onSwipe: _onSwipe,
+        nudge: _showHint,
+        child: _card(current),
+      ),
     );
   }
 

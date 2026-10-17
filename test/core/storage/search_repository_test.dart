@@ -164,6 +164,32 @@ void main() {
     });
   });
 
+  test('folder cards count what opening the folder lists', () async {
+    await h.repo.create('One', folder: 'Ideas');
+    await h.repo.create('Two', folder: 'ideas');
+    await h.repo.create('Deep', folder: 'Ideas/Story');
+    await h.repo.create('Kept', folder: 'Archive/Ideas');
+    final gone = await h.repo.create('Gone', folder: 'Ideas');
+    await h.repo.trash(gone);
+
+    final cards = {
+      for (final f in await search.watchFolderSummaries().first)
+        f.path: f.notes,
+    };
+    // Letter case is ignored, as when the folder is opened; archived notes
+    // count only inside the archive; the trash not at all.
+    expect(cards['Ideas'], 3);
+    expect(cards['Ideas/Story'], 1);
+    expect(cards['Archive'], 1);
+    expect(cards['Archive/Ideas'], 1);
+    for (final path in cards.keys) {
+      final listed = await h.repo
+          .watchNotes(filters: SearchFilters(folder: path))
+          .first;
+      expect(listed, hasLength(cards[path]), reason: path);
+    }
+  });
+
   group('recent searches', () {
     late SettingsRepository settings;
     setUp(() => settings = SettingsRepository(h.db));

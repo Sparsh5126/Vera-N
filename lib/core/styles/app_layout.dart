@@ -62,6 +62,15 @@ abstract final class AppSize {
   /// Note card in the Home list layout, before text scaling.
   static const double noteRowHeight = 112;
 
+  /// Folder card on Home's Folders view, grid and list, before text scaling.
+  static const double folderCardHeight = 104;
+
+  /// The line illustration at the top of each onboarding page.
+  static const double onboardingArtHeight = 160;
+
+  /// The ink line those illustrations are drawn with, at full size.
+  static const double artStroke = 2;
+
   /// Space a checkbox or bullet takes at the start of a list line in the
   /// editor. The checkbox is tappable across this width and the line's
   /// height (an inline glyph can't reach the 48 minimum without spreading
@@ -113,6 +122,11 @@ abstract final class AppSize {
   /// Graph lines (confirmed links).
   static const double graphLine = 1.5;
 
+  /// A picked dot grows by this much, on an ink halo this many times its
+  /// size, inside an ink ring.
+  static const double graphPickedScale = 1.4;
+  static const double graphHaloScale = 2.4;
+
   /// Room each note gets in the graph before zooming.
   static const double graphSpacing = 110;
 
@@ -146,6 +160,9 @@ abstract final class AppSize {
 abstract final class AppBorder {
   static const double width = 1;
 
+  /// A selected note card's ink outline on Home.
+  static const double selected = 2;
+
   /// Dashed outline of dimmed (suggested) chips.
   static const double dashLength = 4;
   static const double dashGap = 3;
@@ -162,6 +179,10 @@ abstract final class AppOpacity {
 
   /// The light amber wash inside a Graph folder bubble.
   static const double bubbleFill = 0.16;
+
+  /// The faint ink wash behind something selected: a note card on Home,
+  /// a dot in the Graph. Ink, never the seal colour, which is the AI's.
+  static const double selectedWash = 0.08;
 }
 
 /// Which layout a window gets (docs/LAPTOP_PLAN.md, L1).

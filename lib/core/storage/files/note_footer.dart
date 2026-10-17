@@ -14,6 +14,14 @@ abstract final class NoteFooter {
     return '$trimmed$gap$heading\n$line\n';
   }
 
+  /// [body] without its footer: the user's own words, which is all the AI
+  /// reads. It is a prefix of [body], so positions in it are positions in
+  /// the note.
+  static String strip(String body) {
+    final (main, links) = split(body);
+    return links.isEmpty ? body : main;
+  }
+
   /// [body] split into the text above the footer and the footer's link
   /// lines (none when it has no footer).
   static (String, List<String>) split(String body) {

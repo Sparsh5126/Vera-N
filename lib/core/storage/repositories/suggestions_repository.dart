@@ -58,6 +58,33 @@ class SuggestionsRepository {
     )..where((s) => s.expiresAt.isSmallerThanValue(now))).go();
   }
 
+  /// Removes this device's suggestions for note [ref] that matched on its
+  /// "Linked notes" footer, which starts at [footerStart]: the footer
+  /// lists link titles, not the user's words, so notes linked to the same
+  /// notes looked alike (found 2026-10-17). Call it before [ref]'s chunks
+  /// are replaced, while the matched chunks' positions are still stored.
+  /// A chunk counts when it reaches into the footer, since a short last
+  /// line shares a chunk with the line below it.
+  Future<int> dropFooterMatches(int ref, int footerStart) async {
+    final inFooter =
+        await (_db.selectOnly(_db.chunks)
+              ..addColumns([_db.chunks.idx])
+              ..where(
+                _db.chunks.note.equals(ref) &
+                    _db.chunks.end.isBiggerThanValue(footerStart),
+              ))
+            .map((r) => r.read(_db.chunks.idx)!)
+            .get();
+    if (inFooter.isEmpty) return 0;
+    return (_db.delete(_db.suggestions)..where(
+          (s) =>
+              s.fromLaptop.equals(false) &
+              ((s.noteA.equals(ref) & s.chunkA.isIn(inFooter)) |
+                  (s.noteB.equals(ref) & s.chunkB.isIn(inFooter))),
+        ))
+        .go();
+  }
+
   /// The next review batch: fresh suggestions first, then "not sure"
   /// ones, oldest first; pairs with a note in the trash are left out.
   Future<List<Suggestion>> batch({required int size}) async {

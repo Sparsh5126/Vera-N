@@ -52,6 +52,8 @@ Floating pill bottom bar: **Home | Search | Graph | Settings**
 
 Shown once, on first launch. Plain language, no jargon. Draft copy below (all claims must be true at launch).
 
+**Illustrations (decided 2026-10-17, user):** each page opens with a simple line illustration above its words, drawn in code in the theme's ink on the note plate, so it is sharp at any size and follows light and dark. Private: a note with a padlock on its corner. What it does: two notes joined by a dashed seal line, the app's own mark for a suggestion. How it works: a phone with a few linked notes inside (a laptop on the desktop). Reminders: a note line with a bell. Folder: a folder with notes in it. Name: a greeting being written, the cursor after it. Still pictures, not animations; screen readers skip them, since the words say it all. On a short screen they shrink (at most 22% of its height), and they step aside while the keyboard is up.
+
 **Screen 1: Private by design**
 > **Vera N**
 > Notes that stay yours.
@@ -80,7 +82,7 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 
 - Name is optional. If skipped, the greeting is just "Good evening".
 - Short, skippable, no tutorials beyond this.
-- A one-time gesture hint appears the first time the Review screen opens (see section 6).
+- The first time the Review screen opens, its first card nudges itself to show the swipe, with the gestures named below it (see section 6).
 - **Built 2026-10-08:** all five screens are one swipeable set of pages with dots (the user asked for the folder and name to be part of it, not separate screens). Screens 1–3 have **Next**, and **Skip** at the top goes straight to the folder page. The folder page (only where a folder can be picked, i.e. Android) has **Choose folder** and **Not now**; both continue to the name page. The name page has **Done** (saves the name for the greeting) and **Skip**, and its keyboard opens only when that page is reached. Onboarding counts as done only after the name page, so leaving halfway shows it again next launch. Capture entry points (shortcut, later widget and tile) still skip onboarding.
 - Screen 3's laptop line is kept as drafted at the user's request (2026-10-08): the laptop layer is planned for this release, so it must be built before launch for the claim to be true.
 
@@ -130,15 +132,18 @@ Shown once, on first launch. Plain language, no jargon. Draft copy below (all cl
 - Revisit is silent: no notification, the user opens it by choice.
 - Built 2026-10-08: the Revisit card shows no count. It opens the **Revisit screen**, laid out like Review (changed 2026-10-08, user): one old note at a time in a centred card under "You might want to revisit this.", showing when it last changed, its title and start, and "Related to your recent note on <title>.". Below, in thumb reach: **Not now** and **Open**. Open (or tapping the card) opens the note and counts as revisited; the next one, if any, takes its place. Up to 5 are waiting at a time. Not now hides it for a month ("Back in a month", with Undo). Empty state: "Nothing to revisit right now."
 
-**View switch:** thin rounded pills **Recent | Folders | Tags**. Recent is the default. Folders and Tags swap the notes area to folder or tag pills and their notes.
-- **Locked pill (built 2026-10-08):** when the Locked folder has notes, the Folders view ends with a **Locked** pill with a lock icon. Tapping it asks for the phone's lock, then shows those notes with a **Lock now** button above them. If the folder closes while picked, the notes give way to the lock, "Notes here open with your phone's lock." and **Unlock**.
-- Built 2026-10-04: Folders shows a pill for every folder (parents included, e.g. `Ideas` and `Ideas/Story`); tapping one shows its notes below, subfolders included, newest first; tapping it again clears the choice. Tags works the same with `#tag` pills. Pinned notes appear in place (with their pin icon), not in a separate row. "No folders yet." / "No tags yet." when there are none. The view and the picked folder or tag are kept while the app runs, so returning from a note keeps the user's place.
+**View switch:** thin rounded pills **Recent | Folders | Tags**. Recent is the default. Folders swaps the notes area to folder cards; Tags to tag pills and their notes.
+- **Folder cards (decided 2026-10-17, user; were pills):** a card for every folder, parents and subfolders each their own card (flat, not nested), in the Grid or List layout chosen in Settings. A card shows a folder icon, the folder's name, "in Ideas" above the name for a subfolder, and "3 notes" below it. The count is what opening the folder lists (subfolders included), as information in secondary ink, not a badge. Tapping a card opens it: the cards give way to a header with a back arrow ("All folders") and the folder's name, then its notes, subfolders included, newest first. The back arrow or the phone's back gesture returns to the cards.
+- **Locked card (built 2026-10-08 as a pill):** when the Locked folder has notes, the cards end with a **Locked** card with a lock icon and **no count**, so how many notes are locked stays private. Tapping it asks for the phone's lock, then opens it like a folder, with **Lock now** in its header. If the folder closes while open, the notes give way to the lock, "Notes here open with your phone's lock." and **Unlock**.
+- Built 2026-10-04: Tags shows a `#tag` pill for every tag; tapping one shows its notes below; tapping it again clears the choice. Pinned notes appear in place (with their pin icon), not in a separate row. "No folders yet." / "No tags yet." when there are none. The view and the opened folder or picked tag are kept while the app runs, so returning from a note keeps the user's place.
 
 **Notes area**
 - Pinned notes first, as cards with a small pin icon (horizontal row).
 - Remaining notes as scrollable cards.
 - **Layout setting:** two-column grid (default) or single-column list.
-- Cards: text top-aligned, optional title first, long text fades out. Long-pressing a card (2026-10-04, backlog #7) opens a sheet with Pin / Unpin and Delete; Delete moves the note to the trash with an Undo popup, never a confirmation. Both actions are also visible inside the note (the pin button and the ⋮ menu), so the gesture always has a button alternative. A small dimmed dot on a card means that note has pending suggestions (no numbers).
+- Cards: text top-aligned, optional title first, long text fades out. A small dimmed dot on a card means that note has pending suggestions (no numbers).
+- **Selecting notes (decided 2026-10-17, user; replaces the 2026-10-04 long-press sheet):** holding a card and letting go selects it: an ink outline, a ✓ and a faint ink wash behind the card (ink, never the seal colour, which is the AI's). A light selection tick is felt when the hold registers (once, whether it then selects or lifts the card for a drag) and on each tap that adds or removes a card. While any are selected, a tap on a card adds or removes it instead of opening it. The header gives way to "✕ · 2 selected", and the actions float above the nav bar in thumb reach, in its plate, where "New note" was: **Folder** (the folder sheet, "New folder" included), **Lock**, **Archive**, **Pin** (or **Unpin** when all are pinned), **Delete**. Each acts on every selected note and ends selecting. Folder, Lock, Archive and Delete offer one Undo for the whole batch, never a confirmation; Pin shows at once. Lock needs a screen lock on the phone, as in a note, and Archive leaves locked notes locked. ✕ or the phone's back gesture stops selecting (before an opened folder closes). Every action is also inside each note, so nothing depends on the gesture.
+- **Dragging notes into folders (decided 2026-10-17, user):** holding a card and **moving** (instead of letting go) lifts it, with every selected note if it is selected (a small count on the lifted card). Once the finger moves, a tray floats above the nav bar, "Drop on a folder, or rest on one to open it": a chip for every folder (archived folders left out), then **No folder**, **Locked**, **Archive** and **New folder**. A chip turns ink while notes hover over it. **Resting on a folder chip** for 0.7 s opens that folder under the finger (as a desktop file manager does); a banner then reads "Drop to move into Study", and dropping anywhere on its notes moves them in. Dropping straight on a chip works too. Locked never opens under a drag (it needs the phone's lock); dropping on it locks, as the Lock button does. Every drop acts at once with one Undo and ends selecting; letting go anywhere else changes nothing. The selection bar's Folder button does the same without dragging.
 
 **Empty state (first launch):** a blank page with "Write your first thought" and the New note button.
 
@@ -224,7 +229,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 
 **Batches:** 5 cards per batch. "Not sure" cards return in the next batch and stop appearing after their 30 days.
 
-**First-time hint:** a one-time overlay showing the four gestures, never shown again.
+**First-time hint (changed 2026-10-17, user; was an overlay):** the first time Review opens, the first real card shows the swipe by itself, once: it leans right (the faint ✓ shows), settles, leans left (the ✕), settles, about 2.3 s, with a finger icon resting on it. Touching the card stops it. Under the card, above the buttons, a quiet strip names the four gestures ("Swipe to decide": right link them, left not related, up not sure yet, down undo) with **Got it**. Got it or the first decision puts it away for good. With "reduce motion" on, the card doesn't move; the strip still shows.
 
 **Other card types** use the same swipe pattern: tag suggestion (note with proposed tag chip) and topic suggestion (the notes it would group). Built 2026-10-08: tag cards show this note, then the closest note that already has the tag ("This note" / "Has #music"), with "Notes like this one are tagged #music." Topic cards wait for topic discovery.
 
@@ -396,6 +401,7 @@ One reusable card, two containers:
 - **Show suggestions** toggle (off by default) adds dimmed dashed lines; tapping one opens the suggestion sheet.
 - Pan and pinch to zoom; titles appear only when zoomed in.
 - Tap a dot → preview card at the bottom (title, snippet, **Open**, **Focus**). Focus shows that note and neighbors 1 to 3 hops out.
+- **Picked dot (decided 2026-10-17, user):** the picked dot grows by 1.4×, sits on a faint ink wash (the same wash as a selected note card on Home) inside an ink ring, and its links are drawn heavier in ink; nothing else is dimmed, since dimmed means "AI suggestion". Picking a new dot plays the light selection tick; tapping the same dot again or tapping away does not.
 - Search icon jumps to and centers a note.
 - Filter pills: Folder and Tag, plus the two toggles.
 - No stats, no "orphan note" nudges, nothing to maintain.
@@ -417,7 +423,7 @@ One reusable card, two containers:
   - Ctrl+B bold, Ctrl+K link to a note;
   - in Review: Ctrl+Enter accept, Delete reject, Ctrl+U not sure, Ctrl+Z undo.
   Every shortcut has a visible button.
-- **Mouse:** right-click on a card opens the long-press menu.
+- **Mouse:** right-click on a card selects it, as holding does.
 - **Reminders** don't appear on the laptop (phone-only).
 - **Home header:** the wordmark is in the sidebar, so Home shows only the greeting.
 - **Settings and onboarding** sit in a readable column (680 wide), centred in the pane.

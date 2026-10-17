@@ -33,6 +33,23 @@ void main() {
     expect(chunks.map((c) => words(c.text)).reduce((a, b) => a + b), 30);
   });
 
+  test('the Linked notes footer is left out', () {
+    const body =
+        'Time loop\nWhat if every day repeats. I would learn piano.\n\n'
+        '## Linked notes\n'
+        '- [[20261003-153228-a7f3|Shopping list for Sunday]]\n'
+        '- [[20261004-101010-b8e2|Morning routine plan]]\n';
+    final chunks = NoteChunker.split(body, words, maxTokens: 50);
+    final text = chunks.map((c) => c.text).join(' ');
+    expect(text, contains('piano'));
+    expect(text, isNot(contains('Linked notes')));
+    expect(text, isNot(contains('Shopping')));
+    expect(text, isNot(contains('Morning')));
+    for (final c in chunks) {
+      expect(c.end, lessThanOrEqualTo(body.indexOf('## Linked notes')));
+    }
+  });
+
   test('chunks hold the text as read: links as titles, no symbols', () {
     const body = '- [ ] buy **milk**, see [[20261003-153228-a7f3|Shopping]]';
     final chunk = NoteChunker.split(body, words, maxTokens: 50).single;

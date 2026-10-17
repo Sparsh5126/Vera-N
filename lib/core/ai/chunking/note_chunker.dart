@@ -1,4 +1,5 @@
 import '../ai_settings.dart';
+import '../../storage/files/note_footer.dart';
 import '../../storage/files/note_markup.dart';
 
 /// A piece of a note's text the model reads at once.
@@ -29,10 +30,13 @@ class TextChunk {
 ///   says what the note is about. Shorter text ("Tuesday") has too little
 ///   meaning to judge, as with whole notes ([AiSettings.minWords]), and
 ///   stays with the next line.
+/// - The "Linked notes" footer is left out: it lists the titles of linked
+///   notes, not the user's words, and every note linked to the same notes
+///   matched every other on it (found 2026-10-17).
 abstract final class NoteChunker {
   /// Bumped whenever chunks are cut differently, so every note is
   /// analysed again (it is part of the analysis model id).
-  static const version = 2;
+  static const version = 3;
 
   static final _listItem = RegExp(r'^[ \t]*(- |\* |\+ |• |\d{1,9}[.)] )');
 
@@ -42,10 +46,11 @@ abstract final class NoteChunker {
   static final _word = RegExp(r'\S+');
 
   static List<TextChunk> split(
-    String body,
+    String note,
     int Function(String text) countTokens, {
     required int maxTokens,
   }) {
+    final body = NoteFooter.strip(note);
     final chunks = <TextChunk>[];
     int? start;
     var end = 0;

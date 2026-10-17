@@ -8,6 +8,7 @@ import '../../../core/styles/app_styles.dart';
 import '../../../core/utils/date_label.dart';
 import '../../../shared/widgets/note_card.dart';
 import 'card_callbacks.dart';
+import 'draggable_note_card.dart';
 
 /// Home's note cards, as a two-column grid (the default) or a list, as
 /// chosen in Settings. Built lazily, so long libraries scroll smoothly.
@@ -32,15 +33,21 @@ class NoteCards extends ConsumerWidget {
     final scaler = MediaQuery.textScalerOf(context);
     Widget card(BuildContext context, int i) {
       final note = notes[i];
-      return NoteCard(
-        title: note.title,
-        preview: note.preview,
-        dateLabel: DateLabel.of(note.modified, now),
-        pinned: note.pinned,
-        suggested: showSuggested && note.suggested,
-        conflict: note.conflict,
-        onTap: () => cards.open(note.ref),
-        onLongPress: () => cards.menu(note),
+      return DraggableNoteCard(
+        note: note,
+        cards: cards,
+        card: NoteCard(
+          title: note.title,
+          preview: note.preview,
+          dateLabel: DateLabel.of(note.modified, now),
+          pinned: note.pinned,
+          suggested: showSuggested && note.suggested,
+          conflict: note.conflict,
+          onTap: () => cards.tap(note),
+          onSecondaryTap: () => cards.hold(note),
+          onSemanticLongPress: () => cards.hold(note),
+          selected: cards.isSelected(note.ref),
+        ),
       );
     }
 

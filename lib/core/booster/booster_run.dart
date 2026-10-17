@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../models/booster_result.dart';
+import '../storage/files/note_footer.dart';
 import '../storage/repositories/analysis_repository.dart';
 import '../storage/repositories/booster_repository.dart';
 import '../storage/repositories/suggestions_repository.dart';
@@ -96,14 +97,14 @@ class BoosterRun {
   Future<void> _duplicates(Map<int, Float32List> meanings) async {
     final lengths = <int, int>{};
     for (final ref in meanings.keys) {
-      lengths[ref] = (await analysis.bodyOf(ref))?.length ?? 0;
+      lengths[ref] = (await _text(ref))?.length ?? 0;
     }
     final pairs = NoteGroups.duplicateCandidates(meanings, lengths);
     for (final (a, b) in pairs) {
       if (_mustStop) return;
       final pending = _pending(BoosterKind.duplicate, [a, b]);
       if (pending == null) continue;
-      final textA = await analysis.bodyOf(a), textB = await analysis.bodyOf(b);
+      final textA = await _text(a), textB = await _text(b);
       if (textA == null || textB == null) continue;
       final reply = await _ask(
         BoosterPrompts.duplicate,
@@ -122,7 +123,7 @@ class BoosterRun {
       if (_mustStop) return;
       final pending = _pending(BoosterKind.topic, group);
       if (pending == null) continue;
-      final texts = [for (final ref in group) ?await analysis.bodyOf(ref)];
+      final texts = [for (final ref in group) ?await _text(ref)];
       final reply = await _ask(
         BoosterPrompts.topic,
         BoosterPrompts.notes(texts, tags),
@@ -137,7 +138,7 @@ class BoosterRun {
       if (_mustStop) return;
       final pending = _pending(BoosterKind.tags, [ref]);
       if (pending == null) continue;
-      final text = await analysis.bodyOf(ref);
+      final text = await _text(ref);
       if (text == null || _words(text) < BoosterSettings.minWordsForTags) {
         continue;
       }
@@ -199,8 +200,15 @@ class BoosterRun {
     _done.add(result.jobKey);
   }
 
-  Future<String?> _passage(int ref, int chunk) async {
+  /// What the model reads of note [ref]: its text without the "Linked
+  /// notes" footer, which lists other notes' titles, not the user's words.
+  Future<String?> _text(int ref) async {
     final body = await analysis.bodyOf(ref);
+    return body == null ? null : NoteFooter.strip(body);
+  }
+
+  Future<String?> _passage(int ref, int chunk) async {
+    final body = await _text(ref);
     final range = await analysis.chunkRange(ref, chunk);
     if (body == null || range == null) return body;
     final (start, end) = range;
