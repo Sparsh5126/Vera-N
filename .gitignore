@@ -56,3 +56,8 @@ app.*.map.json
 # Sync engine binaries, fetched by tool/fetch_sync_engine.ps1 (pinned hashes)
 /windows/sync_engine/
 /android/app/src/main/jniLibs/*/libsyncthingnative.so
+
+# goldie renders (store screenshots, preview video, studio data)
+goldie/out/
+# argent screen recordings (local checks only)
+.argent/recordings/

@@ -1,0 +1,22 @@
+steps:
+  - run: store-setup
+  - tap:
+      text: New note
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Checklist
+      timeoutMs: 10000
+  - tool: keyboard
+    args:
+      text: Train to Dehradun
+  - tool: keyboard
+    args:
+      key: enter
+  - tool: keyboard
+    args:
+      text: Book by Monday, ask Kabir if he is coming too
+  - wait: 1200
+  - await:
+      idle: true

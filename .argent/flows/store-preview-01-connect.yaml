@@ -1,0 +1,35 @@
+executionPrerequisite: >-
+  Vera N restarted by goldie after the screenshot flows, which left it
+  onboarded with the demo notes analysed: Home with New connections.
+steps:
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: New connections
+      timeoutMs: 15000
+  - wait: 1000
+  - tap:
+      text: New connections
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Got it
+      timeoutMs: 10000
+  - wait: 800
+  - tap:
+      text: Got it
+  - wait: 1200
+  - echo: Accept links the two DBMS notes; the next suggestion slides in.
+  - tap:
+      text: Accept
+  - wait: 1500
+  - tap:
+      text: Close
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Recent
+      timeoutMs: 10000

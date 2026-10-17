@@ -1,0 +1,35 @@
+steps:
+  - run: store-setup
+  - tap:
+      text: Search
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Folder
+      timeoutMs: 10000
+  - wait: 800
+  - echo: Search in Hindi ("when should I water the plant"). adb can't type
+      Devanagari, so put it on the clipboard, then tap Gboard's clipboard chip,
+      as a person pasting would. If the paste already landed, the same text
+      selector hits the search field instead, which is harmless.
+  - tool: paste
+    args:
+      text: पौधे को पानी कब दें
+  - wait: 1000
+  - tap:
+      text: पौधे को पानी कब दें
+  - echo: The English soil-sensor note is found by meaning alone.
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Soil moisture sensor
+      timeoutMs: 15000
+  - tool: button
+    args:
+      button: back
+    delayMs: 300
+  - wait: 800
+  - await:
+      idle: true

@@ -1,0 +1,4 @@
+steps:
+  - run: store-setup
+  - await:
+      idle: true

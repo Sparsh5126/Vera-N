@@ -1,0 +1,12 @@
+steps:
+  - run: store-setup
+  - tap:
+      text: किराने की लिस्ट
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: "Suggested tag: #recipes"
+      timeoutMs: 10000
+  - await:
+      idle: true

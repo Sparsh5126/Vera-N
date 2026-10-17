@@ -1,0 +1,21 @@
+steps:
+  - run: store-setup
+  - tap:
+      text: New connections
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Got it
+      timeoutMs: 10000
+  - echo: Dismiss the first-time swipe tip so the suggestion card shows whole.
+  - tap:
+      text: Got it
+  - tool: await-ui-element
+    args:
+      condition: hidden
+      selector:
+        text: Swipe to decide
+      timeoutMs: 5000
+  - await:
+      idle: true

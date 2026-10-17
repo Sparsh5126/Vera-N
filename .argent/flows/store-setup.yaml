@@ -1,0 +1,60 @@
+steps:
+  - launch: com.example.vera_n.perf
+  - echo: Clear the test app and seed the made-up demo notes (goldie/seed/notes).
+  - script:
+      path: ../../goldie/seed/prepare-library.mjs
+      timeout: 60000
+  - launch: com.example.vera_n.perf
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Notes that stay yours.
+      timeoutMs: 15000
+  - tap:
+      text: Skip
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Not now
+      timeoutMs: 10000
+  - tap:
+      text: Not now
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: What should we call you?
+      timeoutMs: 10000
+  - tool: keyboard
+    args:
+      text: Meera
+  - echo: The onboarding Done button, above the keyboard. A coordinate because
+      the keyboard's own action key is also labelled "Done".
+  - tap:
+      x: 0.5
+      y: 0.538
+  - echo: The greeting's first words depend on the time of day, so match the name.
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Meera
+      timeoutMs: 10000
+  - tool: button
+    args:
+      button: home
+    delayMs: 500
+  - echo: Leaving the app queued the on-device analysis; run it now instead of
+      waiting for the charger.
+  - script:
+      path: ../../goldie/seed/run-analysis.mjs
+      timeout: 240000
+  - launch: com.example.vera_n.perf
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: New connections
+      timeoutMs: 15000

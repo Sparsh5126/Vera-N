@@ -1,0 +1,39 @@
+executionPrerequisite: >-
+  Home, after closing Review.
+steps:
+  - tap:
+      text: Search
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Folder
+      timeoutMs: 10000
+  - echo: The Hindi query goes in through Gboard's clipboard chip (adb can't
+      type Devanagari); see store-03-search.
+  - tool: paste
+    args:
+      text: पौधे को पानी कब दें
+  - wait: 700
+  - tap:
+      text: पौधे को पानी कब दें
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Soil moisture sensor
+      timeoutMs: 15000
+  - wait: 1200
+  - tool: button
+    args:
+      button: back
+  - wait: 400
+  - tap:
+      text: Soil moisture sensor
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector:
+        text: Projects
+      timeoutMs: 10000
+  - wait: 1000
