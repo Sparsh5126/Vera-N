@@ -149,6 +149,7 @@ class AnalysisRun {
         ...await analysis.linkedWith(ref),
         ...await _stillRejected(ref),
       },
+      preferred: await analysis.sameFolderAs(ref),
     );
     return [
       for (final m in matches)

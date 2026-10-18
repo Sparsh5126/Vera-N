@@ -13,6 +13,10 @@ class NoteMatch {
 
 /// Finds strong matches for one note: two notes match as strongly as their
 /// best-matching chunks do (product spec §7: strong matches only).
+///
+/// [preferred] notes (those in the same folder) are kept first when more
+/// than [limit] match: it ranks, never admits, so the bar is the same for
+/// every note (user, 2026-10-18).
 abstract final class NoteMatcher {
   static List<NoteMatch> strongMatches(
     List<ChunkVector> own,
@@ -20,6 +24,7 @@ abstract final class NoteMatcher {
     required double threshold,
     required int limit,
     Set<int> exclude = const {},
+    Set<int> preferred = const {},
   }) {
     final best = <int, NoteMatch>{};
     for (final other in others) {
@@ -34,8 +39,12 @@ abstract final class NoteMatcher {
         }
       }
     }
+    int rank(NoteMatch m) => preferred.contains(m.note) ? 0 : 1;
     final matches = best.values.toList()
-      ..sort((a, b) => b.score.compareTo(a.score));
+      ..sort((a, b) {
+        final byFolder = rank(a) - rank(b);
+        return byFolder != 0 ? byFolder : b.score.compareTo(a.score);
+      });
     return matches.take(limit).toList();
   }
 }

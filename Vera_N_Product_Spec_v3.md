@@ -147,6 +147,7 @@ Every relationship records who created it (user or AI) and a confidence value.
 Rules:
 - Never interrupt writing; suggestions are batched.
 - High threshold at the start; loosen later based on accept rates.
+- **Same folder ranks first, never lowers the bar (decided 2026-10-18, user).** Two notes in exactly the same folder (letter case ignored) are more likely related, so among matches that already pass the threshold they come first: a note keeps same-folder matches first when it has more than it can show, and Review and a note's "Suggested links" list same-folder links before the rest. Sharing a folder never lets a weaker match through: the closest unrelated pair measured sits at 0.58, just under the 0.60 bar, so a boost would let unrelated notes in. Notes with no folder never count as sharing one.
 - Plain human wording ("Looks related to your note on Time Loop"). No percentages, no technical terms.
 - Suggestions are visible on notes only as dimmed items, never silently converted to real links.
 

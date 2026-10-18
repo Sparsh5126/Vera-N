@@ -182,6 +182,21 @@ class AnalysisRepository {
   }
 
   /// When each live, unarchived note last changed, for Revisit.
+  /// Notes in exactly [ref]'s folder (letter case ignored), not [ref]
+  /// itself; none when [ref] has no folder, since that says nothing.
+  Future<Set<int>> sameFolderAs(int ref) async {
+    final rows = await _db
+        .customSelect(
+          'SELECT o.id FROM notes n JOIN notes o '
+          "ON lower(o.folder) = lower(n.folder) AND o.id != n.id "
+          "WHERE n.id = ? AND n.folder != '' AND o.trashed_at IS NULL",
+          variables: [Variable(ref)],
+          readsFrom: {_db.notes},
+        )
+        .get();
+    return {for (final r in rows) r.read<int>('id')};
+  }
+
   Future<Map<int, DateTime>> modifiedTimes() async {
     final rows =
         await (_db.select(_db.notes)..where(

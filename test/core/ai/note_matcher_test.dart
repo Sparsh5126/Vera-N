@@ -47,4 +47,34 @@ void main() {
     final m = NoteMatcher.strongMatches(own, own, threshold: 0, limit: 5);
     expect(m, isEmpty);
   });
+
+  test('over the limit, a same-folder match is kept first', () {
+    final best = NoteMatcher.strongMatches(
+      own,
+      others,
+      threshold: .9,
+      limit: 1,
+    );
+    final strongest = best.single.note;
+    final other = strongest == 3 ? 4 : 3;
+    final m = NoteMatcher.strongMatches(
+      own,
+      others,
+      threshold: .9,
+      limit: 1,
+      preferred: {other},
+    );
+    expect(m.single.note, other);
+  });
+
+  test('a same-folder note below the bar is still left out', () {
+    final m = NoteMatcher.strongMatches(
+      own,
+      others,
+      threshold: .9,
+      limit: 5,
+      preferred: {2},
+    );
+    expect(m.map((x) => x.note), isNot(contains(2)));
+  });
 }

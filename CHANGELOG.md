@@ -4,6 +4,11 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Changed
+- **Notes in the same folder rank first among suggestions** (user, 2026-10-18: "if notes share the same folder, it's more likely that they are connected"; chose ranking over a score boost, and the exact folder). Among matches that already pass the 0.60 bar, a note keeps same-folder matches first when it has more than 3 (`NoteMatcher.strongMatches(preferred:)`, `AnalysisRepository.sameFolderAs`), and Review and "Suggested links" list same-folder links first (`SuggestionsRepository._pending`; fresh still come before "not sure"). The bar itself is unchanged: on the real-model test set the closest unrelated pair is at 0.58, so a boost would let unrelated notes through. Notes with no folder never count. Product spec §7 and UI spec §6 updated.
+  - Not measured yet whether same-folder links are accepted more often; the per-kind accept counts (`suggestion_learning`) would show it once there is use.
+  - Tests: a same-folder match is kept first over the limit; one below the bar is still left out; same folder ignores case and never matches "no folder"; Review order, with "not sure" still last (5).
+
 ## [1.0.0] - 2026-10-18
 
 The first release: everything below, back to 0.1.0, ships in it. Shared on GitHub as a signed Android APK.

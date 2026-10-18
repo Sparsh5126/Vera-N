@@ -227,7 +227,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 - Accepting shows a brief "Linked" confirmation with undo.
 - Tapping either note opens the full note.
 
-**Batches:** 5 cards per batch. "Not sure" cards return in the next batch and stop appearing after their 30 days.
+**Batches:** 5 cards per batch. "Not sure" cards return in the next batch and stop appearing after their 30 days. Within fresh and within "not sure", links between two notes in the same folder come first, then oldest first (product spec §7, 2026-10-18).
 
 **First-time hint (changed 2026-10-17, user; was an overlay):** the first time Review opens, the first real card shows the swipe by itself, once: it leans right (the faint ✓ shows), settles, leans left (the ✕), settles, about 2.3 s, with a finger icon resting on it. Touching the card stops it. Under the card, above the buttons, a quiet strip names the four gestures ("Swipe to decide": right link them, left not related, up not sure yet, down undo) with **Got it**. Got it or the first decision puts it away for good. With "reduce motion" on, the card doesn't move; the strip still shows.
 

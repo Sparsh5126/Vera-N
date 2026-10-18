@@ -86,15 +86,16 @@ class SuggestionsRepository {
   }
 
   /// The next review batch: fresh suggestions first, then "not sure"
-  /// ones, oldest first; pairs with a note in the trash are left out.
+  /// ones; within each, same-folder links first, then oldest first (the
+  /// order [_pending] gives, kept by splitting rather than re-sorting).
+  /// Pairs with a note in the trash are left out.
   Future<List<Suggestion>> batch({required int size}) async {
     final rows = await _pending().get();
-    rows.sort((a, b) {
-      final status =
-          (a.status == notSure ? 1 : 0) - (b.status == notSure ? 1 : 0);
-      return status != 0 ? status : a.createdAt.compareTo(b.createdAt);
-    });
-    return rows.take(size).map(_suggestion).toList();
+    final ordered = [
+      ...rows.where((r) => r.status != notSure),
+      ...rows.where((r) => r.status == notSure),
+    ];
+    return ordered.take(size).map(_suggestion).toList();
   }
 
   /// Every suggestion waiting for review, oldest first.
@@ -243,9 +244,19 @@ class SuggestionsRepository {
     );
   }
 
+  /// Oldest first, except that links between two notes in the same folder
+  /// come before the rest: they are more likely related (user, 2026-10-18).
+  /// No folder never counts as the same folder.
   Selectable<SuggestionRow> _pending() {
+    const sameFolderFirst = CustomExpression<int>(
+      "CASE WHEN suggestions.kind = 'link' AND a.folder != '' "
+      'AND lower(a.folder) = lower(b.folder) THEN 0 ELSE 1 END',
+    );
     final query = _pendingJoin()
-      ..orderBy([OrderingTerm(expression: _db.suggestions.createdAt)]);
+      ..orderBy([
+        OrderingTerm(expression: sameFolderFirst),
+        OrderingTerm(expression: _db.suggestions.createdAt),
+      ]);
     return query.map((r) => r.readTable(_db.suggestions));
   }
 
