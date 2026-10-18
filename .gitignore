@@ -61,3 +61,7 @@ app.*.map.json
 goldie/out/
 # argent screen recordings (local checks only)
 .argent/recordings/
+# goldie studio exports (the finished set is copied to docs/media)
+/appstore-assets.zip
+# /brag launch-video renders and their work files (the video is copied to docs/media)
+/brag-output*/

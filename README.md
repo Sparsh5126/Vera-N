@@ -6,6 +6,18 @@ A local-first, privacy-first notes app. Write naturally on your phone; Vera N qu
 
 Built with Flutter. Android first, with a Windows laptop version.
 
+[![Vera N in 22 seconds: a search typed in Hindi finds a note written in English](docs/media/vera-n-launch.jpg)](docs/media/vera-n-launch.mp4)
+
+*Vera N in 22 seconds (click to play). Every screen is the real app, with made-up notes.*
+
+<p>
+  <img src="docs/media/play-01-home.png" width="19%" alt="Notes that stay yours: Home with the New connections card">
+  <img src="docs/media/play-02-write.png" width="19%" alt="Just write: a new note being typed">
+  <img src="docs/media/play-03-review.png" width="19%" alt="Remembers what you forgot: a suggestion linking two notes">
+  <img src="docs/media/play-04-search.png" width="19%" alt="Search by meaning: a Hindi search finds an English note">
+  <img src="docs/media/play-05-note.png" width="19%" alt="Hindi and English, one note: a mixed grocery list">
+</p>
+
 - Product spec: [`Vera_N_Product_Spec_v3.md`](Vera_N_Product_Spec_v3.md)
 - UI spec: [`Vera_N_UI_Spec.md`](Vera_N_UI_Spec.md)
 - Architecture: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)

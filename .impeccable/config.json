@@ -1,0 +1,23 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-10-18T15:27:09.701Z",
+        "reason": "Vera N's brand typeface: CLAUDE.md §4 and DESIGN.md mandate Inter; the brag video reuses the app's own fonts"
+      },
+      {
+        "rule": "tight-leading",
+        "value": "*",
+        "files": [
+          "brag-output/work/index.html"
+        ],
+        "createdAt": "2026-10-18T15:27:09.913Z",
+        "reason": "Display headlines (54-118px, 1-2 lines) in a launch video, not body text; tight leading is deliberate display typography"
+      }
+    ]
+  }
+}

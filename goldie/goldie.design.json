@@ -1,0 +1,21 @@
+{
+  "background": "linear-gradient(160deg, #1E293B 0%, #0F172A 100%)",
+  "fontFamily": "Inter",
+  "order": [
+    "home",
+    "write",
+    "review",
+    "search",
+    "note"
+  ],
+  "template": "magazine",
+  "layout": "classic",
+  "screenOnly": false,
+  "sceneLayouts": {
+    "write": "classic",
+    "home": "offset",
+    "note": "hero",
+    "search": "tilt-right",
+    "review": "tilt"
+  }
+}

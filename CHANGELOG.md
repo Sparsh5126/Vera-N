@@ -4,6 +4,10 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Added
+- **The README shows the launch video and the Play Store screenshots** (user, 2026-10-18). `docs/media/` holds the 22-second launch video (made with /brag from the real app's captures; GitHub plays it from the poster link, since a README can't embed a repo video) and the five framed screenshots in the studio design the user chose (`goldie/goldie.design.json`, now committed so `goldie frame` rebuilds the same set). About 3.2 MB, in plain git (LFS covers only the model).
+- `.gitignore`: `/brag-output*/` (video renders and work files) and `/appstore-assets.zip` (the studio's export); the finished files live in `docs/media/`. `.impeccable/config.json` (the design checker's shared settings) is committed.
+
 ### Changed
 - **Selecting a note card or a Graph dot: a stronger highlight and a light tick** (user, 2026-10-17; chose both).
   - **Haptic:** a new `HapticEvent.select` in `core/feedback/haptics.dart`, Android's own "selection changed" tick (the lightest). On Home it plays when a hold registers, so a hold that turns into a drag ticks once, not twice, and on each tap that adds or removes a card while selecting. In the Graph, on picking a new dot only. Skipped when touch feedback is off, like every haptic.
