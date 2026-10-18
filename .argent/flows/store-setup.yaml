@@ -1,10 +1,10 @@
 steps:
-  - launch: com.example.vera_n.perf
+  - launch: io.github.sparsh5126.veran.perf
   - echo: Clear the test app and seed the made-up demo notes (goldie/seed/notes).
   - script:
       path: ../../goldie/seed/prepare-library.mjs
       timeout: 60000
-  - launch: com.example.vera_n.perf
+  - launch: io.github.sparsh5126.veran.perf
   - tool: await-ui-element
     args:
       condition: visible
@@ -51,7 +51,7 @@ steps:
   - script:
       path: ../../goldie/seed/run-analysis.mjs
       timeout: 240000
-  - launch: com.example.vera_n.perf
+  - launch: io.github.sparsh5126.veran.perf
   - tool: await-ui-element
     args:
       condition: visible

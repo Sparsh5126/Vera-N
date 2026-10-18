@@ -130,7 +130,7 @@ Built with Flutter. Android first, with a Windows laptop version.
 
 ## Status
 
-Version 0.1.0, in progress, shared on GitHub only. Built-in sync is new: pairing by typed words is checked on a real phone and laptop, but QR scanning has not yet been re-checked with the phone's camera since its last fix. See [`CHANGELOG.md`](CHANGELOG.md) for what has been checked on devices, and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what is open.
+Version 1.0.0, shared on GitHub only. Built-in sync is new: pairing by typed words is checked on a real phone and laptop, but QR scanning has not yet been re-checked with the phone's camera since its last fix. See [`CHANGELOG.md`](CHANGELOG.md) for what has been checked on devices, and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what is open.
 
 ## Building
 
@@ -143,9 +143,20 @@ flutter test
 ```
 
 - **Android:** `flutter build apk --release --split-per-abi`. Install the arm64 APK (about 70 MB) on a modern phone.
+  - Release builds are signed with the project's release key and stop with an error without it. Put a keystore outside the repo and point `android/key.properties` at it (git-ignored):
+    ```properties
+    storeFile=D:\\dev\\keys\\vera-n-release.jks
+    storePassword=...
+    keyAlias=vera-n
+    keyPassword=...
+    ```
+    Every release must use the same key, or phones refuse the update. Back it up.
+  - The app id is `io.github.sparsh5126.veran`; it never changes. Profile builds with `--android-project-arg=vera.perf=true` install as a separate test app, `io.github.sparsh5126.veran.perf`.
 - **Windows:** needs Visual Studio with "Desktop development with C++". To make the installer, run `tool/build_windows_installer.ps1`. It needs Inno Setup 6 and writes `build/installer/VeraN-Setup-<version>.exe`.
 - **Sync engine:** to include sync, run `tool/fetch_sync_engine.ps1` first. It downloads Syncthing and checks it against pinned SHA-256 hashes; the binaries are kept out of git. Builds without it simply hide the sync rows.
 
 ## Licenses
 
-The embedding model (paraphrase-multilingual-MiniLM-L12-v2) is Apache-2.0, Syncthing is MPL-2.0, and the pairing word list is BIP-39 English (BSD-2-Clause). All of them are listed on the app's Licenses page.
+Vera N is open source under the [MIT License](LICENSE).
+
+It includes work under its own licenses: the fonts (Inter, Instrument Serif and Noto Sans Devanagari) are SIL Open Font License 1.1, with their licence files in `assets/fonts/`. The embedding model (paraphrase-multilingual-MiniLM-L12-v2) is Apache-2.0, Syncthing is MPL-2.0, and the pairing word list is BIP-39 English (BSD-2-Clause). All of them are listed on the app's Licenses page.

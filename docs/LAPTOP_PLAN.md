@@ -97,7 +97,7 @@ Each phase is one change: tests, phone check where it touches the phone, changel
   - Uninstalling removes the app and its window placement. It never removes the notes folder or the app's database (`%APPDATA%\com.example\vera_n`).
   - Checked 2026-10-11: silent install, the app runs, silent uninstall.
   - Unsigned, so SmartScreen says "unknown publisher" on first run. Signing needs a code-signing certificate (later).
-  - The application id stays `com.example.vera_n` for now (user, 2026-10-11), and the installer's `AppId` GUID must never change.
+  - The Android application id is `io.github.sparsh5126.veran` since 1.0.0 (user, 2026-10-18); the installer's `AppId` GUID must never change.
 - The model ships inside, as on the phone. Release size is measured and logged.
 - No auto-update service: updates come from GitHub releases.
 

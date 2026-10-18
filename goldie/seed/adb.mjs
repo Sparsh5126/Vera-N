@@ -9,7 +9,7 @@ export const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", ".."
 
 /// The test app goldie captures: the profile build's own id, so real notes
 /// are never involved (android/app/build.gradle.kts, `vera.perf`).
-export const appId = "com.example.vera_n.perf";
+export const appId = "io.github.sparsh5126.veran.perf";
 
 function sdkDir() {
   const props = join(repoRoot, "android", "local.properties");

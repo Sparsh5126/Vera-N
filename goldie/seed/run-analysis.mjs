@@ -12,7 +12,7 @@ const timeoutMs = 240000;
 function queuedJobs() {
   const dump = adb(["shell", "dumpsys", "jobscheduler", appId]);
   const jobs = new Map();
-  const line = /JOB (?:([\w.]+):)?#?u\d+a\d+\/(\d+):[^\n]*com\.example\.vera_n\.perf\//g;
+  const line = /JOB (?:([\w.]+):)?#?u\d+a\d+\/(\d+):[^\n]*io\.github\.sparsh5126\.veran\.perf\//g;
   for (const [, namespace, id] of dump.matchAll(line)) jobs.set(`${namespace}/${id}`, [namespace, id]);
   return [...jobs.values()];
 }

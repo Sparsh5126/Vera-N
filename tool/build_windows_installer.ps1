@@ -17,7 +17,7 @@ if (-not $iscc) {
     throw 'Inno Setup 6 not found. Install it with: winget install JRSoftware.InnoSetup'
 }
 
-# The version without the build number: "0.1.0+1" -> "0.1.0".
+# The version without the build number: "1.0.0+2" -> "1.0.0".
 $line = Select-String -Path "$root\pubspec.yaml" -Pattern '^version:\s*(\S+)'
 $version = $line.Matches[0].Groups[1].Value.Split('+')[0]
 

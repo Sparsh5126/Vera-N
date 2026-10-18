@@ -1,7 +1,17 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Release signing (README, "Building"): android/key.properties names the
+// keystore and its passwords. Both stay out of git. Every release must be
+// signed with the same key, or phones refuse the update.
+val releaseKey = Properties().apply {
+    val file = rootProject.file("key.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
 }
 
 android {
@@ -26,8 +36,9 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.vera_n"
+        // Never change it again: Android would treat it as another app, and
+        // people could not update (decided 2026-10-18, user, for 1.0.0).
+        applicationId = "io.github.sparsh5126.veran"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -40,10 +51,28 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (releaseKey.isNotEmpty()) {
+            create("release") {
+                storeFile = file(releaseKey.getProperty("storeFile"))
+                storePassword = releaseKey.getProperty("storePassword")
+                keyAlias = releaseKey.getProperty("keyAlias")
+                keyPassword = releaseKey.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // No key, no release: a debug-signed release could never be
+            // updated by a properly signed one.
+            signingConfig = signingConfigs.findByName("release")
+                ?: throw GradleException(
+                    "Release builds need android/key.properties (see README, Building).",
+                )
+        }
+        // Profile builds are for measuring on a test phone; the debug key is fine.
+        getByName("profile") {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -55,7 +84,7 @@ android {
 androidComponents {
     onVariants(selector().withBuildType("profile")) { variant ->
         if (project.findProperty("vera.perf") == "true") {
-            variant.applicationId.set("com.example.vera_n.perf")
+            variant.applicationId.set("io.github.sparsh5126.veran.perf")
         }
     }
 }

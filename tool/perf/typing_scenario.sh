@@ -15,7 +15,7 @@ export MSYS_NO_PATHCONV=1
 ADB="${ADB:-adb} -s $1"
 KIND=$2
 RUNS=${3:-3}
-PKG=com.example.vera_n.perf
+PKG=io.github.sparsh5126.veran.perf
 ACT=com.example.vera_n.MainActivity
 
 type_text() { timeout 10 $ADB shell "input text '$1'"; }

@@ -9,7 +9,7 @@
 ;   user's notes (in the folder they picked) or the app's database.
 
 #ifndef AppVersion
-  #define AppVersion "0.1.0"
+  #define AppVersion "1.0.0"
 #endif
 #define AppName "Vera N"
 #define AppExe "vera_n.exe"

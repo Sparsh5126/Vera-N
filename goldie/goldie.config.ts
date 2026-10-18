@@ -1,7 +1,7 @@
 // Google Play store assets for Vera N, made by goldie (https://www.npmjs.com/package/goldie).
 //
 // Every flow starts with .argent/flows/store-setup.yaml: it clears the test
-// app (com.example.vera_n.perf), seeds the made-up notes in goldie/seed/notes
+// app (io.github.sparsh5126.veran.perf), seeds the made-up notes in goldie/seed/notes
 // and runs the on-device analysis, so the suggestions on screen are real
 // ones. Real notes are never involved.
 //
@@ -20,7 +20,7 @@ const config = {
   devices: ["pixel-10-pro"],
   android: {
     appPath: "../build/app/outputs/flutter-apk/app-profile.apk",
-    applicationId: "com.example.vera_n.perf",
+    applicationId: "io.github.sparsh5126.veran.perf",
   },
   locales: ["en-US"],
   appearance: "light",

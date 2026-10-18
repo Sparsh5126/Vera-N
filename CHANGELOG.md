@@ -4,6 +4,16 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-18
+
+The first release: everything below, back to 0.1.0, ships in it. Shared on GitHub as a signed Android APK.
+
+### Release
+- **Version 1.0.0** (user, 2026-10-18): `pubspec.yaml` `1.0.0+2` (build 2, so it is newer than every 0.1.0 build); the Windows installer's default and Settings → About follow it.
+- **Open source under the MIT License** (user, 2026-10-18): `LICENSE` at the root. This makes onboarding's "The code is open source" true. The README lists the licences of what the app includes (fonts OFL 1.1, model Apache-2.0, Syncthing MPL-2.0, word list BSD-2-Clause).
+- **Own application id: `io.github.sparsh5126.veran`** (user, 2026-10-18), replacing `com.example.vera_n`, which Play rejects; it must never change again. Installs alongside earlier test builds as a separate app (notes in the chosen folder are untouched). The test build is `io.github.sparsh5126.veran.perf` (goldie, argent flows, perf scripts updated). The Kotlin package stays `com.example.vera_n`, which nobody sees.
+- **Release signing with the project's own key** (user, 2026-10-18), read from git-ignored `android/key.properties`; the keystore lives outside the repo. A release build without it stops with an error instead of quietly signing with the debug key, which could never be updated by a properly signed build. Profile builds keep the debug key.
+
 ### Added
 - **The README shows the launch video and the Play Store screenshots** (user, 2026-10-18). `docs/media/` holds the 22-second launch video (made with /brag from the real app's captures; GitHub plays it from the poster link, since a README can't embed a repo video) and the five framed screenshots in the studio design the user chose (`goldie/goldie.design.json`, now committed so `goldie frame` rebuilds the same set). About 3.2 MB, in plain git (LFS covers only the model).
 - `.gitignore`: `/brag-output*/` (video renders and work files) and `/appstore-assets.zip` (the studio's export); the finished files live in `docs/media/`. `.impeccable/config.json` (the design checker's shared settings) is committed.
