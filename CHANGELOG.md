@@ -4,6 +4,9 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+- **Release builds crashed about 5 s after launch** (2026-10-19). R8, which shrinks release code, removed ONNX Runtime constructors that only native code calls (JNI), so loading the model aborted with `NoSuchMethodError: NodeInfo.<init>(String, ValueInfo)`. Debug builds skip R8, so this first appeared with the signed 1.0.0 build. New `android/app/proguard-rules.pro` keeps `ai.onnxruntime.**` and native methods, and the release build type names it. Checked in R8's `mapping.txt`: `NodeInfo.<init>(String, ValueInfo)` is kept with its original name.
+
 ### Changed
 - **Notes in the same folder rank first among suggestions** (user, 2026-10-18: "if notes share the same folder, it's more likely that they are connected"; chose ranking over a score boost, and the exact folder). Among matches that already pass the 0.60 bar, a note keeps same-folder matches first when it has more than 3 (`NoteMatcher.strongMatches(preferred:)`, `AnalysisRepository.sameFolderAs`), and Review and "Suggested links" list same-folder links first (`SuggestionsRepository._pending`; fresh still come before "not sure"). The bar itself is unchanged: on the real-model test set the closest unrelated pair is at 0.58, so a boost would let unrelated notes through. Notes with no folder never count. Product spec §7 and UI spec §6 updated.
   - Not measured yet whether same-folder links are accepted more often; the per-kind accept counts (`suggestion_learning`) would show it once there is use.

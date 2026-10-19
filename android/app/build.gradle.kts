@@ -70,6 +70,11 @@ android {
                 ?: throw GradleException(
                     "Release builds need android/key.properties (see README, Building).",
                 )
+            // R8 shrinks release code; these rules keep what native code calls.
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
         // Profile builds are for measuring on a test phone; the debug key is fine.
         getByName("profile") {
