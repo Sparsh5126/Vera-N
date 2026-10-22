@@ -1,16 +1,17 @@
 import '../../models/note.dart';
 import '../../models/rejection.dart';
 import '../../models/suggestion.dart';
-import '../../storage/files/note_merge.dart';
 import '../../storage/files/note_text.dart';
+import '../../storage/repositories/note_merger.dart';
 import '../../storage/repositories/notes_repository.dart';
 import '../../storage/repositories/rejections_repository.dart';
 import '../../storage/repositories/settings_repository.dart';
 import '../../storage/repositories/suggestions_repository.dart';
 import 'suggestion_actions.dart' show Undo;
 
-/// What the user can do with two notes the laptop found to be copies
-/// (docs/LAPTOP_PLAN.md, decided 2026-10-09): Merge, Remove one, or say
+/// What the user can do with two notes found to be copies, by the laptop
+/// (docs/LAPTOP_PLAN.md, decided 2026-10-09) or by on-device matching
+/// (user, 2026-10-22): Merge, Remove one, or say
 /// they aren't copies. Nothing is deleted: a removed note goes to the
 /// trash, and every choice has an Undo.
 class DuplicateActions {
@@ -43,19 +44,12 @@ class DuplicateActions {
     final pair = await _pair(s);
     if (pair == null) return _removeOnly(s);
     final keepRef = keep ?? keepByDefault(pair.$1, pair.$2);
-    final (kept, other) = pair.$1.ref == keepRef ? pair : (pair.$2, pair.$1);
-    final merged = NoteMerge.merge(kept.body, other.body);
-    final changed = merged.trimRight() != kept.body.trimRight();
-    if (changed) await notes.updateBody(kept.ref, merged);
-    await notes.trash(other.ref);
+    final other = s.otherThan(keepRef);
+    final unmerge = await NoteMerger(notes).merge(keepRef, [other]);
+    if (unmerge == null) return _removeOnly(s);
     await suggestions.remove(s.id);
     return () async {
-      await notes.restore(other.ref);
-      // Only if it wasn't edited since: Undo never touches the user's words.
-      final now = await notes.getNote(kept.ref);
-      if (changed && now?.body == merged) {
-        await notes.updateBody(kept.ref, kept.body);
-      }
+      await unmerge();
       await suggestions.putBack(s);
     };
   }

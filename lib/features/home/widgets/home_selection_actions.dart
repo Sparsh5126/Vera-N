@@ -87,6 +87,23 @@ class HomeSelectionActions {
     );
   }
 
+  /// Merges [refs], in the order selected, into the first (user,
+  /// 2026-10-22), with one Undo.
+  Future<void> merge(ScaffoldMessengerState messenger, List<int> refs) async {
+    if (await batch.mergeWouldUnlock(refs)) {
+      NoticeSnackBar.show(messenger, HomeCopy.mergeLockedFirst, long: true);
+      return;
+    }
+    final merged = await batch.merge(refs);
+    done();
+    if (merged == null) return;
+    UndoSnackBar.show(
+      messenger,
+      message: HomeCopy.mergedInto(merged.title),
+      onUndo: () => unawaited(merged.undo()),
+    );
+  }
+
   /// One Undo for every note moved; nothing moved, nothing to say.
   void _undo(
     ScaffoldMessengerState messenger,

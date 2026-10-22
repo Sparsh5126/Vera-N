@@ -181,6 +181,24 @@ class AnalysisRepository {
     ];
   }
 
+  /// Notes the user said aren't copies of [ref] ("Not copies", stored as
+  /// the pair (id, `=` and the other id)): they may be linked, never
+  /// offered to merge again.
+  Future<Set<int>> notCopiesWith(int ref) async {
+    final rows = await _db
+        .customSelect(
+          'SELECT o.id AS other FROM notes n JOIN rejections r '
+          "ON r.note_a = n.note_id OR r.note_b = '=' || n.note_id "
+          "JOIN notes o ON (r.note_a = n.note_id AND r.note_b = '=' || o.note_id) "
+          "OR (r.note_b = '=' || n.note_id AND r.note_a = o.note_id) "
+          'WHERE n.id = ?',
+          variables: [Variable(ref)],
+          readsFrom: {_db.notes, _db.rejections},
+        )
+        .get();
+    return {for (final r in rows) r.read<int>('other')};
+  }
+
   /// When each live, unarchived note last changed, for Revisit.
   /// Notes in exactly [ref]'s folder (letter case ignored), not [ref]
   /// itself; none when [ref] has no folder, since that says nothing.

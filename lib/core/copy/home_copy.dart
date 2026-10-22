@@ -35,6 +35,12 @@ abstract final class HomeCopy {
   static String trashedNotes(int n) =>
       n == 1 ? AppCopy.movedToTrash : '$n notes moved to trash';
 
+  /// Merge keeps the note selected first (user, 2026-10-22).
+  static String mergedInto(String title) =>
+      title.isEmpty ? AppCopy.merged : 'Merged into “$title”';
+  static const mergeLockedFirst =
+      'To merge a locked note, select a locked note first';
+
   // Dragging notes onto folders.
 
   static const dropOnFolder = 'Drop on a folder, or rest on one to open it';

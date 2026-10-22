@@ -130,7 +130,7 @@ Built with Flutter. Android first, with a Windows laptop version.
 
 ## Status
 
-Version 1.0.0, shared on GitHub only. Built-in sync is new: pairing by typed words is checked on a real phone and laptop, but QR scanning has not yet been re-checked with the phone's camera since its last fix. See [`CHANGELOG.md`](CHANGELOG.md) for what has been checked on devices, and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what is open.
+Version 1.0.1, shared on GitHub only. Built-in sync is new: pairing by typed words is checked on a real phone and laptop, but QR scanning has not yet been re-checked with the phone's camera since its last fix. See [`CHANGELOG.md`](CHANGELOG.md) for what has been checked on devices, and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what is open.
 
 ## Building
 

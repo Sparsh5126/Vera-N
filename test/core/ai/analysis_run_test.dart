@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vera_n/core/ai/scheduler/analysis_run.dart';
 import 'package:vera_n/core/ai/suggestions/suggestion_actions.dart';
+import 'package:vera_n/core/models/suggestion.dart';
+import 'package:vera_n/core/models/suggestion_draft.dart';
 import 'package:vera_n/core/storage/files/note_footer.dart';
 import 'package:vera_n/core/storage/repositories/analysis_repository.dart';
 import 'package:vera_n/core/storage/repositories/links_repository.dart';
@@ -172,12 +174,15 @@ void main() {
   });
 
   group('a rejected pair', () {
+    // Related, not copies: four words of their own each (75% the same).
     final shared = List.generate(30, (i) => 'shared$i').join(' ');
-    final extra = List.generate(40, (i) => 'extra$i').join(' ');
+    final extra = List.generate(25, (i) => 'extra$i').join(' ');
+    const ownA = 'apple plum fig pear';
+    const ownB = 'cedar pine oak elm';
 
     Future<int> rejectOnly() async {
-      final a = await h.repo.create('Alpha $shared');
-      await h.repo.create('Beta $shared');
+      final a = await h.repo.create('Alpha $shared $ownA');
+      await h.repo.create('Beta $shared $ownB');
       await run().run();
       final actions = SuggestionActions(
         notes: h.repo,
@@ -192,16 +197,95 @@ void main() {
 
     test('stays away after a small edit', () async {
       final a = await rejectOnly();
-      await h.repo.updateBody(a, 'Alpha $shared typo fixed');
+      await h.repo.updateBody(a, 'Alpha $shared $ownA typo fixed');
       await run().run();
       expect(await suggestions.pending(), isEmpty);
     });
 
     test('may return after a big change, if still a strong match', () async {
       final a = await rejectOnly();
-      await h.repo.updateBody(a, 'Alpha $shared $extra');
+      await h.repo.updateBody(a, 'Alpha $shared $ownA $extra');
       await run().run();
       expect(await suggestions.pending(), hasLength(1));
+    });
+  });
+
+  group('copies (user, 2026-10-22)', () {
+    SuggestionActions actions() => SuggestionActions(
+      notes: h.repo,
+      links: LinksRepository(h.db),
+      suggestions: suggestions,
+      rejections: RejectionsRepository(h.db, h.store),
+      settings: SettingsRepository(h.db),
+    );
+
+    test('a note and its copy are offered to merge, never to link', () async {
+      final a = await h.repo.create(piano);
+      final b = await h.repo.create(piano);
+      await run().run();
+      final pending = await suggestions.pending();
+      expect(pending, hasLength(1));
+      expect(pending.single.kind, Suggestion.duplicateKind);
+      expect((pending.single.noteA, pending.single.noteB), (a, b));
+    });
+
+    test('a link already waiting between copies turns into copies at the '
+        'next run, keeping its expiry date', () async {
+      final a = await h.repo.create(piano);
+      final b = await h.repo.create(piano);
+      await suggestions.add(
+        [
+          SuggestionDraft(
+            kind: Suggestion.linkKind,
+            noteA: a,
+            noteB: b,
+            score: 0.9,
+            chunkA: 0,
+            chunkB: 0,
+          ),
+        ],
+        h.now,
+        const Duration(days: 30),
+      );
+      final link = (await suggestions.pending()).single;
+      h.now = h.now.add(const Duration(days: 3));
+      await run().run();
+      final pending = await suggestions.pending();
+      expect(pending, hasLength(1));
+      expect(pending.single.kind, Suggestion.duplicateKind);
+      expect(pending.single.expiresAt, link.expiresAt);
+    });
+
+    test('a waiting link turns into copies once the notes say the same, '
+        'keeping its expiry date', () async {
+      await h.repo.create(piano);
+      final b = await h.repo.create(piano2);
+      await run().run();
+      final link = (await suggestions.pending()).single;
+      expect(link.kind, Suggestion.linkKind);
+
+      h.now = h.now.add(const Duration(days: 3));
+      // Not shorter than before: a shorter note drops its waiting
+      // suggestions with the old footer check and is matched afresh.
+      await h.repo.updateBody(b, '$piano Every day.');
+      await run().run();
+      final pending = await suggestions.pending();
+      expect(pending, hasLength(1));
+      expect(pending.single.kind, Suggestion.duplicateKind);
+      expect(pending.single.expiresAt, link.expiresAt);
+    });
+
+    test('"Not copies": the pair may be suggested as a link instead', () async {
+      final a = await h.repo.create(piano);
+      await h.repo.create(piano);
+      await run().run();
+      await actions().reject((await suggestions.pending()).single);
+
+      await h.repo.updateBody(a, '$piano Every day.');
+      await run().run();
+      final pending = await suggestions.pending();
+      expect(pending, hasLength(1));
+      expect(pending.single.kind, Suggestion.linkKind);
     });
   });
 }

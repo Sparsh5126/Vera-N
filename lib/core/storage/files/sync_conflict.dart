@@ -13,6 +13,17 @@ abstract final class SyncConflict {
 
   static bool isCopy(String path) => _name.hasMatch(path);
 
+  /// The name of a conflict copy of note [path] made at [time] by
+  /// [device] (7 letters or digits), in Syncthing's own form.
+  static String copyPath(String path, DateTime time, String device) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    final stamp =
+        '${time.year}${two(time.month)}${two(time.day)}-'
+        '${two(time.hour)}${two(time.minute)}${two(time.second)}';
+    final stem = path.substring(0, path.length - '.md'.length);
+    return '$stem.sync-conflict-$stamp-$device.md';
+  }
+
   /// The note [path] is a conflict copy of, or null if it is none.
   static String? originalOf(String path) {
     final m = _name.firstMatch(path);

@@ -4,7 +4,8 @@ import 'note_footer.dart';
 /// decided 2026-10-09): the kept note gains only the lines it doesn't
 /// already have, so lines in both appear once. Its own text is never
 /// changed or reordered; new lines go after it, above its "Linked notes",
-/// and the other note's links join that footer.
+/// keeping the other note's paragraph breaks (2026-10-22), and the other
+/// note's links join that footer.
 abstract final class NoteMerge {
   static String merge(String kept, String other) {
     final (keptMain, keptLinks) = NoteFooter.split(kept);
@@ -13,9 +14,17 @@ abstract final class NoteMerge {
     final added = <String>[];
     for (final line in otherMain.split('\n')) {
       final key = line.trim();
-      if (key.isEmpty || have.contains(key)) continue;
+      if (key.isEmpty) {
+        // One blank line between added paragraphs, as the other note had.
+        if (added.isNotEmpty && added.last.isNotEmpty) added.add('');
+        continue;
+      }
+      if (have.contains(key)) continue;
       have.add(key);
       added.add(line.trimRight());
+    }
+    while (added.isNotEmpty && added.last.isEmpty) {
+      added.removeLast();
     }
     final links = [
       ...keptLinks,

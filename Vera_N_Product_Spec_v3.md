@@ -147,6 +147,7 @@ Every relationship records who created it (user or AI) and a confidence value.
 Rules:
 - Never interrupt writing; suggestions are batched.
 - High threshold at the start; loosen later based on accept rates.
+- **Copies are offered to merge, never to link (decided 2026-10-22, user).** A note and its copy (for example, duplicated when pairing a laptop) match strongly but linking them means nothing. When a strong match shares at least 80% of its words with the note (exact word sets, "Linked notes" left out), it becomes a copies suggestion in Review (Merge / Not copies / Remove one), and a link already waiting between copies is turned into one, keeping its expiry. "Not copies" is remembered as for the laptop's copies, and the pair may then be linked. Merging is the user's choice: nothing is merged without approval (§5).
 - **Same folder ranks first, never lowers the bar (decided 2026-10-18, user).** Two notes in exactly the same folder (letter case ignored) are more likely related, so among matches that already pass the threshold they come first: a note keeps same-folder matches first when it has more than it can show, and Review and a note's "Suggested links" list same-folder links before the rest. Sharing a folder never lets a weaker match through: the closest unrelated pair measured sits at 0.58, just under the 0.60 bar, so a boost would let unrelated notes in. Notes with no folder never count as sharing one.
 - Plain human wording ("Looks related to your note on Time Loop"). No percentages, no technical terms.
 - Suggestions are visible on notes only as dimmed items, never silently converted to real links.
@@ -237,6 +238,7 @@ Tracked internally as a foundation for future features, not as a dashboard the u
 - Later option: built-in device pairing via QR code and local-network discovery.
 - Sync never silently overwrites notes. On conflict, show both versions with Compare / Keep Phone / Keep Desktop / Merge.
   - Built on the phone 2026-10-08 for any outside change (another app or a synced copy): Compare, Keep this version, Keep the other version, and Keep both (the other version becomes its own note, the phone's merge). A true line-by-line merge is not built.
+- **One note id, one file (decided 2026-10-22, user).** A device that pairs without its sync history (a reinstall, the release installed as a new app, cleared data) never saw the old paths of notes moved since, so sync joins both folders and a moved note comes back at its old path too. After each scan the phone keeps the copy it already had (the one being edited, else the one it indexed first) and removes the other file: silently only when every line and tag of it is already in the kept note, otherwise after saving it beside the kept note as a conflict copy for Compare / Keep. Only the phone does this, since file times differ between devices and two devices could keep opposite copies; the laptop follows what sync brings. A note's location may follow the phone rather than a move made on the laptop meanwhile; its words are never lost.
 - Keep note version history so recovery is possible.
 - Optional encrypted relay in the long term.
 

@@ -1,6 +1,7 @@
 import '../../models/archive_folder.dart';
 import '../../models/locked_folder.dart';
 import 'analysis_repository.dart';
+import 'note_merger.dart';
 import 'notes_repository.dart';
 
 /// Actions on several notes at once: Home's selection and drag and drop
@@ -64,6 +65,29 @@ class NoteBatch {
     for (final ref in refs) {
       await _notes.restore(ref);
     }
+  }
+
+  /// Merges [refs] into the first selected (user, 2026-10-22): each next
+  /// one is added to it in turn, then goes to the trash (see
+  /// [NoteMerger]). Returns the kept note's title and the undo, or null
+  /// when a note is gone. The caller checks [mergeWouldUnlock] first.
+  Future<({String title, Future<void> Function() undo})?> merge(
+    List<int> refs,
+  ) async {
+    if (refs.length < 2) return null;
+    final undo = await NoteMerger(_notes).merge(refs.first, refs.sublist(1));
+    final kept = await _notes.getNote(refs.first);
+    if (undo == null || kept == null) return null;
+    return (title: kept.title, undo: undo);
+  }
+
+  /// True when a locked note would be merged into one that isn't locked:
+  /// its words would leave the Locked folder.
+  Future<bool> mergeWouldUnlock(List<int> refs) async {
+    final notes = [for (final ref in refs) await _notes.getNote(ref)];
+    final first = notes.firstOrNull;
+    if (first == null || LockedFolder.contains(first.folder)) return false;
+    return notes.any((n) => n != null && LockedFolder.contains(n.folder));
   }
 
   /// Moves each note to `target(its folder)`, skipping notes already there

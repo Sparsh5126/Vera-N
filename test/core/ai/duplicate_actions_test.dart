@@ -40,6 +40,13 @@ void main() {
       );
     });
 
+    test('added paragraphs keep one blank line between them', () {
+      expect(
+        NoteMerge.merge('Trip\nBoots\n', 'Gear\n\n\nTorch\nBoots\n\nMap\n\n'),
+        'Trip\nBoots\n\nGear\n\nTorch\n\nMap\n',
+      );
+    });
+
     test('Hindi lines merge the same way', () {
       expect(
         NoteMerge.merge('सामान\nदाल\n', 'सामान\nचावल\nदाल'),

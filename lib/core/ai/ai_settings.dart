@@ -25,6 +25,12 @@ abstract final class AiSettings {
   /// less than this share of them still the same (decided 2026-10-04).
   static const sameNoteWords = 2 / 3;
 
+  /// Two strongly matching notes are copies, offered to merge instead of
+  /// link, when at least this share of their words is the same (user,
+  /// 2026-10-22). Copies made by sync share all of them; a related note
+  /// written separately shares far fewer (0.69 in the tests' closest pair).
+  static const copyWords = 0.8;
+
   /// Review batches hold this many suggestions (UI spec §6).
   static const batchSize = 5;
 

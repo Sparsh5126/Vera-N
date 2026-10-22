@@ -65,4 +65,43 @@ void main() {
     await batch.restore([a, b]);
     expect((await h.repo.getNote(b))!.path, isNot(startsWith('.trash')));
   });
+
+  group('merge (user, 2026-10-22)', () {
+    Future<bool> trashed(int ref) async => (await h.row(ref)).trashedAt != null;
+
+    test('the first selected is kept; the others are added in the order '
+        'selected, then go to the trash; Undo puts all back', () async {
+      final first = await h.repo.create('Trip\nBoots');
+      final second = await h.repo.create('Gear\nTorch\nBoots');
+      final third = await h.repo.create('Food\nRice');
+      final merged = await batch.merge([first, second, third]);
+      expect(merged!.title, 'Trip');
+      expect(
+        (await h.row(first)).body,
+        'Trip\nBoots\n\nGear\nTorch\n\nFood\nRice\n',
+      );
+      expect([await trashed(second), await trashed(third)], [true, true]);
+
+      await merged.undo();
+      expect((await h.row(first)).body, 'Trip\nBoots');
+      expect([await trashed(second), await trashed(third)], [false, false]);
+    });
+
+    test('Undo never touches an edit made after the merge', () async {
+      final first = await h.repo.create('Trip');
+      final second = await h.repo.create('Gear');
+      final merged = await batch.merge([first, second]);
+      await h.repo.updateBody(first, 'Trip\nGear\nMy own line');
+      await merged!.undo();
+      expect((await h.row(first)).body, 'Trip\nGear\nMy own line');
+      expect(await trashed(second), isFalse);
+    });
+
+    test('a locked note may only be merged into a locked note', () async {
+      final open = await h.repo.create('Plain');
+      final locked = await h.repo.create('Secret', folder: 'Locked');
+      expect(await batch.mergeWouldUnlock([open, locked]), isTrue);
+      expect(await batch.mergeWouldUnlock([locked, open]), isFalse);
+    });
+  });
 }

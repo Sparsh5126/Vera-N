@@ -189,6 +189,10 @@ class HomeScreen extends ConsumerWidget {
       onLock: () => unawaited(actions.lock(messenger, refs)),
       onArchive: () => unawaited(actions.archive(messenger, refs)),
       onPin: () => unawaited(actions.pin(refs, pinned: !allPinned)),
+      // The order selected: the first is kept, the rest added to it.
+      onMerge: refs.length < 2
+          ? null
+          : () => unawaited(actions.merge(messenger, refs.toList())),
       onDelete: () => unawaited(actions.delete(messenger, refs)),
     );
   }

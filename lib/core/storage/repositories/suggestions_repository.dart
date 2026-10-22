@@ -23,9 +23,11 @@ class SuggestionsRepository {
   Future<void> add(List<SuggestionDraft> drafts, DateTime now, Duration ttl) {
     return _db.batch((b) {
       for (final d in drafts) {
-        // A link is a pair, stored lower id first; a tag or a revisit
-        // belongs to noteA.
-        final (a, z) = d.kind != Suggestion.linkKind || d.noteA < d.noteB
+        // A link or copies are a pair, stored lower id first; a tag or a
+        // revisit belongs to noteA.
+        final pair =
+            d.kind == Suggestion.linkKind || d.kind == Suggestion.duplicateKind;
+        final (a, z) = !pair || d.noteA < d.noteB
             ? (d.noteA, d.noteB)
             : (d.noteB, d.noteA);
         final swapped = a != d.noteA;
@@ -148,6 +150,20 @@ class SuggestionsRepository {
       ),
     );
   }
+
+  /// Turns waiting link [id] into copies to merge, keeping its status and
+  /// expiry date, so it can't live longer by changing kind. If the pair is
+  /// already offered as copies, the link is just removed.
+  Future<void> makeCopies(int id) => _db.transaction(() async {
+    await _db.customUpdate(
+      'UPDATE OR IGNORE suggestions SET kind = ? WHERE id = ?',
+      variables: [Variable(Suggestion.duplicateKind), Variable(id)],
+      updates: {_db.suggestions},
+    );
+    await (_db.delete(
+      _db.suggestions,
+    )..where((s) => s.id.equals(id) & s.kind.equals(Suggestion.linkKind))).go();
+  });
 
   /// Removes a suggestion once the user decided on it.
   Future<void> remove(int id) =>

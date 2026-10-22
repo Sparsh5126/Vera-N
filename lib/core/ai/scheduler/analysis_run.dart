@@ -13,6 +13,7 @@ import '../../storage/repositories/suggestions_repository.dart';
 import '../ai_settings.dart';
 import '../chunking/note_chunker.dart';
 import '../embedder/embedder.dart';
+import '../matching/note_copies.dart';
 import '../matching/note_matcher.dart';
 import '../matching/tag_suggester.dart';
 import '../matching/vectors.dart';
@@ -24,7 +25,7 @@ import '../matching/word_signature.dart';
 ///    that changed (the model is loaded only if there is work, then
 ///    released);
 /// 3. match each changed note against the others; strong matches become
-///    suggestions.
+///    suggestions, and copies become copies to merge, never links.
 class AnalysisRun {
   AnalysisRun({
     required this.analysis,
@@ -62,10 +63,21 @@ class AnalysisRun {
     _stopwatch.start();
     await suggestions.expire(_clock());
     await analysis.forgetLocked();
+    // Before matching, so a waiting link keeps its expiry date as copies.
+    await _settleCopies();
     final model = embedder.model;
     final stale = await analysis.stale(model, limit: AiSettings.notesPerRun);
-    if (stale.isEmpty) return true;
+    final changed = stale.isEmpty
+        ? const <int>[]
+        : await _embedAll(stale, model);
+    await _match(changed, model);
+    return changed.length == stale.length &&
+        stale.length < AiSettings.notesPerRun;
+  }
 
+  /// Embeds [stale] notes until done or told to stop; returns those that
+  /// have chunks to match.
+  Future<List<int>> _embedAll(List<NoteToAnalyze> stale, String model) async {
     final changed = <int>[];
     await embedder.load();
     try {
@@ -78,9 +90,7 @@ class AnalysisRun {
     } finally {
       await embedder.close();
     }
-    await _match(changed, model);
-    return changed.length == stale.length &&
-        stale.length < AiSettings.notesPerRun;
+    return changed;
   }
 
   /// Embeds [note]'s changed chunks and stores them. Returns true when it
@@ -154,7 +164,9 @@ class AnalysisRun {
     return [
       for (final m in matches)
         SuggestionDraft(
-          kind: Suggestion.linkKind,
+          kind: await _areCopies(ref, m.note)
+              ? Suggestion.duplicateKind
+              : Suggestion.linkKind,
           noteA: ref,
           noteB: m.note,
           score: m.score,
@@ -238,15 +250,34 @@ class AnalysisRun {
     );
     return [
       for (final m in best)
-        SuggestionDraft(
-          kind: Suggestion.resurfaceKind,
-          noteA: m.note,
-          noteB: ref,
-          score: m.score,
-          chunkA: m.otherChunk,
-          chunkB: m.ownChunk,
-        ),
+        if (!await _areCopies(ref, m.note))
+          SuggestionDraft(
+            kind: Suggestion.resurfaceKind,
+            noteA: m.note,
+            noteB: ref,
+            score: m.score,
+            chunkA: m.otherChunk,
+            chunkB: m.ownChunk,
+          ),
     ];
+  }
+
+  /// Waiting links between notes that are copies (one duplicated by sync,
+  /// or edited until it says the same) become copies to merge.
+  Future<void> _settleCopies() async {
+    for (final s in await suggestions.pending()) {
+      if (s.isLink && await _areCopies(s.noteA, s.noteB)) {
+        await suggestions.makeCopies(s.id);
+      }
+    }
+  }
+
+  /// Whether [a] and [b] are copies, unless the user said they aren't.
+  Future<bool> _areCopies(int a, int b) async {
+    if ((await analysis.notCopiesWith(a)).contains(b)) return false;
+    final bodyA = await analysis.bodyOf(a);
+    final bodyB = await analysis.bodyOf(b);
+    return bodyA != null && bodyB != null && NoteCopies.alike(bodyA, bodyB);
   }
 
   /// Notes rejected with [ref] where neither note changed a lot since

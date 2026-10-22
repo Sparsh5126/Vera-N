@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 import '../storage/files/note_file_store.dart';
+import '../storage/files/sync_conflict.dart';
 
 /// What one bridge run did.
 class BridgeReport {
@@ -99,21 +100,14 @@ class MirrorBridge {
     final mBytes = await _read(mirror, key);
     if (_equal(fBytes, mBytes)) return;
     if (key.startsWith('n:')) {
-      await folder.write(_conflictPath(key.substring(2)), utf8.decode(mBytes!));
+      await folder.write(
+        SyncConflict.copyPath(key.substring(2), _clock(), _device),
+        utf8.decode(mBytes!),
+      );
       report.conflicts++;
     }
     await _copy(key, from: folder, to: mirror, present: true);
     report.toMirror++;
-  }
-
-  String _conflictPath(String path) {
-    final t = _clock();
-    String two(int n) => n.toString().padLeft(2, '0');
-    final stamp =
-        '${t.year}${two(t.month)}${two(t.day)}-'
-        '${two(t.hour)}${two(t.minute)}${two(t.second)}';
-    final stem = path.substring(0, path.length - '.md'.length);
-    return '$stem.sync-conflict-$stamp-$_device.md';
   }
 
   /// Every file on one side, by key: `n:` notes, `a:` attachments, `p:`

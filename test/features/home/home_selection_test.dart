@@ -225,4 +225,27 @@ void main() {
     expect(find.text(AppCopy.unpin), findsOneWidget);
     await app.finish(tester);
   });
+
+  testWidgets('Merge, with two or more selected, keeps the note selected '
+      'first and adds the next to it, with Undo', (tester) async {
+    final gear = await app.storage.notes.create('Gear\nTorch');
+    await app.storage.notes.create('Trip\nBoots');
+    await app.pump(tester);
+
+    await hold(tester, 'Gear');
+    expect(find.text(AppCopy.merge), findsNothing);
+    await tapText(tester, 'Trip');
+    await tapText(tester, AppCopy.merge);
+    expect(find.text(HomeCopy.mergedInto('Gear')), findsOneWidget);
+    expect(find.text('Trip'), findsNothing);
+    expect(
+      (await app.storage.notes.getNote(gear))!.body,
+      'Gear\nTorch\n\nTrip\nBoots\n',
+    );
+
+    await tapText(tester, 'Undo');
+    expect(find.text('Trip'), findsOneWidget);
+    expect((await app.storage.notes.getNote(gear))!.body, 'Gear\nTorch');
+    await app.finish(tester);
+  });
 }

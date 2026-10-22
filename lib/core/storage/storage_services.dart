@@ -16,6 +16,7 @@ import 'files/switching_note_file_store.dart';
 import 'indexer/note_indexer.dart';
 import 'indexer/note_writer.dart';
 import 'indexer/notes_relocator.dart';
+import 'indexer/same_id_files.dart';
 import 'repositories/attachments_repository.dart';
 import 'repositories/analysis_repository.dart';
 import 'repositories/conflict_resolver.dart';
@@ -40,12 +41,16 @@ typedef AnalysisStorage = ({
 /// Notes live in the folder the user picked, or, until then (or if access
 /// is removed), in the app-private holding folder (ARCHITECTURE.md §8).
 class StorageServices {
-  StorageServices(this.db, NoteFileStore holding, {this.folders})
-    : _holding = holding,
-      store = SwitchingNoteFileStore(holding),
-      settings = SettingsRepository(db),
-      suggestions = SuggestionsRepository(db),
-      analysis = AnalysisRepository(db) {
+  StorageServices(
+    this.db,
+    NoteFileStore holding, {
+    this.folders,
+    this.settleSameIds = false,
+  }) : _holding = holding,
+       store = SwitchingNoteFileStore(holding),
+       settings = SettingsRepository(db),
+       suggestions = SuggestionsRepository(db),
+       analysis = AnalysisRepository(db) {
     writer = NoteWriter(db, store);
     indexer = NoteIndexer(db, store);
     notes = NotesRepository(db, store, writer);
@@ -55,6 +60,7 @@ class StorageServices {
     attachments = AttachmentsRepository(db, store);
     exporter = NotesExporter(db, writer);
     conflicts = ConflictResolver(db, store, writer, indexer, notes);
+    sameIds = SameIdFiles(db, store);
   }
 
   /// Opens storage on the device and reconnects to the picked folder.
@@ -64,6 +70,7 @@ class StorageServices {
     final services = StorageServices(
       AppDatabase.open(),
       IoNoteFileStore(holding),
+      settleSameIds: Platform.isAndroid || Platform.isIOS,
       folders: Platform.isAndroid
           ? const AndroidFolderAccess()
           : Platform.isWindows || Platform.isMacOS || Platform.isLinux
@@ -104,6 +111,11 @@ class StorageServices {
   late final AttachmentsRepository attachments;
   late final NotesExporter exporter;
   late final ConflictResolver conflicts;
+  late final SameIdFiles sameIds;
+
+  /// The phone settles two files with one note id after each scan (see
+  /// [SameIdFiles]); the laptop leaves it to the phone.
+  final bool settleSameIds;
   Future<void>? _reconciling;
   FolderWatcher? _watcher;
 
@@ -180,9 +192,14 @@ class StorageServices {
 
   /// Picks up changes made outside the app. Never runs twice at once.
   Future<void> reconcile() {
-    return _reconciling ??= indexer.reconcile().whenComplete(
+    return _reconciling ??= _reconcileOnce().whenComplete(
       () => _reconciling = null,
     );
+  }
+
+  Future<void> _reconcileOnce() async {
+    await indexer.reconcile();
+    if (settleSameIds) await sameIds.settle();
   }
 
   /// After start, never delaying it: reads every device's rejections file

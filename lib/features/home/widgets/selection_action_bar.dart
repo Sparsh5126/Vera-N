@@ -5,7 +5,8 @@ import '../../../core/styles/app_styles.dart';
 
 /// The actions for the selected notes, floating above the nav bar in thumb
 /// reach, in the nav bar's own plate: Folder, Lock, Archive, Pin or Unpin,
-/// Delete. Each is a labelled button at least 48 points across.
+/// Merge (two or more selected), Delete. Each is a labelled button at
+/// least 48 points across.
 class SelectionActionBar extends StatelessWidget {
   const SelectionActionBar({
     super.key,
@@ -15,6 +16,7 @@ class SelectionActionBar extends StatelessWidget {
     required this.onPin,
     required this.onDelete,
     required this.allPinned,
+    this.onMerge,
   });
 
   final VoidCallback onFolder;
@@ -22,6 +24,9 @@ class SelectionActionBar extends StatelessWidget {
   final VoidCallback onArchive;
   final VoidCallback onPin;
   final VoidCallback onDelete;
+
+  /// Null hides Merge: it needs two notes or more.
+  final VoidCallback? onMerge;
 
   /// Every selected note is pinned, so the pin button unpins.
   final bool allPinned;
@@ -33,10 +38,11 @@ class SelectionActionBar extends StatelessWidget {
       // The nav bar's height: the floating slot would otherwise let the
       // bar grow over the notes.
       height: AppSize.navBarHeight,
-      // As wide as five nav items, narrower on a small phone: the buttons
-      // share the width, each still a full tap target.
-      constraints: const BoxConstraints(
-        maxWidth: AppSize.navItemWidth * 5 + AppSpace.s * 2,
+      // As wide as a nav item per button, narrower on a small phone: the
+      // buttons share the width, each still a full tap target.
+      constraints: BoxConstraints(
+        maxWidth:
+            AppSize.navItemWidth * (onMerge == null ? 5 : 6) + AppSpace.s * 2,
       ),
       padding: const EdgeInsets.symmetric(horizontal: AppSpace.s),
       decoration: ShapeDecoration(
@@ -68,6 +74,8 @@ class SelectionActionBar extends StatelessWidget {
               allPinned ? AppCopy.unpin : AppCopy.pin,
               onPin,
             ),
+            if (onMerge case final merge?)
+              _button(context, Icons.call_merge, AppCopy.merge, merge),
             _button(context, Icons.delete_outline, AppCopy.delete, onDelete),
           ],
         ),
