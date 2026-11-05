@@ -4,6 +4,10 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-11-05
+
+Same-title links, a "Linked Notes" heading, "Not sure" that waits, and capitals in list items. `pubspec.yaml` `1.0.3+5`; the Windows installer's default and the README follow it. 1.0.2 was skipped: a `v1.0.2` tag already pointed at the 1.0.1 code. Shared on GitHub as release v1.0.3 (APKs uploaded by the user).
+
 ### Added
 - **Notes with the same title are suggested as a link** (user, 2026-11-05: two notes named "Quotes" were never suggested). A title shorter than four words joins its first line for matching, so two "Quotes" notes with different quotes never reached the bar. Now each analysed note is also paired with notes titled the same (`SameTitle`: as shown, trimmed, case ignored; untitled notes never), even when their words don't match, at most `suggestionsPerNote` per note, with their closest passages for "Why?". Linked and still-rejected pairs are left out; copies still become copies to merge. Review says "Both notes are called “Quotes”." Deciding on one doesn't move the learned link bar, which it never passed.
   - **Existing notes:** the first analysis run after updating pairs notes that already share a title, once (`sameTitleSwept` setting). It reads the stored chunks only; nothing is embedded again, so no battery cost beyond one pass over the titles.
