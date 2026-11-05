@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/copy/app_copy.dart';
 import '../../../core/storage/files/note_markup.dart';
 import '../../../core/styles/app_styles.dart';
+import '../../../shared/widgets/section_label.dart';
 import '../state/markup_editing.dart';
 import '../state/markup_semantics.dart';
 import 'checkbox_glyph.dart';
@@ -127,6 +129,7 @@ class TitledTextController extends TextEditingController {
         case MarkupKind.numbered:
         case MarkupKind.embed:
         case MarkupKind.webLink:
+        case MarkupKind.footer:
           break;
       }
     }
@@ -134,6 +137,12 @@ class TitledTextController extends TextEditingController {
   }
 
   InlineSpan _glyph(MarkupSpan span, TextStyle style) {
+    if (span.kind == MarkupKind.footer) {
+      return const WidgetSpan(
+        alignment: PlaceholderAlignment.middle,
+        child: ExcludeSemantics(child: SectionLabel(AppCopy.linkedNotes)),
+      );
+    }
     if (span.isBlock) {
       final embed = embedBuilder;
       final webLink = webLinkBuilder;

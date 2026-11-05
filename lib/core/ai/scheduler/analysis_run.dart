@@ -15,6 +15,7 @@ import '../chunking/note_chunker.dart';
 import '../embedder/embedder.dart';
 import '../matching/note_copies.dart';
 import '../matching/note_matcher.dart';
+import '../matching/same_title.dart';
 import '../matching/tag_suggester.dart';
 import '../matching/vectors.dart';
 import '../matching/word_signature.dart';
@@ -36,6 +37,7 @@ class AnalysisRun {
     bool Function()? stopRequested,
     this.linkThreshold = AiSettings.strongMatch,
     this.tagThreshold = AiSettings.strongMatch,
+    this.sweepSameTitles = false,
   }) : _stopRequested = stopRequested ?? _never,
        _clock = clock ?? DateTime.now,
        _stopwatch = stopwatch ?? Stopwatch();
@@ -45,6 +47,10 @@ class AnalysisRun {
 
   /// The bar for a tag's neighbours, learned separately (kind `tag`).
   final double tagThreshold;
+
+  /// Also pair every analysed note with the notes titled the same, not
+  /// only changed ones: once, for notes written before same-title links.
+  final bool sweepSameTitles;
   final AnalysisRepository analysis;
   final SuggestionsRepository suggestions;
   final Embedder embedder;
@@ -130,51 +136,106 @@ class AnalysisRun {
   }
 
   Future<void> _match(List<int> changed, String model) async {
-    if (changed.isEmpty) return;
+    if (changed.isEmpty && !sweepSameTitles) return;
     final all = await analysis.allChunks(model);
     final dates = await analysis.modifiedTimes();
+    final titles = SameTitle.groups(await analysis.titles());
     final drafts = <SuggestionDraft>[];
     for (final ref in changed) {
       final own = all.where((c) => c.note == ref).toList();
       drafts
-        ..addAll(await _linkDrafts(ref, own, all))
+        ..addAll(await _linkDrafts(ref, own, all, titles))
         ..addAll(await _tagDrafts(ref, own, all))
         ..addAll(await _revisitDrafts(ref, own, all, dates));
+    }
+    if (sweepSameTitles) {
+      final named = {for (final notes in titles.values) ...notes};
+      final rest = {for (final c in all) c.note}
+          .intersection(named)
+          .difference(changed.toSet());
+      for (final ref in rest) {
+        final own = all.where((c) => c.note == ref).toList();
+        final exclude = await _linkExclusions(ref);
+        drafts.addAll(
+          await _drafts(ref, _titleMatches(ref, own, all, titles, exclude)),
+        );
+      }
     }
     await suggestions.add(drafts, _clock(), AiSettings.suggestionLifetime);
   }
 
+  /// Strong matches, then notes with the same title that didn't match
+  /// strongly ([SameTitle]).
   Future<List<SuggestionDraft>> _linkDrafts(
     int ref,
     List<ChunkVector> own,
     List<ChunkVector> all,
+    Map<String, List<int>> titles,
   ) async {
-    final matches = NoteMatcher.strongMatches(
+    final exclude = await _linkExclusions(ref);
+    final strong = NoteMatcher.strongMatches(
       own,
       all,
       threshold: linkThreshold,
       limit: AiSettings.suggestionsPerNote,
-      exclude: {
-        ref,
-        ...await analysis.linkedWith(ref),
-        ...await _stillRejected(ref),
-      },
+      exclude: exclude,
       preferred: await analysis.sameFolderAs(ref),
     );
-    return [
-      for (final m in matches)
-        SuggestionDraft(
-          kind: await _areCopies(ref, m.note)
-              ? Suggestion.duplicateKind
-              : Suggestion.linkKind,
-          noteA: ref,
-          noteB: m.note,
-          score: m.score,
-          chunkA: m.ownChunk,
-          chunkB: m.otherChunk,
-        ),
-    ];
+    final named = _titleMatches(ref, own, all, titles, {
+      ...exclude,
+      for (final m in strong) m.note,
+    });
+    return _drafts(ref, [...strong, ...named]);
   }
+
+  /// Notes never suggested as a link to [ref]: itself, those linked, and
+  /// those still rejected.
+  Future<Set<int>> _linkExclusions(int ref) async => {
+    ref,
+    ...await analysis.linkedWith(ref),
+    ...await _stillRejected(ref),
+  };
+
+  /// Notes titled as [ref], with the closest passages of each pair, at
+  /// most [AiSettings.suggestionsPerNote], whatever the match bar.
+  List<NoteMatch> _titleMatches(
+    int ref,
+    List<ChunkVector> own,
+    List<ChunkVector> all,
+    Map<String, List<int>> titles,
+    Set<int> exclude,
+  ) {
+    final named = SameTitle.notesLike(
+      ref,
+      titles,
+    ).where((n) => !exclude.contains(n)).take(AiSettings.suggestionsPerNote);
+    final wanted = named.toSet();
+    if (wanted.isEmpty) return const [];
+    return NoteMatcher.strongMatches(
+      own,
+      all.where((c) => wanted.contains(c.note)),
+      threshold: -1,
+      limit: wanted.length,
+    );
+  }
+
+  /// A link for each match, or copies to merge when the notes are copies.
+  Future<List<SuggestionDraft>> _drafts(
+    int ref,
+    List<NoteMatch> matches,
+  ) async => [
+    for (final m in matches)
+      SuggestionDraft(
+        kind: await _areCopies(ref, m.note)
+            ? Suggestion.duplicateKind
+            : Suggestion.linkKind,
+        noteA: ref,
+        noteB: m.note,
+        score: m.score,
+        chunkA: m.ownChunk,
+        chunkB: m.otherChunk,
+      ),
+  ];
 
   /// Tags that notes very close to [ref] share and it lacks (product spec
   /// §11; see [TagSuggester]).

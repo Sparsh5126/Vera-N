@@ -147,6 +147,7 @@ abstract final class MarkupEditing {
           );
         case MarkupKind.embed:
         case MarkupKind.webLink:
+        case MarkupKind.footer:
           return null;
       }
     }

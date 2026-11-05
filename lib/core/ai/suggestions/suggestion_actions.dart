@@ -10,6 +10,7 @@ import '../../storage/repositories/notes_repository.dart';
 import '../../storage/repositories/rejections_repository.dart';
 import '../../storage/repositories/settings_repository.dart';
 import '../../storage/repositories/suggestions_repository.dart';
+import '../matching/same_title.dart';
 import '../matching/word_signature.dart';
 import '../ai_settings.dart';
 import 'duplicate_actions.dart';
@@ -100,10 +101,11 @@ class SuggestionActions {
   }
 
   /// Counts the decision toward the kind's match bar (product spec §8);
-  /// returns its undo. The laptop's suggestions never passed this
-  /// device's bar, so they don't move it.
+  /// returns its undo. The laptop's suggestions and links between notes
+  /// with the same title never passed this device's bar, so they don't
+  /// move it.
   Future<Undo> _learn(Suggestion s, {required bool accepted}) async {
-    if (s.fromLaptop) return () async {};
+    if (s.fromLaptop || await _sameTitle(s)) return () async {};
     final kind = s.kind;
     final learned = await settings.learning(kind);
     await settings.saveLearning(
@@ -214,6 +216,13 @@ class SuggestionActions {
     final a = await notes.getNote(s.noteA);
     final b = await notes.getNote(s.noteB);
     return a == null || b == null ? null : (a, b);
+  }
+
+  /// A link between two notes with the same title ([SameTitle]).
+  Future<bool> _sameTitle(Suggestion s) async {
+    if (!s.isLink) return false;
+    final pair = await _notes(s);
+    return pair != null && SameTitle.alike(pair.$1.title, pair.$2.title);
   }
 
   /// A note of the pair is gone: the suggestion just goes away.

@@ -47,6 +47,8 @@ class SuggestionSide {
     second: AppCopy.reviewOlderLabel,
     reason: s.isDuplicate
         ? AppCopy.duplicateReason
+        : view.sameTitle
+        ? AppCopy.sameTitleReason(view.older.title)
         : AppCopy.suggestionReason(otherTitle ?? view.older.title),
     hint: kept == null ? null : AppCopy.mergeKeeps(kept.title),
   );

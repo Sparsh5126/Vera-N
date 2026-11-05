@@ -12,6 +12,7 @@ Future<bool> runAnalysisOnce(
 }) async {
   final links = await storage.settings.learning('link');
   final tags = await storage.settings.learning('tag');
+  final sweep = !await storage.settings.sameTitleSwept();
   final done = await AnalysisRun(
     analysis: storage.analysis,
     suggestions: storage.suggestions,
@@ -25,7 +26,9 @@ Future<bool> runAnalysisOnce(
       tags,
       SuggestionLearning.baseFor('tag'),
     ),
+    sweepSameTitles: sweep,
   ).run();
+  if (sweep) await storage.settings.setSameTitleSwept();
   // "Last looked" in Settings, so waiting and finding nothing differ.
   await storage.settings.setLastAnalysis(DateTime.now());
   return done;

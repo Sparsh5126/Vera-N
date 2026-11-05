@@ -89,6 +89,8 @@ abstract final class AppCopy {
   // Review and suggestion card (UI spec §6, §8).
   static String suggestionReason(String title) =>
       'Looks related to your note on $title.';
+  static String sameTitleReason(String title) =>
+      'Both notes are called “$title”.';
   static String tagReason(String tag) =>
       'Notes like this one are tagged ${tagLabel(tag)}.';
   static const tagThisNote = 'This note';
@@ -100,6 +102,9 @@ abstract final class AppCopy {
   static const undo = 'Undo';
   static const why = 'Why?';
   static const linked = 'Linked';
+
+  /// The heading of a note's "Linked notes" footer, as the editor shows it.
+  static const linkedNotes = 'Linked Notes';
   static const reviewNewLabel = 'NEW';
   static const reviewOlderLabel = 'OLDER';
 

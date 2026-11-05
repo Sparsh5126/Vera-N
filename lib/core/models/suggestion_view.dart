@@ -32,6 +32,15 @@ class SuggestionView {
   /// shows only the note to tag.
   bool get single => suggestion.isTag && suggestion.noteA == suggestion.noteB;
 
+  /// A link between two notes with the same title, as `SameTitle` compares
+  /// them (the titles here are already as shown).
+  bool get sameTitle {
+    final a = newer.title.trim().toLowerCase();
+    return suggestion.isLink &&
+        a.isNotEmpty &&
+        a == older.title.trim().toLowerCase();
+  }
+
   SuggestedNote? noteOf(int ref) => newer.ref == ref
       ? newer
       : older.ref == ref

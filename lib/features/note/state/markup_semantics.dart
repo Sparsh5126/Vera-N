@@ -36,6 +36,7 @@ abstract final class MarkupSemantics {
   }
 
   static String _blockLabel(String text, MarkupSpan span) {
+    if (span.kind == MarkupKind.footer) return AppCopy.linkedNotes;
     if (span.kind == MarkupKind.webLink) {
       final link = WebLink.parse(text.substring(span.start, span.end));
       return link == null ? '' : AppCopy.linkSpoken(link.label, link.site);

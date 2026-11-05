@@ -4,6 +4,15 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Added
+- **Notes with the same title are suggested as a link** (user, 2026-11-05: two notes named "Quotes" were never suggested). A title shorter than four words joins its first line for matching, so two "Quotes" notes with different quotes never reached the bar. Now each analysed note is also paired with notes titled the same (`SameTitle`: as shown, trimmed, case ignored; untitled notes never), even when their words don't match, at most `suggestionsPerNote` per note, with their closest passages for "Why?". Linked and still-rejected pairs are left out; copies still become copies to merge. Review says "Both notes are called “Quotes”." Deciding on one doesn't move the learned link bar, which it never passed.
+  - **Existing notes:** the first analysis run after updating pairs notes that already share a title, once (`sameTitleSwept` setting). It reads the stored chunks only; nothing is embedded again, so no battery cost beyond one pass over the titles.
+  - Risk: several notes with a generic title ("Notes", "Todo") are paired too, up to 3 per note; rejections are remembered.
+  - Product spec §7 and UI spec (reason copy) updated. Tests: `SameTitle` (case, markup, empty, groups); a same-title pair with unrelated words becomes a link; a rejected one stays away and the bar doesn't move; the sweep pairs notes analysed earlier.
+
+### Changed
+- **The "Linked notes" footer shows as a heading, "Linked Notes"** (user, 2026-11-05). The editor showed the raw `## Linked notes` line. Now that line is drawn as a small section heading (`MarkupKind.footer`, a block like a link card: the cursor steps over it, deleting into it removes the line, a screen reader says "Linked Notes"). Note files are unchanged, so sync, existing notes and other apps are not affected. Wording in `AppCopy.linkedNotes`. UI spec updated. Tests: found as one block (and not in a longer line), heard as shown, caret and deletion, shown in the editor.
+
 ### Fixed
 - **"Not sure" brought the suggestion straight back** (user, 2026-11-05). It only marked the suggestion, so the "New connections" card stayed on Home and Review showed the same card on the next visit. Now "Not sure" rests a suggestion for 3 days (`AiSettings.notSureRest`): Review, "Review more" and the Home card leave it out until then; it stays dimmed in the note and the Graph, and still expires after its 30 days. Undo restores it as it was.
   - **Database schema 8:** a nullable `suggestions.returnsAt`, compared with the database's clock. Upgrades add the column; suggestions already marked "not sure" have none, so they show as before until chosen again.

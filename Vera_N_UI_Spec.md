@@ -236,7 +236,7 @@ Full-screen page (not a bottom sheet), opened from the "new connections" card.
 **Finished:** a quiet "All caught up" screen. No streaks or rewards. A "Review more" button appears only if more exist; it loads the next batch of 5 (no number on the button, changed 2026-10-08 so it never feels urgent).
 
 **Built 2026-10-04:**
-- Accepting writes the link into the newer note's "Linked notes" footer, pointing at the older note.
+- Accepting writes the link into the newer note's "Linked notes" footer, pointing at the older note. In the note, the footer's `## Linked notes` line shows as a small section heading, "Linked Notes", never as Markdown (changed 2026-11-05, user); the file is unchanged. It is one piece: the cursor steps over it, and deleting into it removes the line.
 - The Home card shows no count ("New connections"), however many wait (changed 2026-10-08, user: a number creates urgency).
 - "Review more" counts only suggestions the finished batch didn't show, so "Not sure" ones return in a later visit, not immediately.
 - "Why?" shows the matched passages in full; a fuller explanation needs the laptop layer.
@@ -498,7 +498,7 @@ Version
 
 ## 12. Microcopy
 
-- Suggestion reason: "Looks related to your note on {title}."
+- Suggestion reason: "Looks related to your note on {title}." For two notes with the same title: "Both notes are called “{title}”." (2026-11-05)
 - Revisit: "You might want to revisit this."
 - Review finished: "All caught up."
 - Empty home: "Write your first thought."

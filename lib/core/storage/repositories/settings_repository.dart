@@ -16,6 +16,7 @@ class SettingsRepository {
   static const _onboardingDone = 'onboardingDone';
   static const _recentSearches = 'recentSearches';
   static const _reviewHintSeen = 'reviewHintSeen';
+  static const _sameTitleSwept = 'sameTitleSwept';
   static const _learning = 'learning.';
   static const _unusedSince = 'attachments.unusedSince';
   static const _notificationsAsked = 'reminders.notificationsAsked';
@@ -87,6 +88,12 @@ class SettingsRepository {
   Future<bool> reviewHintSeen() async => await _get(_reviewHintSeen) == 'true';
 
   Future<void> setReviewHintSeen() => _set(_reviewHintSeen, 'true');
+
+  /// Notes that already shared a title were paired once (2026-11-05);
+  /// after that only changed notes are.
+  Future<bool> sameTitleSwept() async => await _get(_sameTitleSwept) == 'true';
+
+  Future<void> setSameTitleSwept() => _set(_sameTitleSwept, 'true');
 
   /// What was learned about suggestions of [kind] (accept / reject
   /// decisions and its match bar), kept on this device only.

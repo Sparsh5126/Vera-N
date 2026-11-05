@@ -216,15 +216,23 @@ class AnalysisRepository {
   }
 
   Future<Map<int, DateTime>> modifiedTimes() async {
-    final rows =
-        await (_db.select(_db.notes)..where(
-              (n) =>
-                  n.trashedAt.isNull() &
-                  NoteRows.notArchived(n) &
-                  NoteRows.notLocked(n),
-            ))
-            .get();
-    return {for (final r in rows) r.id: r.modified};
+    return {for (final r in await _openNotes()) r.id: r.modified};
+  }
+
+  /// Each open note's title as written, for same-title links.
+  Future<Map<int, String>> titles() async {
+    return {for (final r in await _openNotes()) r.id: r.title};
+  }
+
+  /// Notes the AI may suggest: not in the trash, archived or locked.
+  Future<List<NoteRow>> _openNotes() {
+    return (_db.select(_db.notes)..where(
+          (n) =>
+              n.trashedAt.isNull() &
+              NoteRows.notArchived(n) &
+              NoteRows.notLocked(n),
+        ))
+        .get();
   }
 
   /// Old notes already offered to revisit (waiting or put off): not

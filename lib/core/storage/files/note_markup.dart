@@ -1,9 +1,21 @@
 import 'package:flutter/foundation.dart';
 
+import 'note_footer.dart';
 import 'web_link.dart';
 
 /// Kinds of Markdown the app shows as formatting instead of symbols.
-enum MarkupKind { link, bold, checkbox, bullet, numbered, embed, webLink }
+enum MarkupKind {
+  link,
+  bold,
+  checkbox,
+  bullet,
+  numbered,
+  embed,
+  webLink,
+
+  /// The "Linked notes" heading of the footer ([NoteFooter.heading]).
+  footer,
+}
 
 /// One piece of Markdown in a note's text. The file keeps the Markdown; the
 /// editor shows [contentStart]..[contentEnd] formatted, hides the symbols,
@@ -44,8 +56,12 @@ class MarkupSpan {
       kind == MarkupKind.bullet ||
       kind == MarkupKind.numbered;
 
-  /// An attachment or a web link: a whole line drawn as one card.
-  bool get isBlock => kind == MarkupKind.embed || kind == MarkupKind.webLink;
+  /// An attachment, a web link or the footer's heading: a whole line drawn
+  /// as one piece.
+  bool get isBlock =>
+      kind == MarkupKind.embed ||
+      kind == MarkupKind.webLink ||
+      kind == MarkupKind.footer;
 
   /// Checkboxes and bullets are drawn as glyphs, a block as its card;
   /// numbers stay as written.
@@ -105,6 +121,12 @@ abstract final class NoteMarkup {
   /// An embed with its line break, so leaving it out leaves no gap.
   static final _embedLine = RegExp(
     r'^!\[[^\]\n]*\]\(Attachments/[^()\s/\\]+\)[ \t]*(\r?\n|$)',
+    multiLine: true,
+  );
+
+  /// The footer's heading on its own line, as written.
+  static final _footer = RegExp(
+    '^${RegExp.escape(NoteFooter.heading)}[ \t]*\$',
     multiLine: true,
   );
 
@@ -177,6 +199,14 @@ abstract final class NoteMarkup {
       // The address is group 2 of a card line, group 1 of a bare one.
       for (final m in WebLink.card.allMatches(text)) _webLinkSpan(m, m[2]!),
       for (final m in WebLink.bare.allMatches(text)) _webLinkSpan(m, m[1]!),
+      for (final m in _footer.allMatches(text))
+        MarkupSpan(
+          kind: MarkupKind.footer,
+          start: m.start,
+          contentStart: m.end,
+          contentEnd: m.end,
+          end: m.end,
+        ),
     ];
   }
 
