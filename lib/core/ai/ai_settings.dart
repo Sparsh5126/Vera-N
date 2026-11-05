@@ -53,6 +53,10 @@ abstract final class AiSettings {
   /// Unreviewed suggestions disappear after this (product spec §7).
   static const suggestionLifetime = Duration(days: 30);
 
+  /// After "Not sure", how long Review and the Home card leave a
+  /// suggestion out (user, 2026-11-05: it came back at once).
+  static const notSureRest = Duration(days: 3);
+
   /// Notes analyzed per run; the rest wait for the next run.
   static const notesPerRun = 200;
 

@@ -114,11 +114,11 @@ class ReviewController extends Notifier<ReviewState> {
     }
   }
 
-  /// "Not sure" ones from this batch only come back in a later batch, so
-  /// "more" means suggestions this batch didn't show.
+  /// "Not sure" ones rest before coming back, so "more" means suggestions
+  /// Review may show that this batch didn't.
   Future<void> _checkMore() async {
     final shown = {for (final v in state.batch) v.suggestion.id};
-    final pending = await ref.read(storageProvider).suggestions.pending();
+    final pending = await ref.read(storageProvider).suggestions.reviewable();
     state = state.copyWith(
       moreWaiting: pending.any((s) => !shown.contains(s.id)),
     );

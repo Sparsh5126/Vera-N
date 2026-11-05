@@ -14,6 +14,7 @@ class Suggestion {
     this.tag = '',
     this.detail = '',
     this.fromLaptop = false,
+    this.returnsAt,
   });
 
   final int id;
@@ -61,6 +62,9 @@ class Suggestion {
   final bool notSure;
   final DateTime createdAt;
   final DateTime expiresAt;
+
+  /// After "Not sure", when Review shows it again; null if it may now.
+  final DateTime? returnsAt;
 
   /// The other note of the pair, seen from [note].
   int otherThan(int note) => note == noteA ? noteB : noteA;

@@ -91,8 +91,9 @@ class SuggestionsRepository {
   /// ones; within each, same-folder links first, then oldest first (the
   /// order [_pending] gives, kept by splitting rather than re-sorting).
   /// Pairs with a note in the trash are left out.
+  /// "Not sure" ones still resting are left out.
   Future<List<Suggestion>> batch({required int size}) async {
-    final rows = await _pending().get();
+    final rows = await _pending(reviewable: true).get();
     final ordered = [
       ...rows.where((r) => r.status != notSure),
       ...rows.where((r) => r.status == notSure),
@@ -104,8 +105,13 @@ class SuggestionsRepository {
   Future<List<Suggestion>> pending() async =>
       (await _pending().get()).map(_suggestion).toList();
 
-  /// How many suggestions are waiting, for the Home card.
-  Stream<int> watchCount() => _pending().watch().map((rows) => rows.length);
+  /// Every suggestion Review would show now, oldest first.
+  Future<List<Suggestion>> reviewable() async =>
+      (await _pending(reviewable: true).get()).map(_suggestion).toList();
+
+  /// How many suggestions Review would show, for the Home card.
+  Stream<int> watchCount() =>
+      _pending(reviewable: true).watch().map((rows) => rows.length);
 
   /// Every suggestion waiting, for the Graph's dashed lines.
   Stream<List<Suggestion>> watchPending() =>
@@ -143,10 +149,13 @@ class SuggestionsRepository {
     ],
   );
 
-  Future<void> setNotSure(int id, {required bool notSure}) {
+  /// Marks [id] "not sure" (or fresh again). With [until], Review and the
+  /// Home card leave it out until then; it stays dimmed everywhere else.
+  Future<void> setNotSure(int id, {required bool notSure, DateTime? until}) {
     return (_db.update(_db.suggestions)..where((s) => s.id.equals(id))).write(
       SuggestionsCompanion(
         status: Value(notSure ? SuggestionsRepository.notSure : fresh),
+        returnsAt: Value(notSure ? until : null),
       ),
     );
   }
@@ -230,6 +239,7 @@ class SuggestionsRepository {
             chunkA: s.chunkA,
             chunkB: s.chunkB,
             status: s.notSure ? notSure : fresh,
+            returnsAt: Value(s.returnsAt),
             createdAt: s.createdAt,
             expiresAt: s.expiresAt,
           ),
@@ -263,12 +273,20 @@ class SuggestionsRepository {
   /// Oldest first, except that links between two notes in the same folder
   /// come before the rest: they are more likely related (user, 2026-10-18).
   /// No folder never counts as the same folder.
-  Selectable<SuggestionRow> _pending() {
+  /// With [reviewable], "not sure" ones still resting are left out.
+  Selectable<SuggestionRow> _pending({bool reviewable = false}) {
     const sameFolderFirst = CustomExpression<int>(
       "CASE WHEN suggestions.kind = 'link' AND a.folder != '' "
       'AND lower(a.folder) = lower(b.folder) THEN 0 ELSE 1 END',
     );
+    final returnsAt = _db.suggestions.returnsAt;
     final query = _pendingJoin()
+      ..where(
+        reviewable
+            ? returnsAt.isNull() |
+                  returnsAt.isSmallerOrEqual(currentDateAndTime)
+            : const Constant(true),
+      )
       ..orderBy([
         OrderingTerm(expression: sameFolderFirst),
         OrderingTerm(expression: _db.suggestions.createdAt),
@@ -287,6 +305,7 @@ class SuggestionsRepository {
     notSure: r.status == notSure,
     createdAt: r.createdAt,
     expiresAt: r.expiresAt,
+    returnsAt: r.returnsAt,
     tag: r.tag,
     detail: r.detail,
     fromLaptop: r.fromLaptop,

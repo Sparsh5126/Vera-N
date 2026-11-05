@@ -117,6 +117,37 @@ void main() {
     expect(protect(at('a **big** idea', 9), composing), composing);
   });
 
+  group('capitals in list items', () {
+    test('the first letter of an empty item is a capital', () {
+      expect(protect(at('- [ ] ', 6), at('- [ ] m', 7)).text, '- [ ] M');
+      expect(protect(at('x\n- ', 4), at('x\n- e', 5)).text, 'x\n- E');
+      expect(protect(at('1. ', 3), at('1. b', 4)).text, '1. B');
+    });
+
+    test('also while the keyboard is composing, keeping the range', () {
+      const typed = TextEditingValue(
+        text: '- [ ] m',
+        selection: TextSelection.collapsed(offset: 7),
+        composing: TextRange(start: 6, end: 7),
+      );
+      final fixed = protect(at('- [ ] ', 6), typed);
+      expect(fixed.text, '- [ ] M');
+      expect(fixed.composing, typed.composing);
+      expect(caret(fixed), 7);
+    });
+
+    test('later letters, items with text, and plain lines are left', () {
+      expect(protect(at('- [ ] M', 7), at('- [ ] Mi', 8)).text, '- [ ] Mi');
+      expect(
+        protect(at('- [ ] ilk', 6), at('- [ ] milk', 7)).text,
+        '- [ ] milk',
+      );
+      expect(protect(at('x\n', 2), at('x\nm', 3)).text, 'x\nm');
+      expect(protect(at('- [ ] ', 6), at('- [ ] 4', 7)).text, '- [ ] 4');
+      expect(protect(at('- [ ] ', 6), at('- [ ] ह', 7)).text, '- [ ] ह');
+    });
+  });
+
   group('web link cards', () {
     const card = '[Dreams](https://ex.com/a)'; // 26 characters
     const t = 'Read\n$card\nlater'; // card 5..31

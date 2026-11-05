@@ -11,7 +11,10 @@ import '../../../core/storage/files/note_markup.dart';
 ///   right after a list number removes the number;
 /// - Enter on a checklist, bullet or numbered line starts the next one
 ///   (numbers count on, and the items below are renumbered); Enter on an
-///   empty item ends the list.
+///   empty item ends the list;
+/// - the first letter typed into an empty item is a capital. (The keyboard
+///   sees the hidden marker before the cursor, not a new line, so it
+///   doesn't capitalize there itself.)
 abstract final class MarkupEditing {
   static const _checkboxPrefix = '- [ ] ';
   static const _bulletPrefix = '- ';
@@ -21,8 +24,12 @@ abstract final class MarkupEditing {
     TextEditingValue previous,
     TextEditingValue next,
   ) {
-    if (next.composing.isValid) return next;
     final grew = next.text.length - previous.text.length;
+    if (grew == 1) {
+      final capitalized = _capitalizeItem(next);
+      if (capitalized != null) return capitalized;
+    }
+    if (next.composing.isValid) return next;
     if (grew == 1) {
       final continued = _continueList(previous, next);
       if (continued != null) return continued;
@@ -71,6 +78,24 @@ abstract final class MarkupEditing {
         next.text.replaceRange(caret, caret, prefix),
         caret + prefix.length,
       );
+    }
+    return null;
+  }
+
+  /// [next] with a capital for the letter just typed, if that letter is
+  /// all an item holds. Keeps the composing range, which the keyboard is
+  /// still working on.
+  static TextEditingValue? _capitalizeItem(TextEditingValue next) {
+    final sel = next.selection;
+    if (!sel.isValid || !sel.isCollapsed || sel.baseOffset < 1) return null;
+    final at = sel.baseOffset - 1;
+    final typed = next.text[at];
+    final upper = typed.toUpperCase();
+    if (upper == typed || upper.length != 1) return null;
+    for (final span in NoteMarkup.find(next.text)) {
+      if (span.isLine && span.contentStart == at && span.contentEnd == at + 1) {
+        return next.copyWith(text: next.text.replaceRange(at, at + 1, upper));
+      }
     }
     return null;
   }

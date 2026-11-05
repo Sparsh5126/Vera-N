@@ -180,10 +180,16 @@ class SuggestionActions {
     return () => suggestions.putBack(s);
   }
 
-  /// Keeps it dimmed; it comes back in a later batch until it expires.
+  /// Keeps it dimmed; Review shows it again after [AiSettings.notSureRest],
+  /// until it expires. Undo restores how it was.
   Future<Undo> notSure(Suggestion s) async {
-    await suggestions.setNotSure(s.id, notSure: true);
-    return () => suggestions.setNotSure(s.id, notSure: s.notSure);
+    await suggestions.setNotSure(
+      s.id,
+      notSure: true,
+      until: _clock().add(AiSettings.notSureRest),
+    );
+    return () =>
+        suggestions.setNotSure(s.id, notSure: s.notSure, until: s.returnsAt);
   }
 
   Rejection _rejection(

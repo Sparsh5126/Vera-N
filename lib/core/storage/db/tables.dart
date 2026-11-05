@@ -173,6 +173,9 @@ class Suggestions extends Table {
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get expiresAt => dateTime()();
 
+  /// "Not sure": Review and the Home card leave it out until then (schema 8).
+  DateTimeColumn get returnsAt => dateTime().nullable()();
+
   @override
   List<Set<Column<Object>>> get uniqueKeys => [
     {kind, noteA, noteB, tag},

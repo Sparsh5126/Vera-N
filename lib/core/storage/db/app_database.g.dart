@@ -2762,6 +2762,17 @@ class $SuggestionsTable extends Suggestions
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _returnsAtMeta = const VerificationMeta(
+    'returnsAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> returnsAt = GeneratedColumn<DateTime>(
+    'returns_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2777,6 +2788,7 @@ class $SuggestionsTable extends Suggestions
     status,
     createdAt,
     expiresAt,
+    returnsAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2883,6 +2895,12 @@ class $SuggestionsTable extends Suggestions
     } else if (isInserting) {
       context.missing(_expiresAtMeta);
     }
+    if (data.containsKey('returns_at')) {
+      context.handle(
+        _returnsAtMeta,
+        returnsAt.isAcceptableOrUnknown(data['returns_at']!, _returnsAtMeta),
+      );
+    }
     return context;
   }
 
@@ -2948,6 +2966,10 @@ class $SuggestionsTable extends Suggestions
         DriftSqlType.dateTime,
         data['${effectivePrefix}expires_at'],
       )!,
+      returnsAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}returns_at'],
+      ),
     );
   }
 
@@ -2988,6 +3010,9 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
   final String status;
   final DateTime createdAt;
   final DateTime expiresAt;
+
+  /// "Not sure": Review and the Home card leave it out until then (schema 8).
+  final DateTime? returnsAt;
   const SuggestionRow({
     required this.id,
     required this.kind,
@@ -3002,6 +3027,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     required this.status,
     required this.createdAt,
     required this.expiresAt,
+    this.returnsAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3019,6 +3045,9 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     map['status'] = Variable<String>(status);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['expires_at'] = Variable<DateTime>(expiresAt);
+    if (!nullToAbsent || returnsAt != null) {
+      map['returns_at'] = Variable<DateTime>(returnsAt);
+    }
     return map;
   }
 
@@ -3037,6 +3066,9 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       status: Value(status),
       createdAt: Value(createdAt),
       expiresAt: Value(expiresAt),
+      returnsAt: returnsAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(returnsAt),
     );
   }
 
@@ -3059,6 +3091,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       status: serializer.fromJson<String>(json['status']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       expiresAt: serializer.fromJson<DateTime>(json['expiresAt']),
+      returnsAt: serializer.fromJson<DateTime?>(json['returnsAt']),
     );
   }
   @override
@@ -3078,6 +3111,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       'status': serializer.toJson<String>(status),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'expiresAt': serializer.toJson<DateTime>(expiresAt),
+      'returnsAt': serializer.toJson<DateTime?>(returnsAt),
     };
   }
 
@@ -3095,6 +3129,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     String? status,
     DateTime? createdAt,
     DateTime? expiresAt,
+    Value<DateTime?> returnsAt = const Value.absent(),
   }) => SuggestionRow(
     id: id ?? this.id,
     kind: kind ?? this.kind,
@@ -3109,6 +3144,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     status: status ?? this.status,
     createdAt: createdAt ?? this.createdAt,
     expiresAt: expiresAt ?? this.expiresAt,
+    returnsAt: returnsAt.present ? returnsAt.value : this.returnsAt,
   );
   SuggestionRow copyWithCompanion(SuggestionsCompanion data) {
     return SuggestionRow(
@@ -3127,6 +3163,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
       status: data.status.present ? data.status.value : this.status,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       expiresAt: data.expiresAt.present ? data.expiresAt.value : this.expiresAt,
+      returnsAt: data.returnsAt.present ? data.returnsAt.value : this.returnsAt,
     );
   }
 
@@ -3145,7 +3182,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
           ..write('chunkB: $chunkB, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
-          ..write('expiresAt: $expiresAt')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('returnsAt: $returnsAt')
           ..write(')'))
         .toString();
   }
@@ -3165,6 +3203,7 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
     status,
     createdAt,
     expiresAt,
+    returnsAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -3182,7 +3221,8 @@ class SuggestionRow extends DataClass implements Insertable<SuggestionRow> {
           other.chunkB == this.chunkB &&
           other.status == this.status &&
           other.createdAt == this.createdAt &&
-          other.expiresAt == this.expiresAt);
+          other.expiresAt == this.expiresAt &&
+          other.returnsAt == this.returnsAt);
 }
 
 class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
@@ -3199,6 +3239,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
   final Value<String> status;
   final Value<DateTime> createdAt;
   final Value<DateTime> expiresAt;
+  final Value<DateTime?> returnsAt;
   const SuggestionsCompanion({
     this.id = const Value.absent(),
     this.kind = const Value.absent(),
@@ -3213,6 +3254,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.expiresAt = const Value.absent(),
+    this.returnsAt = const Value.absent(),
   });
   SuggestionsCompanion.insert({
     this.id = const Value.absent(),
@@ -3228,6 +3270,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     required String status,
     required DateTime createdAt,
     required DateTime expiresAt,
+    this.returnsAt = const Value.absent(),
   }) : kind = Value(kind),
        noteA = Value(noteA),
        noteB = Value(noteB),
@@ -3251,6 +3294,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     Expression<String>? status,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? expiresAt,
+    Expression<DateTime>? returnsAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3266,6 +3310,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
       if (status != null) 'status': status,
       if (createdAt != null) 'created_at': createdAt,
       if (expiresAt != null) 'expires_at': expiresAt,
+      if (returnsAt != null) 'returns_at': returnsAt,
     });
   }
 
@@ -3283,6 +3328,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     Value<String>? status,
     Value<DateTime>? createdAt,
     Value<DateTime>? expiresAt,
+    Value<DateTime?>? returnsAt,
   }) {
     return SuggestionsCompanion(
       id: id ?? this.id,
@@ -3298,6 +3344,7 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       expiresAt: expiresAt ?? this.expiresAt,
+      returnsAt: returnsAt ?? this.returnsAt,
     );
   }
 
@@ -3343,6 +3390,9 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
     if (expiresAt.present) {
       map['expires_at'] = Variable<DateTime>(expiresAt.value);
     }
+    if (returnsAt.present) {
+      map['returns_at'] = Variable<DateTime>(returnsAt.value);
+    }
     return map;
   }
 
@@ -3361,7 +3411,8 @@ class SuggestionsCompanion extends UpdateCompanion<SuggestionRow> {
           ..write('chunkB: $chunkB, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
-          ..write('expiresAt: $expiresAt')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('returnsAt: $returnsAt')
           ..write(')'))
         .toString();
   }
@@ -6484,6 +6535,7 @@ typedef $$SuggestionsTableCreateCompanionBuilder =
       required String status,
       required DateTime createdAt,
       required DateTime expiresAt,
+      Value<DateTime?> returnsAt,
     });
 typedef $$SuggestionsTableUpdateCompanionBuilder =
     SuggestionsCompanion Function({
@@ -6500,6 +6552,7 @@ typedef $$SuggestionsTableUpdateCompanionBuilder =
       Value<String> status,
       Value<DateTime> createdAt,
       Value<DateTime> expiresAt,
+      Value<DateTime?> returnsAt,
     });
 
 final class $$SuggestionsTableReferences
@@ -6602,6 +6655,11 @@ class $$SuggestionsTableFilterComposer
 
   ColumnFilters<DateTime> get expiresAt => $composableBuilder(
     column: $table.expiresAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get returnsAt => $composableBuilder(
+    column: $table.returnsAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6716,6 +6774,11 @@ class $$SuggestionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get returnsAt => $composableBuilder(
+    column: $table.returnsAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$NotesTableOrderingComposer get noteA {
     final $$NotesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -6807,6 +6870,9 @@ class $$SuggestionsTableAnnotationComposer
   GeneratedColumn<DateTime> get expiresAt =>
       $composableBuilder(column: $table.expiresAt, builder: (column) => column);
 
+  GeneratedColumn<DateTime> get returnsAt =>
+      $composableBuilder(column: $table.returnsAt, builder: (column) => column);
+
   $$NotesTableAnnotationComposer get noteA {
     final $$NotesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -6895,6 +6961,7 @@ class $$SuggestionsTableTableManager
                 Value<String> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> expiresAt = const Value.absent(),
+                Value<DateTime?> returnsAt = const Value.absent(),
               }) => SuggestionsCompanion(
                 id: id,
                 kind: kind,
@@ -6909,6 +6976,7 @@ class $$SuggestionsTableTableManager
                 status: status,
                 createdAt: createdAt,
                 expiresAt: expiresAt,
+                returnsAt: returnsAt,
               ),
           createCompanionCallback:
               ({
@@ -6925,6 +6993,7 @@ class $$SuggestionsTableTableManager
                 required String status,
                 required DateTime createdAt,
                 required DateTime expiresAt,
+                Value<DateTime?> returnsAt = const Value.absent(),
               }) => SuggestionsCompanion.insert(
                 id: id,
                 kind: kind,
@@ -6939,6 +7008,7 @@ class $$SuggestionsTableTableManager
                 status: status,
                 createdAt: createdAt,
                 expiresAt: expiresAt,
+                returnsAt: returnsAt,
               ),
           withReferenceMapper: (p0) => p0
               .map(

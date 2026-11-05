@@ -40,7 +40,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -77,6 +77,7 @@ class AppDatabase extends _$AppDatabase {
               suggestions.tag,
               suggestions.detail,
               suggestions.fromLaptop,
+              suggestions.returnsAt,
             ],
           ),
         );
@@ -89,6 +90,10 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(suggestions, suggestions.fromLaptop);
         }
         await m.createTable(importedResults);
+      }
+      // "Not sure" rests for a while. Before 6 the table was rebuilt above.
+      if (from >= 6 && from < 8) {
+        await m.addColumn(suggestions, suggestions.returnsAt);
       }
     },
     beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),

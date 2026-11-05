@@ -4,6 +4,13 @@ All notable changes to Vera N are documented here. Format follows [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+- **"Not sure" brought the suggestion straight back** (user, 2026-11-05). It only marked the suggestion, so the "New connections" card stayed on Home and Review showed the same card on the next visit. Now "Not sure" rests a suggestion for 3 days (`AiSettings.notSureRest`): Review, "Review more" and the Home card leave it out until then; it stays dimmed in the note and the Graph, and still expires after its 30 days. Undo restores it as it was.
+  - **Database schema 8:** a nullable `suggestions.returnsAt`, compared with the database's clock. Upgrades add the column; suggestions already marked "not sure" have none, so they show as before until chosen again.
+  - UI spec (Review, Batches) and product spec §7 updated.
+  - Tests: hidden from Review and the Home count while resting but still on the note; back after the rest; undo clears the rest and put-back keeps it.
+- **A new checklist, bullet or numbered item started in lower case** (user, 2026-11-03: "new line should start with uppercase in checklists"). The keyboard capitalizes after a line break, but before the cursor it saw the hidden `- [ ] ` marker. Now the first letter typed into an empty item becomes a capital (`MarkupEditing._capitalizeItem`), also while the keyboard is composing. Letters without a capital (Devanagari, digits) are left alone. Limit: an item can't start with a lower-case letter (for example "iPhone" gives "IPhone"). Tests: all three list kinds, while composing, and later letters, items with text and plain lines left alone. **Not yet checked on the phone** with Gboard.
+
 ## [1.0.1] - 2026-10-22
 
 Fixes for duplicated notes after pairing, copies to merge, and Merge for selected notes. `pubspec.yaml` `1.0.1+4`; the Windows installer's default and the README follow it. Shared on GitHub as release v1.0.1.
